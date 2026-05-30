@@ -1,5 +1,5 @@
-export type AlbumSource = 'manual' | 'musicbrainz';
-export type ArtworkSource = 'manual' | 'cover-art-archive' | 'remote';
+export type AlbumSource = "manual" | "musicbrainz";
+export type ArtworkSource = "manual" | "cover-art-archive" | "remote";
 
 export interface AlbumDraft {
   id: string;
@@ -27,10 +27,10 @@ export interface AlbumDraftInput {
   sourceId?: string;
 }
 
-export const defaultPalette = ['#f28c28', '#c02465', '#f4a35d', '#a98cbd', '#21889b', '#17245c'];
+export const defaultPalette = ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"];
 
 export function normalizeAlbumText(value: string): string {
-  return value.replace(/\s+/g, ' ').trim();
+  return value.replace(/\s+/g, " ").trim();
 }
 
 export function createEmptyAlbumDraft(): AlbumDraft {
@@ -40,15 +40,15 @@ export function createEmptyAlbumDraft(): AlbumDraft {
 export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
   return {
     id: input.id ?? `draft-${crypto.randomUUID()}`,
-    title: normalizeAlbumText(input.title ?? ''),
-    artist: normalizeAlbumText(input.artist ?? ''),
-    releaseDate: normalizeAlbumText(input.releaseDate ?? ''),
-    metadataLine: normalizeAlbumText(input.metadataLine ?? ''),
-    artworkUrl: input.artworkUrl ?? '',
-    artworkSource: input.artworkSource ?? 'manual',
+    title: normalizeAlbumText(input.title ?? ""),
+    artist: normalizeAlbumText(input.artist ?? ""),
+    releaseDate: normalizeAlbumText(input.releaseDate ?? ""),
+    metadataLine: normalizeAlbumText(input.metadataLine ?? ""),
+    artworkUrl: input.artworkUrl ?? "",
+    artworkSource: input.artworkSource ?? "manual",
     palette: normalizePalette(input.palette),
-    source: input.source ?? 'manual',
-    sourceId: input.sourceId ?? '',
+    source: input.source ?? "manual",
+    sourceId: input.sourceId ?? "",
   };
 }
 
