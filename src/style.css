@@ -160,3 +160,138 @@ h1 {
   width: clamp(24px, 4vw, 44px);
   aspect-ratio: 1;
 }
+
+.app-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 520px) minmax(420px, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+
+.workspace-panel {
+  min-width: 0;
+}
+
+.controls-column {
+  display: grid;
+  gap: 18px;
+}
+
+.preview-column {
+  position: sticky;
+  top: 32px;
+  display: grid;
+  place-items: center;
+}
+
+.hero-panel.compact {
+  padding: 28px;
+  border-radius: 22px;
+}
+
+.hero-panel.compact h1 {
+  font-size: clamp(2rem, 5vw, 3.6rem);
+}
+
+.control-card {
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: var(--panel);
+}
+
+.control-card h2 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.search-form,
+.field-grid {
+  display: grid;
+  gap: 12px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+button {
+  border: 0;
+  border-radius: 999px;
+  padding: 12px 18px;
+  color: #fffaf0;
+  background: var(--ink);
+  font-weight: 800;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.status-text {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.results-list,
+.palette-editor {
+  display: grid;
+  gap: 10px;
+}
+
+.result-button {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.6);
+  text-align: left;
+}
+
+.result-button span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.palette-editor {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 980px) {
+  .app-shell {
+    padding: 24px;
+  }
+
+  .app-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preview-column {
+    position: static;
+  }
+}

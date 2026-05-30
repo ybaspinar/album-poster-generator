@@ -1,0 +1,42 @@
+import { mount } from "@vue/test-utils";
+import { describe, expect, it, vi } from "vitest";
+import App from "../App.vue";
+
+vi.mock("../sources/musicbrainz", () => ({
+  searchMusicBrainzAlbums: vi.fn().mockResolvedValue([
+    {
+      title: "Kids See Ghosts",
+      artist: "Kanye West & Kid Cudi",
+      releaseDate: "2018-06-08",
+      source: "musicbrainz",
+      sourceId: "rg-1",
+    },
+  ]),
+}));
+
+vi.mock("../sources/cover-art", () => ({
+  findCoverArt: vi.fn().mockResolvedValue({
+    artworkUrl: "https://example.com/front.jpg",
+    artworkSource: "cover-art-archive",
+  }),
+}));
+
+describe("App flow", () => {
+  it("searches, selects a result, and allows manual title override", async () => {
+    const wrapper = mount(App);
+
+    await wrapper.find('[data-test="search-input"]').setValue("kids see ghosts");
+    await wrapper.find('[data-test="search-form"]').trigger("submit");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    await wrapper.find('[data-test="result-0"]').trigger("click");
+    await Promise.resolve();
+
+    expect(wrapper.text()).toContain("Kids See Ghosts");
+
+    await wrapper.find('[data-test="title-input"]').setValue("My Custom Poster Title");
+
+    expect(wrapper.text()).toContain("My Custom Poster Title");
+  });
+});
