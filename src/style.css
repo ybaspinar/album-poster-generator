@@ -78,3 +78,85 @@ h1 {
   font-size: 1.1rem;
   line-height: 1.6;
 }
+
+.poster-page {
+  width: min(100%, 720px);
+  aspect-ratio: 2480 / 3508;
+  padding: 7.2%;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.9), transparent 34%), var(--paper);
+  box-shadow: 0 32px 100px rgba(23, 23, 23, 0.18);
+}
+
+.poster-art-frame {
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: #e7ded0;
+}
+
+.poster-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.poster-art-empty {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.poster-caption {
+  padding-top: 7.5%;
+}
+
+.poster-caption h2 {
+  margin: 0;
+  font-size: clamp(2.6rem, 8vw, 5.8rem);
+  line-height: 0.88;
+  letter-spacing: -0.07em;
+  text-transform: uppercase;
+}
+
+.poster-artist {
+  margin: 2.4% 0 0;
+  font-size: clamp(1.1rem, 2.8vw, 2rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.poster-rule {
+  margin: 3.6% 0;
+  border-top: 2px solid var(--ink);
+}
+
+.poster-meta-row {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.poster-meta-row p {
+  margin: 0;
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.poster-swatches {
+  display: flex;
+  gap: 14px;
+}
+
+.poster-swatch {
+  display: block;
+  width: clamp(24px, 4vw, 44px);
+  aspect-ratio: 1;
+}
