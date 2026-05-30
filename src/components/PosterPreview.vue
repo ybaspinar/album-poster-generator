@@ -7,7 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <article class="poster-page" aria-label="Album poster preview">
+  <article data-export-poster class="poster-page" aria-label="Album poster preview">
     <div class="poster-art-frame">
       <img
         v-if="draft.artworkUrl"

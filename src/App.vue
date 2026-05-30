@@ -11,7 +11,8 @@ import {
   type AlbumDraftInput,
 } from "./domain/album";
 import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
-import { type ExportPresetId, getExportPreset } from "./export/presets";
+import { createExportFilename, type ExportPresetId, getExportPreset } from "./export/presets";
+import { exportElementAsPng } from "./export/png";
 import { findCoverArt } from "./sources/cover-art";
 
 const draft = ref<AlbumDraft>(createEmptyAlbumDraft());
@@ -44,9 +45,29 @@ function patchDraft(patch: Partial<AlbumDraft>): void {
 }
 
 async function exportPoster(): Promise<void> {
+  const posterElement = document.querySelector<HTMLElement>("[data-export-poster]");
+
+  if (!posterElement) {
+    status.value = "Poster preview is not ready to export.";
+    return;
+  }
+
   exporting.value = true;
-  status.value = `Export target: ${selectedPreset.value.label}. PNG export is wired in the export task.`;
-  exporting.value = false;
+  status.value = "Preparing PNG export…";
+
+  try {
+    await exportElementAsPng(
+      posterElement,
+      selectedPreset.value,
+      createExportFilename(draft.value.artist, draft.value.title, selectedPreset.value),
+    );
+    status.value = `Exported ${selectedPreset.value.label} PNG.`;
+  } catch (error) {
+    status.value =
+      error instanceof Error ? error.message : "PNG export failed. Try another preset.";
+  } finally {
+    exporting.value = false;
+  }
 }
 </script>
 
