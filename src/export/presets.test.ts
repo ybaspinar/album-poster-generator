@@ -19,6 +19,16 @@ describe("export presets", () => {
       heightPx: 4961,
       dpi: 300,
     });
+    expect(getExportPreset("poster-12x18")).toMatchObject({
+      widthPx: 3600,
+      heightPx: 5400,
+      dpi: 300,
+    });
+    expect(getExportPreset("square")).toMatchObject({
+      widthPx: 3600,
+      heightPx: 3600,
+      dpi: 300,
+    });
   });
 
   it("creates safe lowercase filenames", () => {
