@@ -54,6 +54,7 @@ Create or modify these files:
 ### Task 1: Scaffold VitePlus Vue project
 
 **Files:**
+
 - Create: `package.json`
 - Create: `vite.config.ts`
 - Create: `tsconfig.json`
@@ -143,31 +144,31 @@ Expected: install succeeds and the listed packages resolve from the project depe
 Write `vite.config.ts` exactly as:
 
 ```ts
-import vue from '@vitejs/plugin-vue';
-import { defineConfig } from 'vite-plus';
+import vue from "@vitejs/plugin-vue";
+import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   plugins: [vue()],
   test: {
-    environment: 'jsdom',
-    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
+    environment: "jsdom",
+    include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
     globals: true,
     coverage: {
-      reporter: ['text', 'html'],
+      reporter: ["text", "html"],
     },
   },
   lint: {
-    ignorePatterns: ['dist/**', 'coverage/**'],
+    ignorePatterns: ["dist/**", "coverage/**"],
     options: {
       typeAware: true,
       typeCheck: true,
     },
     rules: {
-      'no-console': ['error', { allow: ['error'] }],
+      "no-console": ["error", { allow: ["error"] }],
     },
   },
   fmt: {
-    ignorePatterns: ['dist/**', 'coverage/**'],
+    ignorePatterns: ["dist/**", "coverage/**"],
   },
 });
 ```
@@ -179,10 +180,7 @@ Write `tsconfig.json` exactly as:
 ```json
 {
   "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }]
 }
 ```
 
@@ -245,11 +243,11 @@ Write `tsconfig.node.json` exactly as:
 Write `src/main.ts` exactly as:
 
 ```ts
-import { createApp } from 'vue';
-import App from './App.vue';
-import './style.css';
+import { createApp } from "vue";
+import App from "./App.vue";
+import "./style.css";
 
-createApp(App).mount('#app');
+createApp(App).mount("#app");
 ```
 
 Write `src/App.vue` exactly as:
@@ -260,7 +258,9 @@ Write `src/App.vue` exactly as:
     <section class="hero-panel">
       <p class="eyebrow">Album Poster Generator</p>
       <h1>Make print-ready album posters from metadata, artwork, and your own edits.</h1>
-      <p class="hero-copy">Search, override, preview, and export a polished poster without leaving the browser.</p>
+      <p class="hero-copy">
+        Search, override, preview, and export a polished poster without leaving the browser.
+      </p>
     </section>
   </main>
 </template>
@@ -273,7 +273,13 @@ Write `src/style.css` exactly as:
   color: #171717;
   background: #f4efe6;
   font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -371,6 +377,7 @@ Expected: one commit with the VitePlus Vue scaffold.
 ### Task 2: Add album domain model
 
 **Files:**
+
 - Create: `src/domain/album.ts`
 - Create: `src/domain/album.test.ts`
 
@@ -379,36 +386,36 @@ Expected: one commit with the VitePlus Vue scaffold.
 Create `src/domain/album.test.ts`:
 
 ```ts
-import { describe, expect, it } from 'vitest';
-import { createAlbumDraft, createEmptyAlbumDraft, normalizeAlbumText } from './album';
+import { describe, expect, it } from "vitest";
+import { createAlbumDraft, createEmptyAlbumDraft, normalizeAlbumText } from "./album";
 
-describe('album draft model', () => {
-  it('creates an empty editable draft', () => {
+describe("album draft model", () => {
+  it("creates an empty editable draft", () => {
     expect(createEmptyAlbumDraft()).toEqual({
       id: expect.stringMatching(/^draft-/),
-      title: '',
-      artist: '',
-      releaseDate: '',
-      metadataLine: '',
-      artworkUrl: '',
-      artworkSource: 'manual',
-      palette: ['#f28c28', '#c02465', '#f4a35d', '#a98cbd', '#21889b', '#17245c'],
-      source: 'manual',
-      sourceId: '',
+      title: "",
+      artist: "",
+      releaseDate: "",
+      metadataLine: "",
+      artworkUrl: "",
+      artworkSource: "manual",
+      palette: ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"],
+      source: "manual",
+      sourceId: "",
     });
   });
 
-  it('normalizes noisy text fields', () => {
-    expect(normalizeAlbumText('  Kids   See\nGhosts  ')).toBe('Kids See Ghosts');
+  it("normalizes noisy text fields", () => {
+    expect(normalizeAlbumText("  Kids   See\nGhosts  ")).toBe("Kids See Ghosts");
   });
 
-  it('applies provided values while preserving defaults', () => {
-    const draft = createAlbumDraft({ title: 'Graduation', artist: 'Kanye West' });
+  it("applies provided values while preserving defaults", () => {
+    const draft = createAlbumDraft({ title: "Graduation", artist: "Kanye West" });
 
-    expect(draft.title).toBe('Graduation');
-    expect(draft.artist).toBe('Kanye West');
+    expect(draft.title).toBe("Graduation");
+    expect(draft.artist).toBe("Kanye West");
     expect(draft.palette).toHaveLength(6);
-    expect(draft.source).toBe('manual');
+    expect(draft.source).toBe("manual");
   });
 });
 ```
@@ -428,8 +435,8 @@ Expected: fail because `src/domain/album.ts` does not exist.
 Create `src/domain/album.ts`:
 
 ```ts
-export type AlbumSource = 'manual' | 'musicbrainz';
-export type ArtworkSource = 'manual' | 'cover-art-archive' | 'remote';
+export type AlbumSource = "manual" | "musicbrainz";
+export type ArtworkSource = "manual" | "cover-art-archive" | "remote";
 
 export interface AlbumDraft {
   id: string;
@@ -457,10 +464,10 @@ export interface AlbumDraftInput {
   sourceId?: string;
 }
 
-export const defaultPalette = ['#f28c28', '#c02465', '#f4a35d', '#a98cbd', '#21889b', '#17245c'];
+export const defaultPalette = ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"];
 
 export function normalizeAlbumText(value: string): string {
-  return value.replace(/\s+/g, ' ').trim();
+  return value.replace(/\s+/g, " ").trim();
 }
 
 export function createEmptyAlbumDraft(): AlbumDraft {
@@ -470,15 +477,15 @@ export function createEmptyAlbumDraft(): AlbumDraft {
 export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
   return {
     id: input.id ?? `draft-${crypto.randomUUID()}`,
-    title: normalizeAlbumText(input.title ?? ''),
-    artist: normalizeAlbumText(input.artist ?? ''),
-    releaseDate: normalizeAlbumText(input.releaseDate ?? ''),
-    metadataLine: normalizeAlbumText(input.metadataLine ?? ''),
-    artworkUrl: input.artworkUrl ?? '',
-    artworkSource: input.artworkSource ?? 'manual',
+    title: normalizeAlbumText(input.title ?? ""),
+    artist: normalizeAlbumText(input.artist ?? ""),
+    releaseDate: normalizeAlbumText(input.releaseDate ?? ""),
+    metadataLine: normalizeAlbumText(input.metadataLine ?? ""),
+    artworkUrl: input.artworkUrl ?? "",
+    artworkSource: input.artworkSource ?? "manual",
     palette: normalizePalette(input.palette),
-    source: input.source ?? 'manual',
-    sourceId: input.sourceId ?? '',
+    source: input.source ?? "manual",
+    sourceId: input.sourceId ?? "",
   };
 }
 
@@ -512,6 +519,7 @@ Expected: one commit with domain model and tests.
 ### Task 3: Add MusicBrainz source adapter
 
 **Files:**
+
 - Create: `src/sources/musicbrainz.ts`
 - Create: `src/sources/musicbrainz.test.ts`
 
@@ -520,21 +528,21 @@ Expected: one commit with domain model and tests.
 Create `src/sources/musicbrainz.test.ts`:
 
 ```ts
-import { describe, expect, it, vi } from 'vitest';
-import { searchMusicBrainzAlbums } from './musicbrainz';
+import { describe, expect, it, vi } from "vitest";
+import { searchMusicBrainzAlbums } from "./musicbrainz";
 
-describe('searchMusicBrainzAlbums', () => {
-  it('normalizes release group search results', async () => {
+describe("searchMusicBrainzAlbums", () => {
+  it("normalizes release group search results", async () => {
     const fetcher = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
-          'release-groups': [
+          "release-groups": [
             {
-              id: 'rg-1',
-              title: 'Kids See Ghosts',
-              'first-release-date': '2018-06-08',
-              'primary-type': 'Album',
-              'artist-credit': [{ name: 'Kanye West' }, { name: 'Kid Cudi' }],
+              id: "rg-1",
+              title: "Kids See Ghosts",
+              "first-release-date": "2018-06-08",
+              "primary-type": "Album",
+              "artist-credit": [{ name: "Kanye West" }, { name: "Kid Cudi" }],
             },
           ],
         }),
@@ -542,38 +550,40 @@ describe('searchMusicBrainzAlbums', () => {
       ),
     );
 
-    await expect(searchMusicBrainzAlbums('kids see ghosts', fetcher)).resolves.toEqual([
+    await expect(searchMusicBrainzAlbums("kids see ghosts", fetcher)).resolves.toEqual([
       {
-        id: 'rg-1',
-        title: 'Kids See Ghosts',
-        artist: 'Kanye West & Kid Cudi',
-        releaseDate: '2018-06-08',
-        source: 'musicbrainz',
-        sourceId: 'rg-1',
+        id: "rg-1",
+        title: "Kids See Ghosts",
+        artist: "Kanye West & Kid Cudi",
+        releaseDate: "2018-06-08",
+        source: "musicbrainz",
+        sourceId: "rg-1",
       },
     ]);
 
     expect(fetcher).toHaveBeenCalledWith(
-      'https://musicbrainz.org/ws/2/release-group?query=kids%20see%20ghosts&type=album&fmt=json&limit=8',
+      "https://musicbrainz.org/ws/2/release-group?query=kids%20see%20ghosts&type=album&fmt=json&limit=8",
       {
         headers: {
-          Accept: 'application/json',
+          Accept: "application/json",
         },
       },
     );
   });
 
-  it('returns an empty list for blank queries without fetching', async () => {
+  it("returns an empty list for blank queries without fetching", async () => {
     const fetcher = vi.fn();
 
-    await expect(searchMusicBrainzAlbums('  ', fetcher)).resolves.toEqual([]);
+    await expect(searchMusicBrainzAlbums("  ", fetcher)).resolves.toEqual([]);
     expect(fetcher).not.toHaveBeenCalled();
   });
 
-  it('throws a readable error when MusicBrainz fails', async () => {
-    const fetcher = vi.fn().mockResolvedValue(new Response('rate limited', { status: 503 }));
+  it("throws a readable error when MusicBrainz fails", async () => {
+    const fetcher = vi.fn().mockResolvedValue(new Response("rate limited", { status: 503 }));
 
-    await expect(searchMusicBrainzAlbums('test', fetcher)).rejects.toThrow('MusicBrainz search failed with status 503');
+    await expect(searchMusicBrainzAlbums("test", fetcher)).rejects.toThrow(
+      "MusicBrainz search failed with status 503",
+    );
   });
 });
 ```
@@ -593,7 +603,7 @@ Expected: fail because `src/sources/musicbrainz.ts` does not exist.
 Create `src/sources/musicbrainz.ts`:
 
 ```ts
-import type { AlbumDraftInput } from '../domain/album';
+import type { AlbumDraftInput } from "../domain/album";
 
 type Fetcher = typeof fetch;
 
@@ -604,17 +614,20 @@ interface MusicBrainzArtistCredit {
 interface MusicBrainzReleaseGroup {
   id?: string;
   title?: string;
-  'first-release-date'?: string;
-  'artist-credit'?: MusicBrainzArtistCredit[];
+  "first-release-date"?: string;
+  "artist-credit"?: MusicBrainzArtistCredit[];
 }
 
 interface MusicBrainzReleaseGroupResponse {
-  'release-groups'?: MusicBrainzReleaseGroup[];
+  "release-groups"?: MusicBrainzReleaseGroup[];
 }
 
-const musicBrainzBaseUrl = 'https://musicbrainz.org/ws/2/release-group';
+const musicBrainzBaseUrl = "https://musicbrainz.org/ws/2/release-group";
 
-export async function searchMusicBrainzAlbums(query: string, fetcher: Fetcher = fetch): Promise<AlbumDraftInput[]> {
+export async function searchMusicBrainzAlbums(
+  query: string,
+  fetcher: Fetcher = fetch,
+): Promise<AlbumDraftInput[]> {
   const normalizedQuery = query.trim();
 
   if (!normalizedQuery) {
@@ -622,14 +635,14 @@ export async function searchMusicBrainzAlbums(query: string, fetcher: Fetcher = 
   }
 
   const url = new URL(musicBrainzBaseUrl);
-  url.searchParams.set('query', normalizedQuery);
-  url.searchParams.set('type', 'album');
-  url.searchParams.set('fmt', 'json');
-  url.searchParams.set('limit', '8');
+  url.searchParams.set("query", normalizedQuery);
+  url.searchParams.set("type", "album");
+  url.searchParams.set("fmt", "json");
+  url.searchParams.set("limit", "8");
 
   const response = await fetcher(url.toString(), {
     headers: {
-      Accept: 'application/json',
+      Accept: "application/json",
     },
   });
 
@@ -638,7 +651,7 @@ export async function searchMusicBrainzAlbums(query: string, fetcher: Fetcher = 
   }
 
   const data = (await response.json()) as MusicBrainzReleaseGroupResponse;
-  return (data['release-groups'] ?? []).flatMap(normalizeReleaseGroup);
+  return (data["release-groups"] ?? []).flatMap(normalizeReleaseGroup);
 }
 
 function normalizeReleaseGroup(group: MusicBrainzReleaseGroup): AlbumDraftInput[] {
@@ -649,17 +662,19 @@ function normalizeReleaseGroup(group: MusicBrainzReleaseGroup): AlbumDraftInput[
   return [
     {
       title: group.title,
-      artist: normalizeArtistCredit(group['artist-credit'] ?? []),
-      releaseDate: group['first-release-date'] ?? '',
-      source: 'musicbrainz',
+      artist: normalizeArtistCredit(group["artist-credit"] ?? []),
+      releaseDate: group["first-release-date"] ?? "",
+      source: "musicbrainz",
       sourceId: group.id,
     },
   ];
 }
 
 function normalizeArtistCredit(credits: MusicBrainzArtistCredit[]): string {
-  const names = credits.map((credit) => credit.name?.trim()).filter((name): name is string => Boolean(name));
-  return names.join(' & ');
+  const names = credits
+    .map((credit) => credit.name?.trim())
+    .filter((name): name is string => Boolean(name));
+  return names.join(" & ");
 }
 ```
 
@@ -687,6 +702,7 @@ Expected: one commit with adapter and tests.
 ### Task 4: Add Cover Art Archive adapter
 
 **Files:**
+
 - Create: `src/sources/cover-art.ts`
 - Create: `src/sources/cover-art.test.ts`
 
@@ -695,24 +711,24 @@ Expected: one commit with adapter and tests.
 Create `src/sources/cover-art.test.ts`:
 
 ```ts
-import { describe, expect, it, vi } from 'vitest';
-import { findCoverArt } from './cover-art';
+import { describe, expect, it, vi } from "vitest";
+import { findCoverArt } from "./cover-art";
 
-describe('findCoverArt', () => {
-  it('selects front artwork from Cover Art Archive images', async () => {
+describe("findCoverArt", () => {
+  it("selects front artwork from Cover Art Archive images", async () => {
     const fetcher = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
           images: [
             {
               front: false,
-              image: 'https://example.com/back.jpg',
-              thumbnails: { large: 'https://example.com/back-large.jpg' },
+              image: "https://example.com/back.jpg",
+              thumbnails: { large: "https://example.com/back-large.jpg" },
             },
             {
               front: true,
-              image: 'https://example.com/front.jpg',
-              thumbnails: { large: 'https://example.com/front-large.jpg' },
+              image: "https://example.com/front.jpg",
+              thumbnails: { large: "https://example.com/front-large.jpg" },
             },
           ],
         }),
@@ -720,25 +736,27 @@ describe('findCoverArt', () => {
       ),
     );
 
-    await expect(findCoverArt('rg-1', fetcher)).resolves.toEqual({
-      artworkUrl: 'https://example.com/front-large.jpg',
-      artworkSource: 'cover-art-archive',
+    await expect(findCoverArt("rg-1", fetcher)).resolves.toEqual({
+      artworkUrl: "https://example.com/front-large.jpg",
+      artworkSource: "cover-art-archive",
     });
   });
 
-  it('returns an empty result when the archive has no art', async () => {
-    const fetcher = vi.fn().mockResolvedValue(new Response('', { status: 404 }));
+  it("returns an empty result when the archive has no art", async () => {
+    const fetcher = vi.fn().mockResolvedValue(new Response("", { status: 404 }));
 
-    await expect(findCoverArt('missing', fetcher)).resolves.toEqual({
-      artworkUrl: '',
-      artworkSource: 'remote',
+    await expect(findCoverArt("missing", fetcher)).resolves.toEqual({
+      artworkUrl: "",
+      artworkSource: "remote",
     });
   });
 
-  it('throws a readable error for non-404 failures', async () => {
-    const fetcher = vi.fn().mockResolvedValue(new Response('', { status: 500 }));
+  it("throws a readable error for non-404 failures", async () => {
+    const fetcher = vi.fn().mockResolvedValue(new Response("", { status: 500 }));
 
-    await expect(findCoverArt('broken', fetcher)).rejects.toThrow('Cover art lookup failed with status 500');
+    await expect(findCoverArt("broken", fetcher)).rejects.toThrow(
+      "Cover art lookup failed with status 500",
+    );
   });
 });
 ```
@@ -758,7 +776,7 @@ Expected: fail because `src/sources/cover-art.ts` does not exist.
 Create `src/sources/cover-art.ts`:
 
 ```ts
-import type { AlbumDraftInput } from '../domain/album';
+import type { AlbumDraftInput } from "../domain/album";
 
 type Fetcher = typeof fetch;
 
@@ -775,19 +793,25 @@ interface CoverArtResponse {
   images?: CoverArtImage[];
 }
 
-export async function findCoverArt(releaseGroupId: string, fetcher: Fetcher = fetch): Promise<AlbumDraftInput> {
+export async function findCoverArt(
+  releaseGroupId: string,
+  fetcher: Fetcher = fetch,
+): Promise<AlbumDraftInput> {
   const id = releaseGroupId.trim();
 
   if (!id) {
-    return { artworkUrl: '', artworkSource: 'remote' };
+    return { artworkUrl: "", artworkSource: "remote" };
   }
 
-  const response = await fetcher(`https://coverartarchive.org/release-group/${encodeURIComponent(id)}`, {
-    headers: { Accept: 'application/json' },
-  });
+  const response = await fetcher(
+    `https://coverartarchive.org/release-group/${encodeURIComponent(id)}`,
+    {
+      headers: { Accept: "application/json" },
+    },
+  );
 
   if (response.status === 404) {
-    return { artworkUrl: '', artworkSource: 'remote' };
+    return { artworkUrl: "", artworkSource: "remote" };
   }
 
   if (!response.ok) {
@@ -797,11 +821,11 @@ export async function findCoverArt(releaseGroupId: string, fetcher: Fetcher = fe
   const data = (await response.json()) as CoverArtResponse;
   const images = data.images ?? [];
   const selected = images.find((image) => image.front) ?? images[0];
-  const artworkUrl = selected?.thumbnails?.large ?? selected?.image ?? '';
+  const artworkUrl = selected?.thumbnails?.large ?? selected?.image ?? "";
 
   return {
     artworkUrl,
-    artworkSource: artworkUrl ? 'cover-art-archive' : 'remote',
+    artworkSource: artworkUrl ? "cover-art-archive" : "remote",
   };
 }
 ```
@@ -830,6 +854,7 @@ Expected: one commit with adapter and tests.
 ### Task 5: Add draft editing helpers
 
 **Files:**
+
 - Create: `src/editor/draft.ts`
 - Create: `src/editor/draft.test.ts`
 
@@ -838,39 +863,39 @@ Expected: one commit with adapter and tests.
 Create `src/editor/draft.test.ts`:
 
 ```ts
-import { describe, expect, it } from 'vitest';
-import { createAlbumDraft } from '../domain/album';
-import { applyDraftPatch, createPosterMetadataLine, mergeFetchedAlbum } from './draft';
+import { describe, expect, it } from "vitest";
+import { createAlbumDraft } from "../domain/album";
+import { applyDraftPatch, createPosterMetadataLine, mergeFetchedAlbum } from "./draft";
 
-describe('draft editing helpers', () => {
-  it('merges fetched album data into a new draft', () => {
-    const draft = mergeFetchedAlbum(createAlbumDraft({ title: 'Old' }), {
-      title: 'Kids See Ghosts',
-      artist: 'Kanye West & Kid Cudi',
-      releaseDate: '2018-06-08',
-      source: 'musicbrainz',
-      sourceId: 'rg-1',
+describe("draft editing helpers", () => {
+  it("merges fetched album data into a new draft", () => {
+    const draft = mergeFetchedAlbum(createAlbumDraft({ title: "Old" }), {
+      title: "Kids See Ghosts",
+      artist: "Kanye West & Kid Cudi",
+      releaseDate: "2018-06-08",
+      source: "musicbrainz",
+      sourceId: "rg-1",
     });
 
-    expect(draft.title).toBe('Kids See Ghosts');
-    expect(draft.artist).toBe('Kanye West & Kid Cudi');
-    expect(draft.releaseDate).toBe('2018-06-08');
-    expect(draft.source).toBe('musicbrainz');
-    expect(draft.sourceId).toBe('rg-1');
+    expect(draft.title).toBe("Kids See Ghosts");
+    expect(draft.artist).toBe("Kanye West & Kid Cudi");
+    expect(draft.releaseDate).toBe("2018-06-08");
+    expect(draft.source).toBe("musicbrainz");
+    expect(draft.sourceId).toBe("rg-1");
   });
 
-  it('applies manual overrides without mutating the previous draft', () => {
-    const original = createAlbumDraft({ title: 'Fetched', artist: 'Artist' });
-    const edited = applyDraftPatch(original, { title: 'My Version' });
+  it("applies manual overrides without mutating the previous draft", () => {
+    const original = createAlbumDraft({ title: "Fetched", artist: "Artist" });
+    const edited = applyDraftPatch(original, { title: "My Version" });
 
-    expect(original.title).toBe('Fetched');
-    expect(edited.title).toBe('My Version');
-    expect(edited.artist).toBe('Artist');
+    expect(original.title).toBe("Fetched");
+    expect(edited.title).toBe("My Version");
+    expect(edited.artist).toBe("Artist");
   });
 
-  it('creates a readable metadata line', () => {
-    expect(createPosterMetadataLine('2018-06-08', 'Kanye West & Kid Cudi')).toBe(
-      'Released: June 8, 2018 · Kanye West & Kid Cudi',
+  it("creates a readable metadata line", () => {
+    expect(createPosterMetadataLine("2018-06-08", "Kanye West & Kid Cudi")).toBe(
+      "Released: June 8, 2018 · Kanye West & Kid Cudi",
     );
   });
 });
@@ -891,14 +916,17 @@ Expected: fail because `src/editor/draft.ts` does not exist.
 Create `src/editor/draft.ts`:
 
 ```ts
-import { createAlbumDraft, type AlbumDraft, type AlbumDraftInput } from '../domain/album';
+import { createAlbumDraft, type AlbumDraft, type AlbumDraftInput } from "../domain/album";
 
 export function mergeFetchedAlbum(current: AlbumDraft, fetched: AlbumDraftInput): AlbumDraft {
   return createAlbumDraft({
     ...current,
     ...fetched,
     id: current.id,
-    metadataLine: createPosterMetadataLine(fetched.releaseDate ?? current.releaseDate, fetched.artist ?? current.artist),
+    metadataLine: createPosterMetadataLine(
+      fetched.releaseDate ?? current.releaseDate,
+      fetched.artist ?? current.artist,
+    ),
   });
 }
 
@@ -922,14 +950,14 @@ export function createPosterMetadataLine(releaseDate: string, artist: string): s
     parts.push(artist.trim());
   }
 
-  return parts.join(' · ');
+  return parts.join(" · ");
 }
 
 function formatReleaseDate(value: string): string {
   const trimmed = value.trim();
 
   if (!trimmed) {
-    return '';
+    return "";
   }
 
   const date = new Date(`${trimmed}T00:00:00Z`);
@@ -938,11 +966,11 @@ function formatReleaseDate(value: string): string {
     return trimmed;
   }
 
-  return new Intl.DateTimeFormat('en', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'UTC',
+  return new Intl.DateTimeFormat("en", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
   }).format(date);
 }
 ```
@@ -971,6 +999,7 @@ Expected: one commit with draft editing helpers and tests.
 ### Task 6: Add image upload and palette utilities
 
 **Files:**
+
 - Create: `src/media/image-upload.ts`
 - Create: `src/media/image-upload.test.ts`
 - Create: `src/media/palette.ts`
@@ -981,26 +1010,32 @@ Expected: one commit with draft editing helpers and tests.
 Create `src/media/image-upload.test.ts`:
 
 ```ts
-import { describe, expect, it } from 'vitest';
-import { validateArtworkFile } from './image-upload';
+import { describe, expect, it } from "vitest";
+import { validateArtworkFile } from "./image-upload";
 
-describe('validateArtworkFile', () => {
-  it('accepts common image files under the size limit', () => {
-    const file = new File(['image'], 'cover.png', { type: 'image/png' });
+describe("validateArtworkFile", () => {
+  it("accepts common image files under the size limit", () => {
+    const file = new File(["image"], "cover.png", { type: "image/png" });
 
-    expect(validateArtworkFile(file)).toEqual({ ok: true, message: '' });
+    expect(validateArtworkFile(file)).toEqual({ ok: true, message: "" });
   });
 
-  it('rejects non-image files', () => {
-    const file = new File(['text'], 'notes.txt', { type: 'text/plain' });
+  it("rejects non-image files", () => {
+    const file = new File(["text"], "notes.txt", { type: "text/plain" });
 
-    expect(validateArtworkFile(file)).toEqual({ ok: false, message: 'Choose a PNG, JPEG, or WebP image.' });
+    expect(validateArtworkFile(file)).toEqual({
+      ok: false,
+      message: "Choose a PNG, JPEG, or WebP image.",
+    });
   });
 
-  it('rejects files above 15 MB', () => {
-    const file = new File([new Uint8Array(16 * 1024 * 1024)], 'huge.jpg', { type: 'image/jpeg' });
+  it("rejects files above 15 MB", () => {
+    const file = new File([new Uint8Array(16 * 1024 * 1024)], "huge.jpg", { type: "image/jpeg" });
 
-    expect(validateArtworkFile(file)).toEqual({ ok: false, message: 'Choose an image smaller than 15 MB.' });
+    expect(validateArtworkFile(file)).toEqual({
+      ok: false,
+      message: "Choose an image smaller than 15 MB.",
+    });
   });
 });
 ```
@@ -1010,25 +1045,21 @@ describe('validateArtworkFile', () => {
 Create `src/media/palette.test.ts`:
 
 ```ts
-import { describe, expect, it } from 'vitest';
-import { quantizePixelsToPalette, rgbToHex } from './palette';
+import { describe, expect, it } from "vitest";
+import { quantizePixelsToPalette, rgbToHex } from "./palette";
 
-describe('palette helpers', () => {
-  it('converts RGB values to hex', () => {
-    expect(rgbToHex(242, 140, 40)).toBe('#f28c28');
+describe("palette helpers", () => {
+  it("converts RGB values to hex", () => {
+    expect(rgbToHex(242, 140, 40)).toBe("#f28c28");
   });
 
-  it('quantizes pixels into up to six stable colors', () => {
+  it("quantizes pixels into up to six stable colors", () => {
     const pixels = new Uint8ClampedArray([
-      242, 140, 40, 255,
-      242, 140, 40, 255,
-      192, 36, 101, 255,
-      33, 136, 155, 255,
-      23, 36, 92, 255,
+      242, 140, 40, 255, 242, 140, 40, 255, 192, 36, 101, 255, 33, 136, 155, 255, 23, 36, 92, 255,
       255, 255, 255, 0,
     ]);
 
-    expect(quantizePixelsToPalette(pixels)).toEqual(['#f08c28', '#c02468', '#20889c', '#18245c']);
+    expect(quantizePixelsToPalette(pixels)).toEqual(["#f08c28", "#c02468", "#20889c", "#18245c"]);
   });
 });
 ```
@@ -1053,19 +1084,19 @@ export interface ValidationResult {
   message: string;
 }
 
-const acceptedTypes = new Set(['image/png', 'image/jpeg', 'image/webp']);
+const acceptedTypes = new Set(["image/png", "image/jpeg", "image/webp"]);
 const maxArtworkBytes = 15 * 1024 * 1024;
 
 export function validateArtworkFile(file: File): ValidationResult {
   if (!acceptedTypes.has(file.type)) {
-    return { ok: false, message: 'Choose a PNG, JPEG, or WebP image.' };
+    return { ok: false, message: "Choose a PNG, JPEG, or WebP image." };
   }
 
   if (file.size > maxArtworkBytes) {
-    return { ok: false, message: 'Choose an image smaller than 15 MB.' };
+    return { ok: false, message: "Choose an image smaller than 15 MB." };
   }
 
-  return { ok: true, message: '' };
+  return { ok: true, message: "" };
 }
 
 export function createArtworkObjectUrl(file: File): string {
@@ -1078,10 +1109,10 @@ export function createArtworkObjectUrl(file: File): string {
 Create `src/media/palette.ts`:
 
 ```ts
-import { defaultPalette } from '../domain/album';
+import { defaultPalette } from "../domain/album";
 
 export function rgbToHex(red: number, green: number, blue: number): string {
-  return `#${[red, green, blue].map((value) => value.toString(16).padStart(2, '0')).join('')}`;
+  return `#${[red, green, blue].map((value) => value.toString(16).padStart(2, "0")).join("")}`;
 }
 
 export function quantizePixelsToPalette(pixels: Uint8ClampedArray, maxColors = 6): string[] {
@@ -1109,8 +1140,8 @@ export function quantizePixelsToPalette(pixels: Uint8ClampedArray, maxColors = 6
 
 export async function extractPaletteFromImage(url: string, maxColors = 6): Promise<string[]> {
   const image = await loadImage(url);
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d', { willReadFrequently: true });
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { willReadFrequently: true });
 
   if (!context) {
     return defaultPalette;
@@ -1132,9 +1163,11 @@ function quantizeChannel(value: number): number {
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.crossOrigin = 'anonymous';
-    image.addEventListener('load', () => resolve(image));
-    image.addEventListener('error', () => reject(new Error('Image could not be loaded for palette extraction.')));
+    image.crossOrigin = "anonymous";
+    image.addEventListener("load", () => resolve(image));
+    image.addEventListener("error", () =>
+      reject(new Error("Image could not be loaded for palette extraction.")),
+    );
     image.src = url;
   });
 }
@@ -1164,6 +1197,7 @@ Expected: one commit with media utilities and tests.
 ### Task 7: Add export presets
 
 **Files:**
+
 - Create: `src/export/presets.ts`
 - Create: `src/export/presets.test.ts`
 
@@ -1172,20 +1206,37 @@ Expected: one commit with media utilities and tests.
 Create `src/export/presets.test.ts`:
 
 ```ts
-import { describe, expect, it } from 'vitest';
-import { createExportFilename, exportPresets, getExportPreset } from './presets';
+import { describe, expect, it } from "vitest";
+import { createExportFilename, exportPresets, getExportPreset } from "./presets";
 
-describe('export presets', () => {
-  it('defines initial print presets at 300 DPI', () => {
-    expect(exportPresets.map((preset) => preset.id)).toEqual(['a4-portrait', 'a3-portrait', 'poster-12x18', 'square']);
-    expect(getExportPreset('a4-portrait')).toMatchObject({ widthPx: 2480, heightPx: 3508, dpi: 300 });
-    expect(getExportPreset('a3-portrait')).toMatchObject({ widthPx: 3508, heightPx: 4961, dpi: 300 });
+describe("export presets", () => {
+  it("defines initial print presets at 300 DPI", () => {
+    expect(exportPresets.map((preset) => preset.id)).toEqual([
+      "a4-portrait",
+      "a3-portrait",
+      "poster-12x18",
+      "square",
+    ]);
+    expect(getExportPreset("a4-portrait")).toMatchObject({
+      widthPx: 2480,
+      heightPx: 3508,
+      dpi: 300,
+    });
+    expect(getExportPreset("a3-portrait")).toMatchObject({
+      widthPx: 3508,
+      heightPx: 4961,
+      dpi: 300,
+    });
   });
 
-  it('creates safe lowercase filenames', () => {
-    expect(createExportFilename('Kanye West & Kid Cudi', 'Kids See Ghosts', getExportPreset('a4-portrait'))).toBe(
-      'kanye-west-kid-cudi-kids-see-ghosts-a4.png',
-    );
+  it("creates safe lowercase filenames", () => {
+    expect(
+      createExportFilename(
+        "Kanye West & Kid Cudi",
+        "Kids See Ghosts",
+        getExportPreset("a4-portrait"),
+      ),
+    ).toBe("kanye-west-kid-cudi-kids-see-ghosts-a4.png");
   });
 });
 ```
@@ -1205,7 +1256,7 @@ Expected: fail because `src/export/presets.ts` does not exist.
 Create `src/export/presets.ts`:
 
 ```ts
-export type ExportPresetId = 'a4-portrait' | 'a3-portrait' | 'poster-12x18' | 'square';
+export type ExportPresetId = "a4-portrait" | "a3-portrait" | "poster-12x18" | "square";
 
 export interface ExportPreset {
   id: ExportPresetId;
@@ -1220,44 +1271,44 @@ export interface ExportPreset {
 
 export const exportPresets: ExportPreset[] = [
   {
-    id: 'a4-portrait',
-    label: 'A4 Portrait',
+    id: "a4-portrait",
+    label: "A4 Portrait",
     widthIn: 8.27,
     heightIn: 11.69,
     widthPx: 2480,
     heightPx: 3508,
     dpi: 300,
-    filenameSuffix: 'a4',
+    filenameSuffix: "a4",
   },
   {
-    id: 'a3-portrait',
-    label: 'A3 Portrait',
+    id: "a3-portrait",
+    label: "A3 Portrait",
     widthIn: 11.69,
     heightIn: 16.54,
     widthPx: 3508,
     heightPx: 4961,
     dpi: 300,
-    filenameSuffix: 'a3',
+    filenameSuffix: "a3",
   },
   {
-    id: 'poster-12x18',
-    label: '12×18 Poster',
+    id: "poster-12x18",
+    label: "12×18 Poster",
     widthIn: 12,
     heightIn: 18,
     widthPx: 3600,
     heightPx: 5400,
     dpi: 300,
-    filenameSuffix: '12x18',
+    filenameSuffix: "12x18",
   },
   {
-    id: 'square',
-    label: 'Square Poster',
+    id: "square",
+    label: "Square Poster",
     widthIn: 12,
     heightIn: 12,
     widthPx: 3600,
     heightPx: 3600,
     dpi: 300,
-    filenameSuffix: 'square',
+    filenameSuffix: "square",
   },
 ];
 
@@ -1272,20 +1323,17 @@ export function getExportPreset(id: ExportPresetId): ExportPreset {
 }
 
 export function createExportFilename(artist: string, title: string, preset: ExportPreset): string {
-  const base = [artist, title, preset.filenameSuffix]
-    .map(slugify)
-    .filter(Boolean)
-    .join('-');
+  const base = [artist, title, preset.filenameSuffix].map(slugify).filter(Boolean).join("-");
 
-  return `${base || 'album-poster'}.png`;
+  return `${base || "album-poster"}.png`;
 }
 
 function slugify(value: string): string {
   return value
     .toLowerCase()
-    .replace(/&/g, ' ')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
+    .replace(/&/g, " ")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 ```
 
@@ -1313,6 +1361,7 @@ Expected: one commit with export presets and tests.
 ### Task 8: Add poster preview template
 
 **Files:**
+
 - Create: `src/components/PosterPreview.vue`
 - Create: `src/components/PosterPreview.test.ts`
 - Modify: `src/style.css`
@@ -1322,30 +1371,30 @@ Expected: one commit with export presets and tests.
 Create `src/components/PosterPreview.test.ts`:
 
 ```ts
-import { mount } from '@vue/test-utils';
-import { describe, expect, it } from 'vitest';
-import { createAlbumDraft } from '../domain/album';
-import PosterPreview from './PosterPreview.vue';
+import { mount } from "@vue/test-utils";
+import { describe, expect, it } from "vitest";
+import { createAlbumDraft } from "../domain/album";
+import PosterPreview from "./PosterPreview.vue";
 
-describe('PosterPreview', () => {
-  it('renders album poster content and palette swatches', () => {
+describe("PosterPreview", () => {
+  it("renders album poster content and palette swatches", () => {
     const wrapper = mount(PosterPreview, {
       props: {
         draft: createAlbumDraft({
-          title: 'Kids See Ghosts',
-          artist: 'Kanye West & Kid Cudi',
-          releaseDate: '2018-06-08',
-          metadataLine: 'Released: June 8, 2018 · Kanye West & Kid Cudi',
-          artworkUrl: 'https://example.com/cover.jpg',
-          palette: ['#f28c28', '#c02465', '#f4a35d', '#a98cbd', '#21889b', '#17245c'],
+          title: "Kids See Ghosts",
+          artist: "Kanye West & Kid Cudi",
+          releaseDate: "2018-06-08",
+          metadataLine: "Released: June 8, 2018 · Kanye West & Kid Cudi",
+          artworkUrl: "https://example.com/cover.jpg",
+          palette: ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"],
         }),
       },
     });
 
-    expect(wrapper.text()).toContain('Kids See Ghosts');
-    expect(wrapper.text()).toContain('Kanye West & Kid Cudi');
-    expect(wrapper.find('img').attributes('src')).toBe('https://example.com/cover.jpg');
-    expect(wrapper.findAll('.poster-swatch')).toHaveLength(6);
+    expect(wrapper.text()).toContain("Kids See Ghosts");
+    expect(wrapper.text()).toContain("Kanye West & Kid Cudi");
+    expect(wrapper.find("img").attributes("src")).toBe("https://example.com/cover.jpg");
+    expect(wrapper.findAll(".poster-swatch")).toHaveLength(6);
   });
 });
 ```
@@ -1366,7 +1415,7 @@ Create `src/components/PosterPreview.vue`:
 
 ```vue
 <script setup lang="ts">
-import type { AlbumDraft } from '../domain/album';
+import type { AlbumDraft } from "../domain/album";
 
 defineProps<{
   draft: AlbumDraft;
@@ -1376,18 +1425,23 @@ defineProps<{
 <template>
   <article class="poster-page" aria-label="Album poster preview">
     <div class="poster-art-frame">
-      <img v-if="draft.artworkUrl" :src="draft.artworkUrl" :alt="`${draft.title || 'Album'} artwork`" class="poster-art" />
+      <img
+        v-if="draft.artworkUrl"
+        :src="draft.artworkUrl"
+        :alt="`${draft.title || 'Album'} artwork`"
+        class="poster-art"
+      />
       <div v-else class="poster-art poster-art-empty">
         <span>Add artwork</span>
       </div>
     </div>
 
     <section class="poster-caption">
-      <h2>{{ draft.title || 'Untitled Album' }}</h2>
-      <p class="poster-artist">{{ draft.artist || 'Unknown Artist' }}</p>
+      <h2>{{ draft.title || "Untitled Album" }}</h2>
+      <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
       <div class="poster-rule" />
       <div class="poster-meta-row">
-        <p>{{ draft.metadataLine || draft.releaseDate || 'Release date' }}</p>
+        <p>{{ draft.metadataLine || draft.releaseDate || "Release date" }}</p>
         <div class="poster-swatches" aria-label="Poster palette">
           <span
             v-for="color in draft.palette"
@@ -1413,8 +1467,7 @@ Append to `src/style.css`:
   padding: 7.2%;
   color: var(--ink);
   background:
-    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.9), transparent 34%),
-    var(--paper);
+    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.9), transparent 34%), var(--paper);
   box-shadow: 0 32px 100px rgba(23, 23, 23, 0.18);
 }
 
@@ -1515,6 +1568,7 @@ Expected: one commit with the poster template and test.
 ### Task 9: Add editor/search UI flow
 
 **Files:**
+
 - Create: `src/components/AlbumSearch.vue`
 - Create: `src/components/AlbumEditor.vue`
 - Create: `src/components/ExportPanel.vue`
@@ -1527,46 +1581,46 @@ Expected: one commit with the poster template and test.
 Create `src/components/AppFlow.test.ts`:
 
 ```ts
-import { mount } from '@vue/test-utils';
-import { describe, expect, it, vi } from 'vitest';
-import App from '../App.vue';
+import { mount } from "@vue/test-utils";
+import { describe, expect, it, vi } from "vitest";
+import App from "../App.vue";
 
-vi.mock('../sources/musicbrainz', () => ({
+vi.mock("../sources/musicbrainz", () => ({
   searchMusicBrainzAlbums: vi.fn().mockResolvedValue([
     {
-      title: 'Kids See Ghosts',
-      artist: 'Kanye West & Kid Cudi',
-      releaseDate: '2018-06-08',
-      source: 'musicbrainz',
-      sourceId: 'rg-1',
+      title: "Kids See Ghosts",
+      artist: "Kanye West & Kid Cudi",
+      releaseDate: "2018-06-08",
+      source: "musicbrainz",
+      sourceId: "rg-1",
     },
   ]),
 }));
 
-vi.mock('../sources/cover-art', () => ({
+vi.mock("../sources/cover-art", () => ({
   findCoverArt: vi.fn().mockResolvedValue({
-    artworkUrl: 'https://example.com/front.jpg',
-    artworkSource: 'cover-art-archive',
+    artworkUrl: "https://example.com/front.jpg",
+    artworkSource: "cover-art-archive",
   }),
 }));
 
-describe('App flow', () => {
-  it('searches, selects a result, and allows manual title override', async () => {
+describe("App flow", () => {
+  it("searches, selects a result, and allows manual title override", async () => {
     const wrapper = mount(App);
 
-    await wrapper.find('[data-test="search-input"]').setValue('kids see ghosts');
-    await wrapper.find('[data-test="search-form"]').trigger('submit');
+    await wrapper.find('[data-test="search-input"]').setValue("kids see ghosts");
+    await wrapper.find('[data-test="search-form"]').trigger("submit");
     await Promise.resolve();
     await Promise.resolve();
 
-    await wrapper.find('[data-test="result-0"]').trigger('click');
+    await wrapper.find('[data-test="result-0"]').trigger("click");
     await Promise.resolve();
 
-    expect(wrapper.text()).toContain('Kids See Ghosts');
+    expect(wrapper.text()).toContain("Kids See Ghosts");
 
-    await wrapper.find('[data-test="title-input"]').setValue('My Custom Poster Title');
+    await wrapper.find('[data-test="title-input"]').setValue("My Custom Poster Title");
 
-    expect(wrapper.text()).toContain('My Custom Poster Title');
+    expect(wrapper.text()).toContain("My Custom Poster Title");
   });
 });
 ```
@@ -1587,28 +1641,30 @@ Create `src/components/AlbumSearch.vue`:
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue';
-import type { AlbumDraftInput } from '../domain/album';
-import { searchMusicBrainzAlbums } from '../sources/musicbrainz';
+import { ref } from "vue";
+import type { AlbumDraftInput } from "../domain/album";
+import { searchMusicBrainzAlbums } from "../sources/musicbrainz";
 
 const emit = defineEmits<{
   select: [album: AlbumDraftInput];
 }>();
 
-const query = ref('');
+const query = ref("");
 const results = ref<AlbumDraftInput[]>([]);
-const status = ref('');
+const status = ref("");
 const loading = ref(false);
 
 async function search(): Promise<void> {
   loading.value = true;
-  status.value = '';
+  status.value = "";
 
   try {
     results.value = await searchMusicBrainzAlbums(query.value);
-    status.value = results.value.length ? `${results.value.length} result${results.value.length === 1 ? '' : 's'} found.` : 'No results found. Start manually or adjust the query.';
+    status.value = results.value.length
+      ? `${results.value.length} result${results.value.length === 1 ? "" : "s"} found.`
+      : "No results found. Start manually or adjust the query.";
   } catch (error) {
-    status.value = error instanceof Error ? error.message : 'MusicBrainz search failed.';
+    status.value = error instanceof Error ? error.message : "MusicBrainz search failed.";
     results.value = [];
   } finally {
     loading.value = false;
@@ -1622,9 +1678,14 @@ async function search(): Promise<void> {
     <form data-test="search-form" class="search-form" @submit.prevent="search">
       <label>
         Album search
-        <input data-test="search-input" v-model="query" type="search" aria-label="Album search example: Kids See Ghosts" />
+        <input
+          data-test="search-input"
+          v-model="query"
+          type="search"
+          aria-label="Album search example: Kids See Ghosts"
+        />
       </label>
-      <button type="submit" :disabled="loading">{{ loading ? 'Searching…' : 'Search' }}</button>
+      <button type="submit" :disabled="loading">{{ loading ? "Searching…" : "Search" }}</button>
     </form>
     <p v-if="status" class="status-text">{{ status }}</p>
     <div class="results-list">
@@ -1637,7 +1698,10 @@ async function search(): Promise<void> {
         @click="emit('select', result)"
       >
         <strong>{{ result.title }}</strong>
-        <span>{{ result.artist || 'Unknown artist' }} · {{ result.releaseDate || 'Unknown date' }}</span>
+        <span
+          >{{ result.artist || "Unknown artist" }} ·
+          {{ result.releaseDate || "Unknown date" }}</span
+        >
       </button>
     </div>
   </section>
@@ -1650,8 +1714,8 @@ Create `src/components/AlbumEditor.vue`:
 
 ```vue
 <script setup lang="ts">
-import type { AlbumDraft } from '../domain/album';
-import { createArtworkObjectUrl, validateArtworkFile } from '../media/image-upload';
+import type { AlbumDraft } from "../domain/album";
+import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
 
 const props = defineProps<{
   draft: AlbumDraft;
@@ -1661,16 +1725,19 @@ const emit = defineEmits<{
   patch: [patch: Partial<AlbumDraft>];
 }>();
 
-function updateField(field: keyof Pick<AlbumDraft, 'title' | 'artist' | 'releaseDate' | 'metadataLine' | 'artworkUrl'>, event: Event): void {
+function updateField(
+  field: keyof Pick<AlbumDraft, "title" | "artist" | "releaseDate" | "metadataLine" | "artworkUrl">,
+  event: Event,
+): void {
   const target = event.target as HTMLInputElement;
-  emit('patch', { [field]: target.value });
+  emit("patch", { [field]: target.value });
 }
 
 function updatePalette(index: number, event: Event): void {
   const target = event.target as HTMLInputElement;
   const palette = [...props.draft.palette];
   palette[index] = target.value;
-  emit('patch', { palette });
+  emit("patch", { palette });
 }
 
 function uploadArtwork(event: Event): void {
@@ -1685,11 +1752,11 @@ function uploadArtwork(event: Event): void {
 
   if (!result.ok) {
     window.alert(result.message);
-    target.value = '';
+    target.value = "";
     return;
   }
 
-  emit('patch', { artworkUrl: createArtworkObjectUrl(file), artworkSource: 'manual' });
+  emit("patch", { artworkUrl: createArtworkObjectUrl(file), artworkSource: "manual" });
 }
 </script>
 
@@ -1707,7 +1774,11 @@ function uploadArtwork(event: Event): void {
       </label>
       <label>
         Release date
-        <input :value="draft.releaseDate" aria-label="Release date, for example 2018-06-08" @input="updateField('releaseDate', $event)" />
+        <input
+          :value="draft.releaseDate"
+          aria-label="Release date, for example 2018-06-08"
+          @input="updateField('releaseDate', $event)"
+        />
       </label>
       <label>
         Metadata line
@@ -1738,7 +1809,7 @@ Create `src/components/ExportPanel.vue`:
 
 ```vue
 <script setup lang="ts">
-import { exportPresets, type ExportPresetId } from '../export/presets';
+import { exportPresets, type ExportPresetId } from "../export/presets";
 
 defineProps<{
   selectedPresetId: ExportPresetId;
@@ -1756,14 +1827,22 @@ const emit = defineEmits<{
     <h2>Export</h2>
     <label>
       Print preset
-      <select :value="selectedPresetId" @change="emit('selectPreset', ($event.target as HTMLSelectElement).value as ExportPresetId)">
+      <select
+        :value="selectedPresetId"
+        @change="emit('selectPreset', ($event.target as HTMLSelectElement).value as ExportPresetId)"
+      >
         <option v-for="preset in exportPresets" :key="preset.id" :value="preset.id">
           {{ preset.label }} · {{ preset.widthPx }}×{{ preset.heightPx }} px
         </option>
       </select>
     </label>
-    <button data-test="export-button" type="button" :disabled="exporting" @click="emit('exportPoster')">
-      {{ exporting ? 'Exporting…' : 'Export PNG' }}
+    <button
+      data-test="export-button"
+      type="button"
+      :disabled="exporting"
+      @click="emit('exportPoster')"
+    >
+      {{ exporting ? "Exporting…" : "Export PNG" }}
     </button>
   </section>
 </template>
@@ -1775,38 +1854,44 @@ Write `src/App.vue` exactly as:
 
 ```vue
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import AlbumEditor from './components/AlbumEditor.vue';
-import AlbumSearch from './components/AlbumSearch.vue';
-import ExportPanel from './components/ExportPanel.vue';
-import PosterPreview from './components/PosterPreview.vue';
-import { createAlbumDraft, createEmptyAlbumDraft, type AlbumDraft, type AlbumDraftInput } from './domain/album';
-import { applyDraftPatch, mergeFetchedAlbum } from './editor/draft';
-import { type ExportPresetId, getExportPreset } from './export/presets';
-import { findCoverArt } from './sources/cover-art';
+import { computed, ref } from "vue";
+import AlbumEditor from "./components/AlbumEditor.vue";
+import AlbumSearch from "./components/AlbumSearch.vue";
+import ExportPanel from "./components/ExportPanel.vue";
+import PosterPreview from "./components/PosterPreview.vue";
+import {
+  createAlbumDraft,
+  createEmptyAlbumDraft,
+  type AlbumDraft,
+  type AlbumDraftInput,
+} from "./domain/album";
+import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
+import { type ExportPresetId, getExportPreset } from "./export/presets";
+import { findCoverArt } from "./sources/cover-art";
 
 const draft = ref<AlbumDraft>(createEmptyAlbumDraft());
-const selectedPresetId = ref<ExportPresetId>('a4-portrait');
+const selectedPresetId = ref<ExportPresetId>("a4-portrait");
 const exporting = ref(false);
-const status = ref('');
+const status = ref("");
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
 
 async function selectAlbum(album: AlbumDraftInput): Promise<void> {
   draft.value = mergeFetchedAlbum(draft.value, album);
-  status.value = 'Album data loaded. You can override every field.';
+  status.value = "Album data loaded. You can override every field.";
 
   if (album.sourceId) {
     try {
       draft.value = applyDraftPatch(draft.value, await findCoverArt(album.sourceId));
     } catch (error) {
-      status.value = error instanceof Error ? error.message : 'Artwork lookup failed. Add artwork manually.';
+      status.value =
+        error instanceof Error ? error.message : "Artwork lookup failed. Add artwork manually.";
     }
   }
 }
 
 function startManual(): void {
   draft.value = createAlbumDraft();
-  status.value = 'Manual draft ready.';
+  status.value = "Manual draft ready.";
 }
 
 function patchDraft(patch: Partial<AlbumDraft>): void {
@@ -1826,7 +1911,9 @@ async function exportPoster(): Promise<void> {
       <div class="hero-panel compact">
         <p class="eyebrow">Album Poster Generator</p>
         <h1>Make print-ready album posters.</h1>
-        <p class="hero-copy">Fetch metadata, override anything, and keep the poster browser-only.</p>
+        <p class="hero-copy">
+          Fetch metadata, override anything, and keep the poster browser-only.
+        </p>
         <button type="button" @click="startManual">Start manually</button>
       </div>
       <AlbumSearch @select="selectAlbum" />
@@ -2011,6 +2098,7 @@ Expected: one commit with the working search/edit/preview flow.
 ### Task 10: Add PNG export engine
 
 **Files:**
+
 - Create: `src/export/png.ts`
 - Create: `src/export/png.test.ts`
 - Modify: `src/App.vue`
@@ -2021,53 +2109,56 @@ Expected: one commit with the working search/edit/preview flow.
 Create `src/export/png.test.ts`:
 
 ```ts
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { exportElementAsPng } from './png';
-import { getExportPreset } from './presets';
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { exportElementAsPng } from "./png";
+import { getExportPreset } from "./presets";
 
-vi.mock('html-to-image', () => ({
-  toPng: vi.fn().mockResolvedValue('data:image/png;base64,abc'),
+vi.mock("html-to-image", () => ({
+  toPng: vi.fn().mockResolvedValue("data:image/png;base64,abc"),
 }));
 
-const appendChild = vi.spyOn(document.body, 'appendChild');
-const removeChild = vi.spyOn(document.body, 'removeChild');
+const appendChild = vi.spyOn(document.body, "appendChild");
+const removeChild = vi.spyOn(document.body, "removeChild");
 
 beforeEach(() => {
   appendChild.mockClear();
   removeChild.mockClear();
 });
 
-describe('exportElementAsPng', () => {
-  it('exports an element with preset dimensions and downloads the result', async () => {
+describe("exportElementAsPng", () => {
+  it("exports an element with preset dimensions and downloads the result", async () => {
     const anchorClicks: string[] = [];
-    const createElement = vi.spyOn(document, 'createElement');
+    const createElement = vi.spyOn(document, "createElement");
     createElement.mockImplementation((tagName: string) => {
-      const element = document.createElementNS('http://www.w3.org/1999/xhtml', tagName) as HTMLElement;
-      if (tagName === 'a') {
-        Object.defineProperty(element, 'click', {
-          value: () => anchorClicks.push('clicked'),
+      const element = document.createElementNS(
+        "http://www.w3.org/1999/xhtml",
+        tagName,
+      ) as HTMLElement;
+      if (tagName === "a") {
+        Object.defineProperty(element, "click", {
+          value: () => anchorClicks.push("clicked"),
         });
       }
       return element as never;
     });
 
-    const element = document.createElement('article');
-    const preset = getExportPreset('a4-portrait');
+    const element = document.createElement("article");
+    const preset = getExportPreset("a4-portrait");
 
-    await exportElementAsPng(element, preset, 'poster.png');
+    await exportElementAsPng(element, preset, "poster.png");
 
-    const { toPng } = await import('html-to-image');
+    const { toPng } = await import("html-to-image");
     expect(toPng).toHaveBeenCalledWith(element, {
       cacheBust: true,
       pixelRatio: 1,
       width: 2480,
       height: 3508,
       style: {
-        width: '2480px',
-        height: '3508px',
+        width: "2480px",
+        height: "3508px",
       },
     });
-    expect(anchorClicks).toEqual(['clicked']);
+    expect(anchorClicks).toEqual(["clicked"]);
     createElement.mockRestore();
   });
 });
@@ -2088,10 +2179,14 @@ Expected: fail because `src/export/png.ts` does not exist.
 Create `src/export/png.ts`:
 
 ```ts
-import { toPng } from 'html-to-image';
-import type { ExportPreset } from './presets';
+import { toPng } from "html-to-image";
+import type { ExportPreset } from "./presets";
 
-export async function exportElementAsPng(element: HTMLElement, preset: ExportPreset, filename: string): Promise<void> {
+export async function exportElementAsPng(
+  element: HTMLElement,
+  preset: ExportPreset,
+  filename: string,
+): Promise<void> {
   const dataUrl = await toPng(element, {
     cacheBust: true,
     pixelRatio: 1,
@@ -2107,7 +2202,7 @@ export async function exportElementAsPng(element: HTMLElement, preset: ExportPre
 }
 
 function downloadDataUrl(dataUrl: string, filename: string): void {
-  const link = document.createElement('a');
+  const link = document.createElement("a");
   link.href = dataUrl;
   link.download = filename;
   document.body.appendChild(link);
@@ -2122,7 +2217,7 @@ Modify `src/components/PosterPreview.vue` so the root article has the export tes
 
 ```vue
 <script setup lang="ts">
-import type { AlbumDraft } from '../domain/album';
+import type { AlbumDraft } from "../domain/album";
 
 defineProps<{
   draft: AlbumDraft;
@@ -2132,18 +2227,23 @@ defineProps<{
 <template>
   <article data-export-poster class="poster-page" aria-label="Album poster preview">
     <div class="poster-art-frame">
-      <img v-if="draft.artworkUrl" :src="draft.artworkUrl" :alt="`${draft.title || 'Album'} artwork`" class="poster-art" />
+      <img
+        v-if="draft.artworkUrl"
+        :src="draft.artworkUrl"
+        :alt="`${draft.title || 'Album'} artwork`"
+        class="poster-art"
+      />
       <div v-else class="poster-art poster-art-empty">
         <span>Add artwork</span>
       </div>
     </div>
 
     <section class="poster-caption">
-      <h2>{{ draft.title || 'Untitled Album' }}</h2>
-      <p class="poster-artist">{{ draft.artist || 'Unknown Artist' }}</p>
+      <h2>{{ draft.title || "Untitled Album" }}</h2>
+      <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
       <div class="poster-rule" />
       <div class="poster-meta-row">
-        <p>{{ draft.metadataLine || draft.releaseDate || 'Release date' }}</p>
+        <p>{{ draft.metadataLine || draft.releaseDate || "Release date" }}</p>
         <div class="poster-swatches" aria-label="Poster palette">
           <span
             v-for="color in draft.palette"
@@ -2164,39 +2264,45 @@ Replace `src/App.vue` with:
 
 ```vue
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import AlbumEditor from './components/AlbumEditor.vue';
-import AlbumSearch from './components/AlbumSearch.vue';
-import ExportPanel from './components/ExportPanel.vue';
-import PosterPreview from './components/PosterPreview.vue';
-import { createAlbumDraft, createEmptyAlbumDraft, type AlbumDraft, type AlbumDraftInput } from './domain/album';
-import { applyDraftPatch, mergeFetchedAlbum } from './editor/draft';
-import { createExportFilename, type ExportPresetId, getExportPreset } from './export/presets';
-import { exportElementAsPng } from './export/png';
-import { findCoverArt } from './sources/cover-art';
+import { computed, ref } from "vue";
+import AlbumEditor from "./components/AlbumEditor.vue";
+import AlbumSearch from "./components/AlbumSearch.vue";
+import ExportPanel from "./components/ExportPanel.vue";
+import PosterPreview from "./components/PosterPreview.vue";
+import {
+  createAlbumDraft,
+  createEmptyAlbumDraft,
+  type AlbumDraft,
+  type AlbumDraftInput,
+} from "./domain/album";
+import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
+import { createExportFilename, type ExportPresetId, getExportPreset } from "./export/presets";
+import { exportElementAsPng } from "./export/png";
+import { findCoverArt } from "./sources/cover-art";
 
 const draft = ref<AlbumDraft>(createEmptyAlbumDraft());
-const selectedPresetId = ref<ExportPresetId>('a4-portrait');
+const selectedPresetId = ref<ExportPresetId>("a4-portrait");
 const exporting = ref(false);
-const status = ref('');
+const status = ref("");
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
 
 async function selectAlbum(album: AlbumDraftInput): Promise<void> {
   draft.value = mergeFetchedAlbum(draft.value, album);
-  status.value = 'Album data loaded. You can override every field.';
+  status.value = "Album data loaded. You can override every field.";
 
   if (album.sourceId) {
     try {
       draft.value = applyDraftPatch(draft.value, await findCoverArt(album.sourceId));
     } catch (error) {
-      status.value = error instanceof Error ? error.message : 'Artwork lookup failed. Add artwork manually.';
+      status.value =
+        error instanceof Error ? error.message : "Artwork lookup failed. Add artwork manually.";
     }
   }
 }
 
 function startManual(): void {
   draft.value = createAlbumDraft();
-  status.value = 'Manual draft ready.';
+  status.value = "Manual draft ready.";
 }
 
 function patchDraft(patch: Partial<AlbumDraft>): void {
@@ -2204,15 +2310,15 @@ function patchDraft(patch: Partial<AlbumDraft>): void {
 }
 
 async function exportPoster(): Promise<void> {
-  const posterElement = document.querySelector<HTMLElement>('[data-export-poster]');
+  const posterElement = document.querySelector<HTMLElement>("[data-export-poster]");
 
   if (!posterElement) {
-    status.value = 'Poster preview is not ready to export.';
+    status.value = "Poster preview is not ready to export.";
     return;
   }
 
   exporting.value = true;
-  status.value = 'Preparing PNG export…';
+  status.value = "Preparing PNG export…";
 
   try {
     await exportElementAsPng(
@@ -2222,7 +2328,8 @@ async function exportPoster(): Promise<void> {
     );
     status.value = `Exported ${selectedPreset.value.label} PNG.`;
   } catch (error) {
-    status.value = error instanceof Error ? error.message : 'PNG export failed. Try another preset.';
+    status.value =
+      error instanceof Error ? error.message : "PNG export failed. Try another preset.";
   } finally {
     exporting.value = false;
   }
@@ -2235,7 +2342,9 @@ async function exportPoster(): Promise<void> {
       <div class="hero-panel compact">
         <p class="eyebrow">Album Poster Generator</p>
         <h1>Make print-ready album posters.</h1>
-        <p class="hero-copy">Fetch metadata, override anything, and keep the poster browser-only.</p>
+        <p class="hero-copy">
+          Fetch metadata, override anything, and keep the poster browser-only.
+        </p>
         <button type="button" @click="startManual">Start manually</button>
       </div>
       <AlbumSearch @select="selectAlbum" />
@@ -2279,6 +2388,7 @@ Expected: one commit with PNG export wired into the app.
 ### Task 11: Final verification, README, and GitHub push
 
 **Files:**
+
 - Create: `README.md`
 - Modify: files only if verification exposes a concrete bug
 
@@ -2286,7 +2396,7 @@ Expected: one commit with PNG export wired into the app.
 
 Create `README.md`:
 
-```md
+````md
 # Album Poster Generator
 
 Browser-only Vue SPA for creating print-ready album posters.
@@ -2313,11 +2423,13 @@ vp test --run
 vp build
 vp check
 ```
+````
 
 ## Notes
 
 The MVP has no backend and stores no API secrets. External album data is treated as a helper; manual editing is always available.
-```
+
+````
 
 - [ ] **Step 2: Run full test suite**
 
@@ -2325,7 +2437,7 @@ Run:
 
 ```bash
 vp test --run
-```
+````
 
 Expected: all tests pass.
 

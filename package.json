@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": false,
   "type": "module",
-  "packageManager": "pnpm@10.12.1",
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
@@ -29,5 +28,6 @@
     "typescript": "latest",
     "vitest": "latest",
     "vue-tsc": "latest"
-  }
+  },
+  "packageManager": "pnpm@10.12.1"
 }
