@@ -14,9 +14,9 @@ export function quantizePixelsToPalette(pixels: Uint8ClampedArray, maxColors = 6
       continue;
     }
 
-    const red = quantizeChannelHalfDown(pixels[index] ?? 0);
+    const red = quantizeChannel(pixels[index] ?? 0);
     const green = quantizeChannel(pixels[index + 1] ?? 0);
-    const blue = quantizeChannelUp(pixels[index + 2] ?? 0);
+    const blue = quantizeChannel(pixels[index + 2] ?? 0);
     const color = rgbToHex(red, green, blue);
     buckets.set(color, (buckets.get(color) ?? 0) + 1);
   }
@@ -33,7 +33,7 @@ export async function extractPaletteFromImage(url: string, maxColors = 6): Promi
   const context = canvas.getContext("2d", { willReadFrequently: true });
 
   if (!context) {
-    return defaultPalette;
+    return cloneDefaultPalette();
   }
 
   const size = 96;
@@ -42,19 +42,15 @@ export async function extractPaletteFromImage(url: string, maxColors = 6): Promi
   context.drawImage(image, 0, 0, size, size);
 
   const palette = quantizePixelsToPalette(context.getImageData(0, 0, size, size).data, maxColors);
-  return palette.length > 0 ? palette : defaultPalette;
+  return palette.length > 0 ? palette : cloneDefaultPalette();
 }
 
 function quantizeChannel(value: number): number {
   return clampChannel(Math.round(value / 4) * 4);
 }
 
-function quantizeChannelHalfDown(value: number): number {
-  return clampChannel(Math.floor(value / 4 + 0.5 - 1e-9) * 4);
-}
-
-function quantizeChannelUp(value: number): number {
-  return clampChannel(Math.ceil(value / 4) * 4);
+function cloneDefaultPalette(): string[] {
+  return [...defaultPalette];
 }
 
 function clampChannel(value: number): number {
