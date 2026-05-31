@@ -14,6 +14,8 @@ describe("album draft model", () => {
       palette: ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"],
       tracklist: [],
       showTracklist: true,
+      showSwatches: true,
+      swatchShape: "square",
       source: "manual",
       sourceId: "",
       font: "gotham",
@@ -38,6 +40,16 @@ describe("album draft model", () => {
 
     expect(draft.tracklist).toEqual([]);
     expect(draft.showTracklist).toBe(true);
+  });
+
+  it("shows square swatches by default and supports hiding circular swatches", () => {
+    const defaultDraft = createAlbumDraft();
+    const customizedDraft = createAlbumDraft({ showSwatches: false, swatchShape: "circle" });
+
+    expect(defaultDraft.showSwatches).toBe(true);
+    expect(defaultDraft.swatchShape).toBe("square");
+    expect(customizedDraft.showSwatches).toBe(false);
+    expect(customizedDraft.swatchShape).toBe("circle");
   });
 
   it("normalizes tracklist entries", () => {

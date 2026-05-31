@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { AlbumDraft, PosterFont } from "../domain/album";
+import type { AlbumDraft, PosterFont, SwatchShape } from "../domain/album";
 import { posterFontOptions } from "../domain/album";
 import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
 import { loadGoogleFont } from "../services/google-fonts";
@@ -47,6 +47,14 @@ function updateTracklist(value: string | number): void {
 
 function updateShowTracklist(event: Event): void {
   emit("patch", { showTracklist: (event.target as HTMLInputElement).checked });
+}
+
+function updateShowSwatches(event: Event): void {
+  emit("patch", { showSwatches: (event.target as HTMLInputElement).checked });
+}
+
+function updateSwatchShape(value: string): void {
+  emit("patch", { swatchShape: value as SwatchShape });
 }
 
 function updatePalette(index: number, value: string | number): void {
@@ -227,6 +235,41 @@ function fontLabel(font: PosterFont): string {
                 <SelectItem v-for="font in posterFontOptions" :key="font" :value="font">
                   {{ fontLabel(font) }}
                 </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div class="grid gap-3">
+        <div class="flex items-center justify-between gap-3">
+          <Label for="poster-show-swatches">Palette swatches</Label>
+          <label
+            for="poster-show-swatches"
+            class="flex items-center gap-2 text-xs font-medium text-muted-foreground"
+          >
+            <input
+              id="poster-show-swatches"
+              data-test="show-swatches-input"
+              type="checkbox"
+              class="size-4 rounded border-input accent-primary"
+              :checked="draft.showSwatches"
+              @change="updateShowSwatches"
+            />
+            Show on poster
+          </label>
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="poster-swatch-shape">Swatch shape</Label>
+          <Select :model-value="draft.swatchShape" @update:model-value="updateSwatchShape">
+            <SelectTrigger id="poster-swatch-shape" class="w-full">
+              <SelectValue placeholder="Select swatch shape" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="square">Square</SelectItem>
+                <SelectItem value="circle">Circle</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>

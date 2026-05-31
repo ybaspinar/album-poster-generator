@@ -1,5 +1,6 @@
 export type AlbumSource = "manual" | "musicbrainz";
 export type ArtworkSource = "manual" | "cover-art-archive" | "remote";
+export type SwatchShape = "square" | "circle";
 export type PosterFont =
   | "gotham"
   | "inter"
@@ -87,6 +88,8 @@ export interface AlbumDraft {
   palette: string[];
   tracklist: string[];
   showTracklist: boolean;
+  showSwatches: boolean;
+  swatchShape: SwatchShape;
   source: AlbumSource;
   sourceId: string;
   font: PosterFont;
@@ -103,6 +106,8 @@ export interface AlbumDraftInput {
   palette?: string[];
   tracklist?: string[];
   showTracklist?: boolean;
+  showSwatches?: boolean;
+  swatchShape?: SwatchShape;
   source?: AlbumSource;
   sourceId?: string;
   font?: PosterFont;
@@ -130,6 +135,8 @@ export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
     palette: normalizePalette(input.palette),
     tracklist: normalizeTracklist(input.tracklist),
     showTracklist: input.showTracklist ?? true,
+    showSwatches: input.showSwatches ?? true,
+    swatchShape: input.swatchShape ?? "square",
     source: input.source ?? "manual",
     sourceId: input.sourceId ?? "",
     font: input.font ?? defaultPosterFont,

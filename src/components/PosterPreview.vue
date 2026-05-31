@@ -82,7 +82,12 @@ watch(
           </p>
           <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
         </div>
-        <div class="poster-swatches" aria-label="Poster palette">
+        <div
+          v-if="draft.showSwatches"
+          class="poster-swatches"
+          :class="`poster-swatches-${draft.swatchShape}`"
+          aria-label="Poster palette"
+        >
           <span
             v-for="color in draft.palette"
             :key="color"

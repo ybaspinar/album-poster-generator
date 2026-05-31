@@ -41,6 +41,15 @@ describe("AlbumEditor", () => {
       { palette: ["#abcdef", "#222222", "#333333", "#444444", "#555555", "#666666"] },
     ]);
 
+    const showSwatchesCheckbox = wrapper.find('[data-test="show-swatches-input"]');
+    expect(showSwatchesCheckbox.exists()).toBe(true);
+    expect((showSwatchesCheckbox.element as HTMLInputElement).checked).toBe(true);
+
+    await showSwatchesCheckbox.setValue(false);
+    expect(wrapper.emitted("patch")?.[4]).toEqual([{ showSwatches: false }]);
+
+    expect(wrapper.find("button#poster-swatch-shape").exists()).toBe(true);
+
     // Verify font select and Google font selector components exist
     expect(wrapper.find("button#poster-font").exists()).toBe(true);
     expect(wrapper.vm.draft.font).toBe("gotham");

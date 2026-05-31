@@ -208,28 +208,30 @@
 }
 
 .poster-meta-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: end;
-  justify-content: space-between;
-  gap: 18px;
+  gap: clamp(18px, 4cqw, 32px);
 }
 
 .poster-meta-left {
   display: grid;
-  gap: 1cqw;
+  gap: 0.85cqw;
+  max-width: 48cqw;
 }
 
 .poster-release {
   margin: 0;
-  font-size: clamp(0.85rem, 1.8cqw, 1.1rem);
-  line-height: 1.4;
+  font-size: clamp(0.72rem, 1.45cqw, 0.95rem);
+  line-height: 1.32;
   text-transform: uppercase;
 }
 
 .poster-artist {
   margin: 0;
-  font-size: clamp(1rem, 2.4cqw, 1.6rem);
-  letter-spacing: 0.18em;
+  font-size: clamp(0.86rem, 1.8cqw, 1.18rem);
+  line-height: 1.25;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
@@ -262,11 +264,21 @@
 
 .poster-swatches {
   display: flex;
-  gap: 14px;
+  align-items: center;
+  gap: clamp(8px, 1.2cqw, 12px);
+  min-height: 2.4em;
 }
 
 .poster-swatch {
   display: block;
-  width: clamp(24px, 4vw, 44px);
+  width: clamp(18px, 3cqw, 34px);
   aspect-ratio: 1;
+}
+
+.poster-swatches-circle .poster-swatch {
+  border-radius: 9999px;
+}
+
+.poster-swatches-square .poster-swatch {
+  border-radius: 0;
 }

@@ -23,6 +23,7 @@ describe("PosterPreview", () => {
     expect(wrapper.text()).toContain("Kanye West & Kid Cudi");
     expect(wrapper.find("img").attributes("src")).toBe("https://example.com/cover.jpg");
     expect(wrapper.findAll(".poster-swatch")).toHaveLength(6);
+    expect(wrapper.find(".poster-swatches").classes()).toContain("poster-swatches-square");
   });
 
   it("places artist name under release in the meta row", () => {
@@ -107,6 +108,41 @@ describe("PosterPreview", () => {
     expect(tracklistRule).toBeDefined();
     expect(tracklistRule).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
     expect(tracklistRule).toContain("row-gap: 0.8cqw");
+  });
+
+  it("hides swatches and supports circular swatches", () => {
+    const hiddenWrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({ showSwatches: false }),
+      },
+    });
+    const circleWrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({ swatchShape: "circle" }),
+      },
+    });
+
+    expect(hiddenWrapper.find(".poster-swatches").exists()).toBe(false);
+    expect(circleWrapper.find(".poster-swatches").classes()).toContain("poster-swatches-circle");
+  });
+
+  it("balances metadata and palette swatches in the poster caption row", () => {
+    const css = readFileSync("src/styles/globals.css", "utf8");
+    const metaRowRule = css.match(/\.poster-meta-row \{(?<body>[^}]+)\}/)?.groups?.body;
+    const metaLeftRule = css.match(/\.poster-meta-left \{(?<body>[^}]+)\}/)?.groups?.body;
+    const releaseRule = css.match(/\.poster-release \{(?<body>[^}]+)\}/)?.groups?.body;
+    const artistRule = css.match(/\.poster-artist \{(?<body>[^}]+)\}/)?.groups?.body;
+    const swatchesRule = css.match(/\.poster-swatches \{(?<body>[^}]+)\}/)?.groups?.body;
+    const swatchRule = css.match(/\.poster-swatch \{(?<body>[^}]+)\}/)?.groups?.body;
+
+    expect(metaRowRule).toContain("grid-template-columns: minmax(0, 1fr) auto");
+    expect(metaLeftRule).toContain("max-width: 48cqw");
+    expect(releaseRule).toContain("font-size: clamp(0.72rem, 1.45cqw, 0.95rem)");
+    expect(artistRule).toContain("font-size: clamp(0.86rem, 1.8cqw, 1.18rem)");
+    expect(artistRule).toContain("letter-spacing: 0.15em");
+    expect(swatchesRule).toContain("gap: clamp(8px, 1.2cqw, 12px)");
+    expect(swatchesRule).toContain("min-height: 2.4em");
+    expect(swatchRule).toContain("width: clamp(18px, 3cqw, 34px)");
   });
 
   it("loads remote artwork with anonymous CORS for PNG export", () => {
