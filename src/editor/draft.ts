@@ -5,9 +5,7 @@ export function mergeFetchedAlbum(current: AlbumDraft, fetched: AlbumDraftInput)
     ...current,
     ...fetched,
     id: current.id,
-    metadataLine: createPosterMetadataLine(
-      fetched.releaseDate ?? current.releaseDate,
-    ),
+    metadataLine: createPosterMetadataLine(fetched.releaseDate ?? current.releaseDate),
   });
 }
 

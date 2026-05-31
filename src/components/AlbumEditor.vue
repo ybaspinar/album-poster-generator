@@ -24,7 +24,10 @@ const emit = defineEmits<{
 }>();
 
 function updateField(
-  field: keyof Pick<AlbumDraft, "title" | "artist" | "releaseDate" | "metadataLine" | "artworkUrl" | "font">,
+  field: keyof Pick<
+    AlbumDraft,
+    "title" | "artist" | "releaseDate" | "metadataLine" | "artworkUrl" | "font"
+  >,
   value: string | number,
 ): void {
   emit("patch", { [field]: String(value) });
@@ -65,38 +68,38 @@ function fontLabel(font: PosterFont): string {
     inter: "Inter (built-in sans-serif)",
     system: "System default",
     // Sans-serif Google Fonts
-    "Roboto": "Roboto",
+    Roboto: "Roboto",
     "Open Sans": "Open Sans",
-    "Lato": "Lato",
-    "Montserrat": "Montserrat",
-    "Poppins": "Poppins",
-    "Raleway": "Raleway",
+    Lato: "Lato",
+    Montserrat: "Montserrat",
+    Poppins: "Poppins",
+    Raleway: "Raleway",
     "Noto Sans": "Noto Sans",
     "Source Sans Pro": "Source Sans Pro",
-    "Nunito": "Nunito",
-    "Oswald": "Oswald",
-    "Ubuntu": "Ubuntu",
+    Nunito: "Nunito",
+    Oswald: "Oswald",
+    Ubuntu: "Ubuntu",
     "Work Sans": "Work Sans",
-    "Rubik": "Rubik",
+    Rubik: "Rubik",
     "IBM Plex Sans": "IBM Plex Sans",
-    "Karla": "Karla",
+    Karla: "Karla",
     "Space Grotesk": "Space Grotesk",
     "Bebas Neue": "Bebas Neue",
-    "Teko": "Teko",
+    Teko: "Teko",
     // Serif Google Fonts
     "Playfair Display": "Playfair Display",
-    "Merriweather": "Merriweather",
-    "Lora": "Lora",
+    Merriweather: "Merriweather",
+    Lora: "Lora",
     "Crimson Text": "Crimson Text",
     "Cormorant Garamond": "Cormorant Garamond",
     "Zilla Slab": "Zilla Slab",
     // Display/Decorative Google Fonts
     "Permanent Marker": "Permanent Marker",
-    "Pacifico": "Pacifico",
+    Pacifico: "Pacifico",
     "Dancing Script": "Dancing Script",
-    "Courgette": "Courgette",
-    "Bangers": "Bangers",
-    "Anton": "Anton",
+    Courgette: "Courgette",
+    Bangers: "Bangers",
+    Anton: "Anton",
   };
   return labels[font] || font;
 }

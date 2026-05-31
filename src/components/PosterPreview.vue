@@ -13,7 +13,7 @@ const BUILTIN_FONTS = ["gotham", "inter", "system"] as const;
 const fontClass = computed(() => {
   const font = props.draft.font;
   // Only add class for built-in fonts, others use inline style
-  if (BUILTIN_FONTS.includes(font as typeof BUILTIN_FONTS[number])) {
+  if (BUILTIN_FONTS.includes(font as (typeof BUILTIN_FONTS)[number])) {
     return `font-${font}`;
   }
   return "";
@@ -25,12 +25,12 @@ function getFontFamily(_font: PosterFont): string {
     inter: "Inter, ui-sans-serif, system-ui, sans-serif",
     system: "system-ui, ui-sans-serif, sans-serif",
   };
-  
+
   // Check if it's a built-in font
   if (_font in fonts) {
     return fonts[_font as keyof typeof fonts];
   }
-  
+
   // It's a Google Font
   return getFontFamilyString(_font);
 }
@@ -39,7 +39,7 @@ function getFontFamily(_font: PosterFont): string {
 watch(
   () => props.draft.font,
   async (newFont) => {
-    if (!BUILTIN_FONTS.includes(newFont as typeof BUILTIN_FONTS[number])) {
+    if (!BUILTIN_FONTS.includes(newFont as (typeof BUILTIN_FONTS)[number])) {
       try {
         await loadGoogleFont(newFont, ["400", "700"]);
       } catch (e) {
@@ -48,7 +48,7 @@ watch(
       }
     }
   },
-  { immediate: true }
+  { immediate: true },
 );
 </script>
 
@@ -78,7 +78,9 @@ watch(
       <div class="poster-rule" />
       <div class="poster-meta-row">
         <div class="poster-meta-left">
-          <p class="poster-release">{{ draft.metadataLine || draft.releaseDate || "Release date" }}</p>
+          <p class="poster-release">
+            {{ draft.metadataLine || draft.releaseDate || "Release date" }}
+          </p>
           <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
         </div>
         <div class="poster-swatches" aria-label="Poster palette">

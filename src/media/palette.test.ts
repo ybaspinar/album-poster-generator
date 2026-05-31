@@ -3,11 +3,9 @@ import { defaultPalette } from "../domain/album";
 import { extractPaletteFromImage } from "./palette";
 
 vi.mock("extract-colors", () => ({
-  extractColors: vi.fn().mockResolvedValue([
-    { hex: "#ff0000" },
-    { hex: "#00ff00" },
-    { hex: "#0000ff" },
-  ]),
+  extractColors: vi
+    .fn()
+    .mockResolvedValue([{ hex: "#ff0000" }, { hex: "#00ff00" }, { hex: "#0000ff" }]),
 }));
 
 describe("palette helpers", () => {

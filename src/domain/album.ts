@@ -1,23 +1,78 @@
 export type AlbumSource = "manual" | "musicbrainz";
 export type ArtworkSource = "manual" | "cover-art-archive" | "remote";
-export type PosterFont = 
-  | "gotham" | "inter" | "system"
-  | "Roboto" | "Open Sans" | "Lato" | "Montserrat" | "Poppins" | "Raleway" | "Noto Sans" | "Source Sans Pro"
-  | "Nunito" | "Oswald" | "Ubuntu" | "Work Sans" | "Rubik" | "IBM Plex Sans" | "Karla" | "Space Grotesk"
-  | "Bebas Neue" | "Teko" | "Playfair Display" | "Merriweather" | "Lora" | "Crimson Text" | "Cormorant Garamond"
-  | "Zilla Slab" | "Permanent Marker" | "Pacifico" | "Dancing Script" | "Courgette" | "Bangers" | "Anton";
+export type PosterFont =
+  | "gotham"
+  | "inter"
+  | "system"
+  | "Roboto"
+  | "Open Sans"
+  | "Lato"
+  | "Montserrat"
+  | "Poppins"
+  | "Raleway"
+  | "Noto Sans"
+  | "Source Sans Pro"
+  | "Nunito"
+  | "Oswald"
+  | "Ubuntu"
+  | "Work Sans"
+  | "Rubik"
+  | "IBM Plex Sans"
+  | "Karla"
+  | "Space Grotesk"
+  | "Bebas Neue"
+  | "Teko"
+  | "Playfair Display"
+  | "Merriweather"
+  | "Lora"
+  | "Crimson Text"
+  | "Cormorant Garamond"
+  | "Zilla Slab"
+  | "Permanent Marker"
+  | "Pacifico"
+  | "Dancing Script"
+  | "Courgette"
+  | "Bangers"
+  | "Anton";
 
 export const posterFontOptions: PosterFont[] = [
   // Built-in fonts
-  "gotham", "inter", "system",
+  "gotham",
+  "inter",
+  "system",
   // Sans-serif Google Fonts
-  "Roboto", "Open Sans", "Lato", "Montserrat", "Poppins", "Raleway", "Noto Sans", "Source Sans Pro",
-  "Nunito", "Oswald", "Ubuntu", "Work Sans", "Rubik", "IBM Plex Sans", "Karla", "Space Grotesk",
-  "Bebas Neue", "Teko",
+  "Roboto",
+  "Open Sans",
+  "Lato",
+  "Montserrat",
+  "Poppins",
+  "Raleway",
+  "Noto Sans",
+  "Source Sans Pro",
+  "Nunito",
+  "Oswald",
+  "Ubuntu",
+  "Work Sans",
+  "Rubik",
+  "IBM Plex Sans",
+  "Karla",
+  "Space Grotesk",
+  "Bebas Neue",
+  "Teko",
   // Serif Google Fonts
-  "Playfair Display", "Merriweather", "Lora", "Crimson Text", "Cormorant Garamond", "Zilla Slab",
+  "Playfair Display",
+  "Merriweather",
+  "Lora",
+  "Crimson Text",
+  "Cormorant Garamond",
+  "Zilla Slab",
   // Display/Decorative Google Fonts
-  "Permanent Marker", "Pacifico", "Dancing Script", "Courgette", "Bangers", "Anton",
+  "Permanent Marker",
+  "Pacifico",
+  "Dancing Script",
+  "Courgette",
+  "Bangers",
+  "Anton",
 ];
 export const defaultPosterFont: PosterFont = "gotham";
 

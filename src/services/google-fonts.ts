@@ -27,7 +27,7 @@ const POPULAR_GOOGLE_FONTS: GoogleFont[] = [
   { family: "Space Grotesk", variants: ["400", "600", "700"], subsets: ["latin"] },
   { family: "Bebas Neue", variants: ["400"], subsets: ["latin"] },
   { family: "Teko", variants: ["400", "600", "700"], subsets: ["latin"] },
-  
+
   // Serif fonts
   { family: "Playfair Display", variants: ["400", "700"], subsets: ["latin"] },
   { family: "Merriweather", variants: ["400", "700"], subsets: ["latin"] },
@@ -35,7 +35,7 @@ const POPULAR_GOOGLE_FONTS: GoogleFont[] = [
   { family: "Crimson Text", variants: ["400", "600", "700"], subsets: ["latin"] },
   { family: "Cormorant Garamond", variants: ["400", "600", "700"], subsets: ["latin"] },
   { family: "Zilla Slab", variants: ["400", "600", "700"], subsets: ["latin"] },
-  
+
   // Display/Decorative fonts
   { family: "Permanent Marker", variants: ["400"], subsets: ["latin"] },
   { family: "Pacifico", variants: ["400"], subsets: ["latin"] },
@@ -90,28 +90,55 @@ export function getFontFamilyString(family: string): string {
 function getFallbackFont(family: string): string {
   // Provide sensible fallbacks based on font category
   const sansFonts = [
-    "Inter", "Roboto", "Open Sans", "Lato", "Montserrat", "Poppins", "Source Sans Pro",
-    "Raleway", "Noto Sans", "Nunito", "Oswald", "Ubuntu", "Work Sans", "Rubik",
-    "IBM Plex Sans", "Karla", "Space Grotesk", "Bebas Neue", "Teko",
-  ];
-  
-  const serifFonts = [
-    "Playfair Display", "Merriweather", "Lora", "Crimson Text", "Cormorant Garamond", "Zilla Slab",
-  ];
-  
-  const displayFonts = [
-    "Permanent Marker", "Pacifico", "Dancing Script", "Courgette", "Bangers", "Anton", "Bebas Neue",
+    "Inter",
+    "Roboto",
+    "Open Sans",
+    "Lato",
+    "Montserrat",
+    "Poppins",
+    "Source Sans Pro",
+    "Raleway",
+    "Noto Sans",
+    "Nunito",
+    "Oswald",
+    "Ubuntu",
+    "Work Sans",
+    "Rubik",
+    "IBM Plex Sans",
+    "Karla",
+    "Space Grotesk",
+    "Bebas Neue",
+    "Teko",
   ];
 
-  if (sansFonts.some(f => family.toLowerCase().includes(f.toLowerCase()))) {
+  const serifFonts = [
+    "Playfair Display",
+    "Merriweather",
+    "Lora",
+    "Crimson Text",
+    "Cormorant Garamond",
+    "Zilla Slab",
+  ];
+
+  const displayFonts = [
+    "Permanent Marker",
+    "Pacifico",
+    "Dancing Script",
+    "Courgette",
+    "Bangers",
+    "Anton",
+    "Bebas Neue",
+  ];
+
+  if (sansFonts.some((f) => family.toLowerCase().includes(f.toLowerCase()))) {
     return "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
   }
-  
-  if (serifFonts.some(f => family.toLowerCase().includes(f.toLowerCase()))) {
+
+  if (serifFonts.some((f) => family.toLowerCase().includes(f.toLowerCase()))) {
     return "ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif";
   }
-  
-  if (displayFonts.some(f => family.toLowerCase().includes(f.toLowerCase()))) {
+
+  if (displayFonts.some((f) => family.toLowerCase().includes(f.toLowerCase()))) {
     return "system-ui, sans-serif";
   }
 
