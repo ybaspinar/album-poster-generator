@@ -4,6 +4,14 @@ import posthog from "posthog-js";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import AlbumEditor from "./components/AlbumEditor.vue";
 import AlbumSearch from "./components/AlbumSearch.vue";
 import ExportPanel from "./components/ExportPanel.vue";
@@ -20,7 +28,12 @@ import { exportElementAsPng } from "./export/png";
 import { createExportableArtworkUrl, type ExportableArtworkUrlResult } from "./media/artwork-url";
 import { extractPaletteFromImage } from "./media/palette";
 import { findCoverArt } from "./sources/cover-art";
-import { fetchMusicBrainzTracklist } from "./sources/musicbrainz";
+import {
+  fetchMusicBrainzEditions,
+  fetchMusicBrainzTracklist,
+  fetchMusicBrainzTracklistForRelease,
+  type MusicBrainzEdition,
+} from "./sources/musicbrainz";
 
 const showTracklistPreferenceKey = "album-poster-generator:show-tracklist";
 
@@ -29,6 +42,9 @@ const selectedPresetId = ref<ExportPresetId>("a4-portrait");
 const exporting = ref(false);
 const status = ref("");
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
+const pendingAlbum = ref<AlbumDraftInput | null>(null);
+const pendingEditions = ref<MusicBrainzEdition[]>([]);
+const editionDialogOpen = computed(() => pendingAlbum.value !== null && pendingEditions.value.length > 1);
 let paletteRequestId = 0;
 
 watch(
@@ -53,7 +69,47 @@ watch(
 );
 
 async function selectAlbum(album: AlbumDraftInput): Promise<void> {
+  const editions = album.sourceId ? await fetchMusicBrainzEditions(album.sourceId) : [];
+
+  if (editions.length > 1) {
+    pendingAlbum.value = album;
+    pendingEditions.value = editions;
+    status.value = "Choose an album edition to load its exact tracklist.";
+    return;
+  }
+
   const tracklist = album.sourceId ? await fetchMusicBrainzTracklist(album.sourceId) : [];
+  await loadAlbumDraft(album, tracklist);
+}
+
+async function selectEdition(edition: MusicBrainzEdition): Promise<void> {
+  if (!pendingAlbum.value) {
+    return;
+  }
+
+  const album = pendingAlbum.value;
+  pendingAlbum.value = null;
+  pendingEditions.value = [];
+  const tracklist = await fetchMusicBrainzTracklistForRelease(edition.id);
+
+  await loadAlbumDraft(
+    {
+      ...album,
+      title: edition.title || album.title,
+      releaseDate: edition.releaseDate || album.releaseDate,
+      artworkUrl: edition.artworkUrl || album.artworkUrl,
+    },
+    tracklist,
+  );
+}
+
+function cancelEditionSelection(): void {
+  pendingAlbum.value = null;
+  pendingEditions.value = [];
+  status.value = "Album selection cancelled.";
+}
+
+async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Promise<void> {
   const exportableArtwork = album.artworkUrl
     ? await makeArtworkExportable(album.artworkUrl)
     : createExportableArtworkResult(album.artworkUrl ?? "");
@@ -231,5 +287,52 @@ async function exportPoster(): Promise<void> {
         </Card>
       </section>
     </div>
+
+    <Dialog :open="editionDialogOpen">
+      <DialogContent data-test="edition-dialog">
+        <DialogHeader>
+          <DialogTitle>Choose edition</DialogTitle>
+          <DialogDescription>
+            This album has multiple MusicBrainz releases. Pick the edition whose tracklist and date
+            should be used on the poster.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div class="grid gap-2">
+          <Button
+            v-for="edition in pendingEditions"
+            :key="edition.id"
+            :data-test="`edition-${edition.id}`"
+            type="button"
+            variant="outline"
+            class="h-auto justify-start p-3 text-left"
+            @click="selectEdition(edition)"
+          >
+            <div class="flex items-center gap-3">
+              <img
+                v-if="edition.artworkUrl"
+                :src="edition.artworkUrl"
+                :alt="`${edition.title} cover`"
+                class="h-12 w-12 rounded object-cover"
+              />
+              <div v-else class="h-12 w-12 rounded bg-muted" />
+              <span class="grid gap-1">
+                <strong class="text-sm text-foreground">{{ edition.title }}</strong>
+                <span class="text-xs font-normal text-muted-foreground">
+                  {{ edition.releaseDate || "Unknown date" }}
+                  <template v-if="edition.country"> · {{ edition.country }}</template>
+                  <template v-if="edition.formats.length"> · {{ edition.formats.join(", ") }}</template>
+                  <template v-if="edition.trackCount"> · {{ edition.trackCount }} tracks</template>
+                </span>
+              </span>
+            </div>
+          </Button>
+        </div>
+
+        <DialogFooter>
+          <Button type="button" variant="outline" @click="cancelEditionSelection">Cancel</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   </main>
 </template>

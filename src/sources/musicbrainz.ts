@@ -34,6 +34,10 @@ interface MusicBrainzReleaseGroupResponse {
 
 interface MusicBrainzReleaseListItem {
   id?: string;
+  title?: string;
+  date?: string;
+  country?: string;
+  media?: MusicBrainzMedium[];
 }
 
 interface MusicBrainzReleaseListResponse {
@@ -45,7 +49,30 @@ interface MusicBrainzTrack {
 }
 
 interface MusicBrainzMedium {
+  format?: string;
   tracks?: MusicBrainzTrack[];
+}
+
+interface CoverArtImage {
+  front?: boolean;
+  image?: string;
+  thumbnails?: {
+    large?: string;
+  };
+}
+
+interface CoverArtResponse {
+  images?: CoverArtImage[];
+}
+
+export interface MusicBrainzEdition {
+  id: string;
+  title: string;
+  releaseDate: string;
+  country: string;
+  formats: string[];
+  trackCount: number;
+  artworkUrl?: string;
 }
 
 interface MusicBrainzReleaseDetailResponse {
@@ -118,6 +145,44 @@ export async function searchMusicBrainzAlbums(
   return enrichedResults;
 }
 
+export async function fetchMusicBrainzEditions(
+  releaseGroupId: string,
+  fetcher: Fetcher = fetch,
+): Promise<MusicBrainzEdition[]> {
+  const id = releaseGroupId.trim();
+
+  if (!id) {
+    return [];
+  }
+
+  const url = `${musicBrainzReleaseBaseUrl}?release-group=${encodeURIComponent(id)}&inc=media&fmt=json&limit=25`;
+  const response = await fetcher(url, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const data = (await response.json()) as MusicBrainzReleaseListResponse;
+  const releases = data.releases ?? [];
+  
+  // Fetch cover art for each release
+  const editions = await Promise.all(
+    releases.map(async (release) => {
+      const baseEdition = normalizeEdition(release)[0];
+      if (!baseEdition) return null;
+      
+      const artworkUrl = release.id ? await fetchReleaseCoverArt(release.id, fetcher) : "";
+      return { ...baseEdition, artworkUrl };
+    }),
+  );
+
+  return editions.filter((edition): edition is MusicBrainzEdition => edition !== null);
+}
+
 export async function fetchMusicBrainzTracklist(
   releaseGroupId: string,
   fetcher: Fetcher = fetch,
@@ -129,7 +194,7 @@ export async function fetchMusicBrainzTracklist(
       return [];
     }
 
-    return fetchReleaseTrackTitles(releaseId, fetcher);
+    return fetchMusicBrainzTracklistForRelease(releaseId, fetcher);
   } catch {
     return [];
   }
@@ -151,7 +216,10 @@ async function fetchFirstReleaseId(releaseGroupId: string, fetcher: Fetcher): Pr
   return data.releases?.find((release) => release.id)?.id ?? "";
 }
 
-async function fetchReleaseTrackTitles(releaseId: string, fetcher: Fetcher): Promise<string[]> {
+export async function fetchMusicBrainzTracklistForRelease(
+  releaseId: string,
+  fetcher: Fetcher = fetch,
+): Promise<string[]> {
   const url = `${musicBrainzReleaseBaseUrl}/${encodeURIComponent(releaseId)}?inc=recordings&fmt=json`;
   const response = await fetcher(url, {
     headers: {
@@ -243,6 +311,53 @@ async function enrichAlbumsWithCoverArt(
       }
     }),
   );
+}
+
+async function fetchReleaseCoverArt(releaseId: string, fetcher: Fetcher): Promise<string> {
+  const response = await fetcher(
+    `https://coverartarchive.org/release/${encodeURIComponent(releaseId)}`,
+    {
+      headers: { Accept: "application/json" },
+    },
+  );
+
+  if (response.status === 404 || !response.ok) {
+    return "";
+  }
+
+  const data = (await response.json()) as CoverArtResponse;
+  const images = data.images ?? [];
+  const selected = images.find((image) => image.front) ?? images[0];
+  return selected?.image ?? selected?.thumbnails?.large ?? "";
+}
+
+function normalizeEdition(release: MusicBrainzReleaseListItem): MusicBrainzEdition[] {
+  if (!release.id || !release.title) {
+    return [];
+  }
+
+  const formats = Array.from(
+    new Set(
+      (release.media ?? [])
+        .map((medium) => medium.format?.trim())
+        .filter((format): format is string => Boolean(format)),
+    ),
+  );
+  const trackCount = (release.media ?? []).reduce(
+    (total, medium) => total + (medium.tracks?.length ?? 0),
+    0,
+  );
+
+  return [
+    {
+      id: release.id,
+      title: release.title,
+      releaseDate: release.date ?? "",
+      country: release.country ?? "",
+      formats,
+      trackCount,
+    },
+  ];
 }
 
 function normalizeReleaseGroup(group: MusicBrainzReleaseGroup): AlbumDraftInput[] {

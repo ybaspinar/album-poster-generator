@@ -2,7 +2,9 @@ import { describe, expect, it, vi } from "vitest";
 import type { AlbumDraftInput } from "../domain/album";
 import { createAlbumSearchCacheKey, type StorageLike } from "./album-search-cache";
 import {
+  fetchMusicBrainzEditions,
   fetchMusicBrainzTracklist,
+  fetchMusicBrainzTracklistForRelease,
   normalizeSearchParams,
   paramsDisplayLabel,
   searchMusicBrainzAlbums,
@@ -319,6 +321,87 @@ describe("searchMusicBrainzAlbums", () => {
   });
 });
 
+describe("fetchMusicBrainzEditions", () => {
+  it("normalizes editions for a release group", async () => {
+    const fetcher = vi.fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            releases: [
+              {
+                id: "release-standard",
+                title: "Red",
+                date: "2012-10-22",
+                country: "US",
+                media: [{ format: "CD", tracks: [{ title: "State of Grace" }] }],
+              },
+              {
+                id: "release-deluxe",
+                title: "Red (Deluxe Edition)",
+                date: "2012-10-22",
+                country: "US",
+                media: [
+                  { format: "CD", tracks: [{ title: "State of Grace" }] },
+                  { format: "Digital Media", tracks: [{ title: "The Moment I Knew" }] },
+                ],
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            images: [{ front: true, image: "https://coverartarchive.org/standard.jpg" }],
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            images: [{ front: true, image: "https://coverartarchive.org/deluxe.jpg" }],
+          }),
+          { status: 200 },
+        ),
+      );
+
+    await expect(fetchMusicBrainzEditions("rg-red", fetcher)).resolves.toEqual([
+      {
+        id: "release-standard",
+        title: "Red",
+        releaseDate: "2012-10-22",
+        country: "US",
+        formats: ["CD"],
+        trackCount: 1,
+        artworkUrl: "https://coverartarchive.org/standard.jpg",
+      },
+      {
+        id: "release-deluxe",
+        title: "Red (Deluxe Edition)",
+        releaseDate: "2012-10-22",
+        country: "US",
+        formats: ["CD", "Digital Media"],
+        trackCount: 2,
+        artworkUrl: "https://coverartarchive.org/deluxe.jpg",
+      },
+    ]);
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://musicbrainz.org/ws/2/release?release-group=rg-red&inc=media&fmt=json&limit=25",
+      { headers: { Accept: "application/json" } },
+    );
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://coverartarchive.org/release/release-standard",
+      { headers: { Accept: "application/json" } },
+    );
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://coverartarchive.org/release/release-deluxe",
+      { headers: { Accept: "application/json" } },
+    );
+  });
+});
+
 describe("fetchMusicBrainzTracklist", () => {
   it("fetches track titles through the first release in a release group", async () => {
     const fetcher = vi
@@ -356,6 +439,20 @@ describe("fetchMusicBrainzTracklist", () => {
 
     await expect(fetchMusicBrainzTracklist("rg-1", fetcher)).resolves.toEqual([]);
     expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("fetches track titles for a specific release", async () => {
+    const fetcher = vi.fn().mockResolvedValueOnce(createReleaseDetailResponse());
+
+    await expect(fetchMusicBrainzTracklistForRelease("release-1", fetcher)).resolves.toEqual([
+      "Feel the Love",
+      "Fire",
+      "4th Dimension",
+    ]);
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://musicbrainz.org/ws/2/release/release-1?inc=recordings&fmt=json",
+      { headers: { Accept: "application/json" } },
+    );
   });
 
   it("returns an empty list when tracklist lookup fails", async () => {

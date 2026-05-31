@@ -2,11 +2,15 @@ import { mount } from "@vue/test-utils";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App.vue";
 import { createExportableArtworkUrl } from "../media/artwork-url";
 import { findCoverArt } from "../sources/cover-art";
-import { fetchMusicBrainzTracklist } from "../sources/musicbrainz";
+import {
+  fetchMusicBrainzEditions,
+  fetchMusicBrainzTracklist,
+  fetchMusicBrainzTracklistForRelease,
+} from "../sources/musicbrainz";
 
 vi.mock("../media/palette", () => ({
   extractPaletteFromImage: vi
@@ -22,7 +26,9 @@ vi.mock("../media/artwork-url", () => ({
 }));
 
 vi.mock("../sources/musicbrainz", () => ({
+  fetchMusicBrainzEditions: vi.fn().mockResolvedValue([]),
   fetchMusicBrainzTracklist: vi.fn().mockResolvedValue(["Feel the Love", "Fire"]),
+  fetchMusicBrainzTracklistForRelease: vi.fn().mockResolvedValue(["Deluxe Song"]),
   searchMusicBrainzAlbums: vi.fn().mockResolvedValue([
     {
       title: "Kids See Ghosts",
@@ -47,6 +53,16 @@ vi.mock("../sources/cover-art", () => ({
   }),
 }));
 
+const mockedFetchMusicBrainzEditions = vi.mocked(fetchMusicBrainzEditions);
+const mockedFetchMusicBrainzTracklistForRelease = vi.mocked(fetchMusicBrainzTracklistForRelease);
+
+beforeEach(() => {
+  mockedFetchMusicBrainzEditions.mockReset();
+  mockedFetchMusicBrainzEditions.mockResolvedValue([]);
+  mockedFetchMusicBrainzTracklistForRelease.mockReset();
+  mockedFetchMusicBrainzTracklistForRelease.mockResolvedValue(["Deluxe Song"]);
+});
+
 describe("App flow", () => {
   it("searches, selects a result, uses search artwork, updates swatches, and allows manual title override", async () => {
     const wrapper = mount(App);
@@ -62,6 +78,8 @@ describe("App flow", () => {
     await Promise.resolve();
 
     await wrapper.find('[data-test="result-0"]').trigger("click");
+    await Promise.resolve();
+    await Promise.resolve();
     await Promise.resolve();
     await Promise.resolve();
     await Promise.resolve();
@@ -88,6 +106,63 @@ describe("App flow", () => {
     await editorTitleInput.setValue("My Custom Poster Title");
 
     expect(wrapper.text()).toContain("My Custom Poster Title");
+  });
+
+  it("opens a shadcn edition picker when an album has multiple editions", async () => {
+    mockedFetchMusicBrainzEditions.mockResolvedValueOnce([
+      {
+        id: "release-standard",
+        title: "Red",
+        releaseDate: "2012-10-22",
+        country: "US",
+        formats: ["CD"],
+        trackCount: 16,
+        artworkUrl: "https://example.com/standard-cover.jpg",
+      },
+      {
+        id: "release-deluxe",
+        title: "Red (Deluxe Edition)",
+        releaseDate: "2012-10-22",
+        country: "US",
+        formats: ["CD", "Digital Media"],
+        trackCount: 22,
+        artworkUrl: "https://example.com/deluxe-cover.jpg",
+      },
+    ]);
+    mockedFetchMusicBrainzTracklistForRelease.mockResolvedValueOnce(["State of Grace", "The Moment I Knew"]);
+    const wrapper = mount(App);
+
+    await wrapper.find('[data-test="artist-input"]').setValue("taylor swift");
+    await wrapper.find('[data-test="title-input"]').setValue("red");
+    await wrapper.find('[data-test="search-form"]').trigger("submit");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    await wrapper.find('[data-test="result-0"]').trigger("click");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(wrapper.find('[data-test="edition-dialog"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain("Choose edition");
+    expect(wrapper.text()).toContain("Red (Deluxe Edition)");
+    expect(wrapper.find('[data-test="edition-release-deluxe"]').find("img").attributes("src")).toBe(
+      "https://example.com/deluxe-cover.jpg",
+    );
+
+    await wrapper.find('[data-test="edition-release-deluxe"]').trigger("click");
+    await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(mockedFetchMusicBrainzTracklistForRelease).toHaveBeenCalledWith("release-deluxe");
+    expect(wrapper.find('[data-test="edition-dialog"]').exists()).toBe(false);
+    expect(wrapper.find('[data-test="tracklist-input"]').element).toHaveProperty(
+      "value",
+      "State of Grace\nThe Moment I Knew",
+    );
+    expect(createExportableArtworkUrl).toHaveBeenCalledWith(
+      "https://example.com/deluxe-cover.jpg",
+    );
   });
 
   it("persists the tracklist visibility preference between drafts", async () => {
