@@ -32,6 +32,17 @@ describe("exportElementAsPng", () => {
     });
 
     const element = document.createElement("article");
+    vi.spyOn(element, "getBoundingClientRect").mockReturnValue({
+      x: 0,
+      y: 0,
+      top: 0,
+      right: 720,
+      bottom: 1018.4516,
+      left: 0,
+      width: 720,
+      height: 1018.4516,
+      toJSON: () => ({}),
+    });
     const preset = getExportPreset("a4-portrait");
 
     await exportElementAsPng(element, preset, "poster.png");
@@ -40,12 +51,10 @@ describe("exportElementAsPng", () => {
     expect(toPng).toHaveBeenCalledWith(element, {
       cacheBust: false,
       pixelRatio: 1,
-      width: 2480,
-      height: 3508,
-      style: {
-        width: "2480px",
-        height: "3508px",
-      },
+      width: 720,
+      height: 1018.4516,
+      canvasWidth: 2480,
+      canvasHeight: 3508,
     });
     expect(anchorClicks).toEqual(["clicked"]);
     createElement.mockRestore();

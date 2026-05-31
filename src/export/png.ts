@@ -6,15 +6,16 @@ export async function exportElementAsPng(
   preset: ExportPreset,
   filename: string,
 ): Promise<void> {
+  const sourceRect = element.getBoundingClientRect();
+  const sourceWidth = sourceRect.width || preset.widthPx;
+  const sourceHeight = sourceRect.height || preset.heightPx;
   const dataUrl = await toPng(element, {
     cacheBust: false,
     pixelRatio: 1,
-    width: preset.widthPx,
-    height: preset.heightPx,
-    style: {
-      width: `${preset.widthPx}px`,
-      height: `${preset.heightPx}px`,
-    },
+    width: sourceWidth,
+    height: sourceHeight,
+    canvasWidth: preset.widthPx,
+    canvasHeight: preset.heightPx,
   });
 
   downloadDataUrl(dataUrl, filename);
