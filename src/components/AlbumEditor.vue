@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import posthog from "posthog-js";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { AlbumDraft, PosterFont, SwatchShape, TracklistColumns, TracklistSize } from "../domain/album";
+import type {
+  AlbumDraft,
+  PosterFont,
+  SwatchShape,
+  TracklistColumns,
+  TracklistSize,
+} from "../domain/album";
 import { posterFontOptions } from "../domain/album";
 import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
 import { loadGoogleFont } from "../services/google-fonts";
@@ -87,6 +94,7 @@ function uploadArtwork(event: Event): void {
     return;
   }
 
+  posthog.capture("artwork_uploaded", { file_type: file.type, file_size_bytes: file.size });
   emit("patch", { artworkUrl: createArtworkObjectUrl(file), artworkSource: "manual" });
 }
 
@@ -214,7 +222,10 @@ function fontLabel(font: PosterFont): string {
           <div class="grid grid-cols-2 gap-3">
             <div class="grid gap-2">
               <Label for="poster-tracklist-columns">Tracklist columns</Label>
-              <Select :model-value="draft.tracklistColumns" @update:model-value="updateTracklistColumns">
+              <Select
+                :model-value="draft.tracklistColumns"
+                @update:model-value="updateTracklistColumns"
+              >
                 <SelectTrigger id="poster-tracklist-columns" class="w-full">
                   <SelectValue placeholder="Columns" />
                 </SelectTrigger>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import posthog from "posthog-js";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -91,6 +92,7 @@ async function selectAlbum(album: AlbumDraftInput): Promise<void> {
 function startManual(): void {
   draft.value = createAlbumDraft({ showTracklist: readShowTracklistPreference() });
   status.value = "Manual draft ready.";
+  posthog.capture("manual_draft_started");
 }
 
 function patchDraft(patch: Partial<AlbumDraft>): void {
@@ -143,9 +145,21 @@ async function exportPoster(): Promise<void> {
       createExportFilename(draft.value.artist, draft.value.title, selectedPreset.value),
     );
     status.value = `Exported ${selectedPreset.value.label} PNG.`;
+    posthog.capture("poster_exported", {
+      preset_id: selectedPreset.value.id,
+      preset_label: selectedPreset.value.label,
+      width_px: selectedPreset.value.widthPx,
+      height_px: selectedPreset.value.heightPx,
+      has_artist: Boolean(draft.value.artist),
+      has_tracklist: draft.value.showTracklist && draft.value.tracklist.length > 0,
+    });
   } catch (error) {
-    status.value =
+    const message =
       error instanceof Error ? error.message : "PNG export failed. Try another preset.";
+    status.value = message;
+    posthog.captureException(error instanceof Error ? error : new Error(message), {
+      preset_id: selectedPreset.value.id,
+    });
   } finally {
     exporting.value = false;
   }

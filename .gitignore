@@ -7,3 +7,6 @@ coverage/
 graphify-out/
 .graphify_*.json
 .graphify_*.txt
+.env
+.claude/
+posthog-setup-report.md

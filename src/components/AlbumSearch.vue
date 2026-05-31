@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
+import posthog from "posthog-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -118,11 +119,21 @@ async function performSearch(): Promise<void> {
     status.value = results.value.length
       ? `${results.value.length} result${results.value.length === 1 ? "" : "s"} found.`
       : "No results found. Start manually or adjust the query.";
+    posthog.capture("album_searched", {
+      result_count: results.value.length,
+      has_artist: Boolean(params.artist),
+      has_title: Boolean(params.title),
+      has_year: Boolean(params.year),
+      release_type: params.type ?? "any",
+    });
     if (results.value.length) {
       const label = paramsDisplayLabel(currentParams());
       if (label) addRecentSearch(label);
     }
   } catch (error) {
+    posthog.captureException(
+      error instanceof Error ? error : new Error("MusicBrainz search failed."),
+    );
     status.value = error instanceof Error ? error.message : "MusicBrainz search failed.";
     results.value = [];
   } finally {
@@ -169,6 +180,12 @@ function onKeyDown(event: KeyboardEvent): void {
 }
 
 function selectResult(album: AlbumDraftInput): void {
+  posthog.capture("album_selected", {
+    album_title: album.title,
+    album_artist: album.artist,
+    has_artwork: Boolean(album.artworkUrl),
+    source_id: album.sourceId,
+  });
   emit("select", album);
   clearResults();
   artist.value = "";
