@@ -17,6 +17,12 @@ export function quantizePixelsToPalette(pixels: Uint8ClampedArray, maxColors = 6
     const red = quantizeChannel(pixels[index] ?? 0);
     const green = quantizeChannel(pixels[index + 1] ?? 0);
     const blue = quantizeChannel(pixels[index + 2] ?? 0);
+
+    // Skip near-white colors (very light colors)
+    if (isNearWhite(red, green, blue)) {
+      continue;
+    }
+
     const color = rgbToHex(red, green, blue);
     buckets.set(color, (buckets.get(color) ?? 0) + 1);
   }
@@ -55,6 +61,13 @@ function cloneDefaultPalette(): string[] {
 
 function clampChannel(value: number): number {
   return Math.max(0, Math.min(255, value));
+}
+
+// Skip colors that are too light (near-white) to avoid extracting paper/white backgrounds
+function isNearWhite(red: number, green: number, blue: number): boolean {
+  const lightness = (Math.max(red, green, blue) + Math.min(red, green, blue)) / 2;
+  // Skip if lightness is above ~85% (values >= 215)
+  return lightness >= 215;
 }
 
 function loadImage(url: string): Promise<HTMLImageElement> {
