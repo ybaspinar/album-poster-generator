@@ -150,9 +150,10 @@
 }
 
 .poster-page {
+  container-type: inline-size;
   width: min(100%, 720px);
   aspect-ratio: 2480 / 3508;
-  padding: 7.2%;
+  padding: 5.5% 7.5%;
   color: var(--ink);
   font-family:
     Inter,
@@ -162,9 +163,8 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  background:
-    radial-gradient(circle at 50% 14%, rgba(255, 255, 255, 0.9), transparent 34%), var(--paper);
-  box-shadow: 0 32px 100px rgba(23, 23, 23, 0.18);
+  background: var(--paper);
+  box-shadow: 0 8px 40px rgba(23, 23, 23, 0.1);
 }
 
 .poster-art-frame {
@@ -191,50 +191,56 @@
 }
 
 .poster-caption {
-  padding-top: 7.5%;
+  padding-top: 5.2%;
 }
 
 .poster-caption h2 {
   margin: 0;
-  font-size: clamp(2.6rem, 8vw, 5.8rem);
+  font-size: clamp(2.6rem, 8cqw, 5.8rem);
   line-height: 0.88;
   letter-spacing: -0.07em;
   text-transform: uppercase;
 }
 
-.poster-artist {
-  margin: 2.4% 0 0;
-  font-size: clamp(1.1rem, 2.8vw, 2rem);
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
 .poster-rule {
-  margin: 3.6% 0;
-  border-top: 2px solid var(--ink);
+  margin: 4.8% 0 4.2%;
+  border-top: 3px solid var(--ink);
 }
 
 .poster-meta-row {
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 24px;
+  gap: 18px;
 }
 
-.poster-meta-row p {
+.poster-meta-left {
+  display: grid;
+  gap: 1cqw;
+}
+
+.poster-release {
   margin: 0;
-  font-size: clamp(0.9rem, 2vw, 1.2rem);
-  line-height: 1.5;
+  font-size: clamp(0.85rem, 1.8cqw, 1.1rem);
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.poster-artist {
+  margin: 0;
+  font-size: clamp(1rem, 2.4cqw, 1.6rem);
+  letter-spacing: 0.18em;
   text-transform: uppercase;
 }
 
 .poster-swatches {
   display: flex;
-  gap: 14px;
+  gap: 8px;
+  align-items: end;
 }
 
 .poster-swatch {
   display: block;
-  width: clamp(24px, 4vw, 44px);
+  width: clamp(22px, 3.8cqw, 38px);
   aspect-ratio: 1;
 }

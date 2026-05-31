@@ -7,7 +7,6 @@ export function mergeFetchedAlbum(current: AlbumDraft, fetched: AlbumDraftInput)
     id: current.id,
     metadataLine: createPosterMetadataLine(
       fetched.releaseDate ?? current.releaseDate,
-      fetched.artist ?? current.artist,
     ),
   });
 }
@@ -20,19 +19,9 @@ export function applyDraftPatch(current: AlbumDraft, patch: AlbumDraftInput): Al
   });
 }
 
-export function createPosterMetadataLine(releaseDate: string, artist: string): string {
-  const parts = [];
+export function createPosterMetadataLine(releaseDate: string): string {
   const formattedDate = formatReleaseDate(releaseDate);
-
-  if (formattedDate) {
-    parts.push(`Released: ${formattedDate}`);
-  }
-
-  if (artist.trim()) {
-    parts.push(artist.trim());
-  }
-
-  return parts.join(" · ");
+  return formattedDate ? `Released: ${formattedDate}` : "";
 }
 
 function formatReleaseDate(value: string): string {

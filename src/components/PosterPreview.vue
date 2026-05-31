@@ -23,10 +23,12 @@ defineProps<{
 
     <section class="poster-caption">
       <h2>{{ draft.title || "Untitled Album" }}</h2>
-      <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
       <div class="poster-rule" />
       <div class="poster-meta-row">
-        <p>{{ draft.metadataLine || draft.releaseDate || "Release date" }}</p>
+        <div class="poster-meta-left">
+          <p class="poster-release">{{ draft.metadataLine || draft.releaseDate || "Release date" }}</p>
+          <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
+        </div>
         <div class="poster-swatches" aria-label="Poster palette">
           <span
             v-for="color in draft.palette"

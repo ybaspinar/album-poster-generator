@@ -29,8 +29,8 @@ describe("draft editing helpers", () => {
   });
 
   it("creates a readable metadata line", () => {
-    expect(createPosterMetadataLine("2018-06-08", "Kanye West & Kid Cudi")).toBe(
-      "Released: June 8, 2018 · Kanye West & Kid Cudi",
+    expect(createPosterMetadataLine("2018-06-08")).toBe(
+      "Released: June 8, 2018",
     );
   });
 });

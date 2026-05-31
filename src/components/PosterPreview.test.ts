@@ -24,6 +24,24 @@ describe("PosterPreview", () => {
     expect(wrapper.findAll(".poster-swatch")).toHaveLength(6);
   });
 
+  it("places artist name under release in the meta row", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          title: "Kids See Ghosts",
+          artist: "Kanye West & Kid Cudi",
+          releaseDate: "2018-06-08",
+          artworkUrl: "https://example.com/cover.jpg",
+        }),
+      },
+    });
+
+    const metaRow = wrapper.find(".poster-meta-row");
+    expect(metaRow.exists()).toBe(true);
+    expect(metaRow.find(".poster-release").text()).toContain("2018-06-08");
+    expect(metaRow.find(".poster-artist").text()).toBe("Kanye West & Kid Cudi");
+  });
+
   it("loads remote artwork with anonymous CORS for PNG export", () => {
     const wrapper = mount(PosterPreview, {
       props: {
