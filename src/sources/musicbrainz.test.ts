@@ -75,7 +75,7 @@ describe("searchMusicBrainzAlbums", () => {
 
     expect(fetcher).toHaveBeenNthCalledWith(
       1,
-      "https://musicbrainz.org/ws/2/release-group?query=kids%20see%20ghosts&type=album&fmt=json&limit=8",
+      "https://musicbrainz.org/ws/2/release-group?query=kids%20see%20ghosts&fmt=json&limit=12",
       {
         headers: {
           Accept: "application/json",
@@ -200,6 +200,40 @@ describe("searchMusicBrainzAlbums", () => {
 
     await expect(searchMusicBrainzAlbums("test", { fetcher })).rejects.toThrow(
       "MusicBrainz search failed with status 503",
+    );
+  });
+
+  it("uses fielded query when input looks like artist - album", async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            "release-groups": [
+              {
+                id: "rg-2",
+                title: "Random Access Memories",
+                "first-release-date": "2013-05-17",
+                "artist-credit": [{ name: "Daft Punk" }],
+              },
+            ],
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(new Response("", { status: 404 }));
+    const storage = new MemoryStorage();
+
+    await searchMusicBrainzAlbums("daft punk - random access memories", {
+      fetcher,
+      storage,
+      now: () => 1_000,
+    });
+
+    expect(fetcher).toHaveBeenNthCalledWith(
+      1,
+      "https://musicbrainz.org/ws/2/release-group?query=artist%3A%22daft%20punk%22%20AND%20releasegroup%3A%22random%20access%20memories%22&fmt=json&limit=12",
+      { headers: { Accept: "application/json" } },
     );
   });
 });

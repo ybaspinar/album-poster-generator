@@ -32,6 +32,7 @@ interface SearchMusicBrainzAlbumsOptions {
 }
 
 const musicBrainzBaseUrl = "https://musicbrainz.org/ws/2/release-group";
+const searchLimit = 12;
 
 export async function searchMusicBrainzAlbums(
   query: string,
@@ -59,11 +60,19 @@ export async function searchMusicBrainzAlbums(
   return enrichedResults;
 }
 
+function buildMusicBrainzQuery(normalizedQuery: string): string {
+  const dashSplit = normalizedQuery.split(/\s+-\s+/);
+  if (dashSplit.length === 2 && dashSplit[0].length > 0 && dashSplit[1].length > 0) {
+    return `artist:"${dashSplit[0]}" AND releasegroup:"${dashSplit[1]}"`;
+  }
+  return normalizedQuery;
+}
+
 async function fetchMusicBrainzAlbums(
   normalizedQuery: string,
   fetcher: Fetcher,
 ): Promise<AlbumDraftInput[]> {
-  const url = `${musicBrainzBaseUrl}?query=${encodeURIComponent(normalizedQuery)}&type=album&fmt=json&limit=8`;
+  const url = `${musicBrainzBaseUrl}?query=${encodeURIComponent(buildMusicBrainzQuery(normalizedQuery))}&fmt=json&limit=${searchLimit}`;
 
   const response = await fetcher(url, {
     headers: {
