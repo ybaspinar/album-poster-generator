@@ -24,7 +24,7 @@ describe("findCoverArt", () => {
     );
 
     await expect(findCoverArt("rg-1", fetcher)).resolves.toEqual({
-      artworkUrl: "https://example.com/front-large.jpg",
+      artworkUrl: "https://example.com/front.jpg",
       artworkSource: "cover-art-archive",
     });
   });

@@ -68,7 +68,7 @@ describe("searchMusicBrainzAlbums", () => {
         releaseDate: "2018-06-08",
         source: "musicbrainz",
         sourceId: "rg-1",
-        artworkUrl: "https://example.com/front-large.jpg",
+        artworkUrl: "https://example.com/front-full.jpg",
         artworkSource: "cover-art-archive",
       },
     ]);

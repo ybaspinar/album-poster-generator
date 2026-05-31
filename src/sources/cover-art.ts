@@ -43,7 +43,8 @@ export async function findCoverArt(
   const data = (await response.json()) as CoverArtResponse;
   const images = data.images ?? [];
   const selected = images.find((image) => image.front) ?? images[0];
-  const artworkUrl = selected?.thumbnails?.large ?? selected?.image ?? "";
+  // Prefer full-size image over large thumbnail for highest quality
+  const artworkUrl = selected?.image ?? selected?.thumbnails?.large ?? "";
 
   return {
     artworkUrl,
