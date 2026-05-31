@@ -2,7 +2,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
 import {
   Select,
   SelectContent,
@@ -14,7 +13,7 @@ import {
 import type { AlbumDraft, PosterFont } from "../domain/album";
 import { posterFontOptions } from "../domain/album";
 import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
-import GoogleFontSelector from "./GoogleFontSelector.vue";
+import { loadGoogleFont } from "../services/google-fonts";
 
 const props = defineProps<{
   draft: AlbumDraft;
@@ -62,11 +61,44 @@ function selectFont(value: string): void {
 
 function fontLabel(font: PosterFont): string {
   const labels: Record<PosterFont, string> = {
-    gotham: "Gotham (sans-serif)",
-    inter: "Inter (system)",
+    gotham: "Gotham (built-in sans-serif)",
+    inter: "Inter (built-in sans-serif)",
     system: "System default",
+    // Sans-serif Google Fonts
+    "Roboto": "Roboto",
+    "Open Sans": "Open Sans",
+    "Lato": "Lato",
+    "Montserrat": "Montserrat",
+    "Poppins": "Poppins",
+    "Raleway": "Raleway",
+    "Noto Sans": "Noto Sans",
+    "Source Sans Pro": "Source Sans Pro",
+    "Nunito": "Nunito",
+    "Oswald": "Oswald",
+    "Ubuntu": "Ubuntu",
+    "Work Sans": "Work Sans",
+    "Rubik": "Rubik",
+    "IBM Plex Sans": "IBM Plex Sans",
+    "Karla": "Karla",
+    "Space Grotesk": "Space Grotesk",
+    "Bebas Neue": "Bebas Neue",
+    "Teko": "Teko",
+    // Serif Google Fonts
+    "Playfair Display": "Playfair Display",
+    "Merriweather": "Merriweather",
+    "Lora": "Lora",
+    "Crimson Text": "Crimson Text",
+    "Cormorant Garamond": "Cormorant Garamond",
+    "Zilla Slab": "Zilla Slab",
+    // Display/Decorative Google Fonts
+    "Permanent Marker": "Permanent Marker",
+    "Pacifico": "Pacifico",
+    "Dancing Script": "Dancing Script",
+    "Courgette": "Courgette",
+    "Bangers": "Bangers",
+    "Anton": "Anton",
   };
-  return labels[font];
+  return labels[font] || font;
 }
 </script>
 
@@ -149,13 +181,6 @@ function fontLabel(font: PosterFont): string {
             </SelectContent>
           </Select>
         </div>
-
-        <Separator class="my-2" />
-
-        <GoogleFontSelector
-          :model-value="draft.font"
-          @update:model-value="selectFont"
-        />
       </div>
 
       <div class="grid grid-cols-3 gap-3" aria-label="Palette editor">

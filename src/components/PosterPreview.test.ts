@@ -71,8 +71,8 @@ describe("PosterPreview", () => {
     const wrapper = mount(PosterPreview, {
       props: {
         draft: createAlbumDraft({
-          // Using a Google Font (not in predefined list)
-          font: "Roboto" as any,
+          // Using a Google Font (not a built-in font)
+          font: "Roboto",
         }),
       },
     });

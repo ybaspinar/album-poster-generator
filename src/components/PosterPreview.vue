@@ -2,17 +2,21 @@
 import { computed, watch } from "vue";
 import type { AlbumDraft, PosterFont } from "../domain/album";
 import { loadGoogleFont, getFontFamilyString } from "../services/google-fonts";
-import { isGoogleFont } from "../domain/album";
 
 const props = defineProps<{
   draft: AlbumDraft;
 }>();
 
+// Built-in fonts that have CSS classes defined
+const BUILTIN_FONTS = ["gotham", "inter", "system"] as const;
+
 const fontClass = computed(() => {
   const font = props.draft.font;
-  // Only add class for predefined fonts, Google Fonts use inline style
-  if (isGoogleFont(font)) return "";
-  return `font-${font}`;
+  // Only add class for built-in fonts, others use inline style
+  if (BUILTIN_FONTS.includes(font as typeof BUILTIN_FONTS[number])) {
+    return `font-${font}`;
+  }
+  return "";
 });
 
 function getFontFamily(_font: PosterFont): string {
@@ -22,7 +26,7 @@ function getFontFamily(_font: PosterFont): string {
     system: "system-ui, ui-sans-serif, sans-serif",
   };
   
-  // Check if it's a predefined font
+  // Check if it's a built-in font
   if (_font in fonts) {
     return fonts[_font as keyof typeof fonts];
   }
@@ -35,7 +39,7 @@ function getFontFamily(_font: PosterFont): string {
 watch(
   () => props.draft.font,
   async (newFont) => {
-    if (isGoogleFont(newFont)) {
+    if (!BUILTIN_FONTS.includes(newFont as typeof BUILTIN_FONTS[number])) {
       try {
         await loadGoogleFont(newFont, ["400", "700"]);
       } catch (e) {
