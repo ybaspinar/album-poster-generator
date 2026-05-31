@@ -235,9 +235,10 @@
 
 .poster-tracklist {
   display: grid;
-  gap: 0.45cqw;
-  max-width: 44cqw;
-  margin: 1.5cqw 0 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 3.2cqw;
+  row-gap: 0.8cqw;
+  margin: 2.2cqw 0 0;
   padding: 0;
   list-style: none;
   color: var(--poster-muted);
@@ -249,15 +250,14 @@
 
 .poster-tracklist li {
   display: grid;
-  grid-template-columns: 2.4em 1fr;
+  grid-template-columns: 2.4em minmax(0, 1fr);
   gap: 0.5em;
+  min-width: 0;
 }
 
 .poster-tracklist span:last-child {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .poster-swatches {

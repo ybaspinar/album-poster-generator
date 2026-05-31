@@ -13,6 +13,7 @@ describe("album draft model", () => {
       artworkSource: "manual",
       palette: ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"],
       tracklist: [],
+      showTracklist: true,
       source: "manual",
       sourceId: "",
       font: "gotham",
@@ -36,6 +37,7 @@ describe("album draft model", () => {
     const draft = createAlbumDraft();
 
     expect(draft.tracklist).toEqual([]);
+    expect(draft.showTracklist).toBe(true);
   });
 
   it("normalizes tracklist entries", () => {

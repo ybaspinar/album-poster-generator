@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import { createAlbumDraft } from "../domain/album";
@@ -42,7 +43,7 @@ describe("PosterPreview", () => {
     expect(metaRow.find(".poster-artist").text()).toBe("Kanye West & Kid Cudi");
   });
 
-  it("renders a numbered tracklist under the artist metadata", () => {
+  it("renders a numbered tracklist below the metadata row", () => {
     const wrapper = mount(PosterPreview, {
       props: {
         draft: createAlbumDraft({
@@ -52,8 +53,11 @@ describe("PosterPreview", () => {
       },
     });
 
+    const metaRow = wrapper.find(".poster-meta-row");
     const tracklist = wrapper.find(".poster-tracklist");
     expect(tracklist.exists()).toBe(true);
+    expect(metaRow.find(".poster-tracklist").exists()).toBe(false);
+    expect(metaRow.element.nextElementSibling).toBe(tracklist.element);
     expect(tracklist.text()).toContain("1) Foo");
     expect(tracklist.text()).toContain("2) Xox");
     expect(tracklist.text()).toContain("3) Last Song");
@@ -70,6 +74,39 @@ describe("PosterPreview", () => {
     });
 
     expect(wrapper.find(".poster-tracklist").exists()).toBe(false);
+  });
+
+  it("does not render a tracklist block when tracklist visibility is disabled", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          artist: "Test Artist",
+          tracklist: ["Foo", "Xox"],
+          showTracklist: false,
+        }),
+      },
+    });
+
+    expect(wrapper.find(".poster-tracklist").exists()).toBe(false);
+  });
+
+  it("allows long track names to use available space instead of truncating", () => {
+    const css = readFileSync("src/styles/globals.css", "utf8");
+    const trackTitleRule = css.match(/\.poster-tracklist span:last-child \{(?<body>[^}]+)\}/)?.groups
+      ?.body;
+
+    expect(trackTitleRule).toBeDefined();
+    expect(trackTitleRule).not.toContain("text-overflow: ellipsis");
+    expect(trackTitleRule).not.toContain("white-space: nowrap");
+  });
+
+  it("limits the poster tracklist to three columns with readable row spacing", () => {
+    const css = readFileSync("src/styles/globals.css", "utf8");
+    const tracklistRule = css.match(/\.poster-tracklist \{(?<body>[^}]+)\}/)?.groups?.body;
+
+    expect(tracklistRule).toBeDefined();
+    expect(tracklistRule).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
+    expect(tracklistRule).toContain("row-gap: 0.8cqw");
   });
 
   it("loads remote artwork with anonymous CORS for PNG export", () => {

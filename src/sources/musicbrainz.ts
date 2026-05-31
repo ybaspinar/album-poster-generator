@@ -32,6 +32,26 @@ interface MusicBrainzReleaseGroupResponse {
   "release-groups"?: MusicBrainzReleaseGroup[];
 }
 
+interface MusicBrainzReleaseListItem {
+  id?: string;
+}
+
+interface MusicBrainzReleaseListResponse {
+  releases?: MusicBrainzReleaseListItem[];
+}
+
+interface MusicBrainzTrack {
+  title?: string;
+}
+
+interface MusicBrainzMedium {
+  tracks?: MusicBrainzTrack[];
+}
+
+interface MusicBrainzReleaseDetailResponse {
+  media?: MusicBrainzMedium[];
+}
+
 interface SearchMusicBrainzAlbumsOptions {
   fetcher?: Fetcher;
   storage?: StorageLike;
@@ -39,6 +59,7 @@ interface SearchMusicBrainzAlbumsOptions {
 }
 
 const musicBrainzBaseUrl = "https://musicbrainz.org/ws/2/release-group";
+const musicBrainzReleaseBaseUrl = "https://musicbrainz.org/ws/2/release";
 const searchLimit = 12;
 
 export function normalizeSearchParams(params: MusicBrainzSearchParams): string {
@@ -95,6 +116,59 @@ export async function searchMusicBrainzAlbums(
   writeCachedAlbumSearchResults(normalizedQuery, enrichedResults, storage, now);
 
   return enrichedResults;
+}
+
+export async function fetchMusicBrainzTracklist(
+  releaseGroupId: string,
+  fetcher: Fetcher = fetch,
+): Promise<string[]> {
+  try {
+    const releaseId = await fetchFirstReleaseId(releaseGroupId, fetcher);
+
+    if (!releaseId) {
+      return [];
+    }
+
+    return fetchReleaseTrackTitles(releaseId, fetcher);
+  } catch {
+    return [];
+  }
+}
+
+async function fetchFirstReleaseId(releaseGroupId: string, fetcher: Fetcher): Promise<string> {
+  const url = `${musicBrainzReleaseBaseUrl}?release-group=${encodeURIComponent(releaseGroupId)}&fmt=json&limit=5`;
+  const response = await fetcher(url, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    return "";
+  }
+
+  const data = (await response.json()) as MusicBrainzReleaseListResponse;
+  return data.releases?.find((release) => release.id)?.id ?? "";
+}
+
+async function fetchReleaseTrackTitles(releaseId: string, fetcher: Fetcher): Promise<string[]> {
+  const url = `${musicBrainzReleaseBaseUrl}/${encodeURIComponent(releaseId)}?inc=recordings&fmt=json`;
+  const response = await fetcher(url, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const data = (await response.json()) as MusicBrainzReleaseDetailResponse;
+  return (data.media ?? []).flatMap((medium) =>
+    (medium.tracks ?? [])
+      .map((track) => track.title?.replace(/\s+/g, " ").trim())
+      .filter((title): title is string => Boolean(title)),
+  );
 }
 
 function buildMusicBrainzQuery(normalizedQuery: string, params?: MusicBrainzSearchParams): string {

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from "vitest";
 import App from "../App.vue";
 import { createExportableArtworkUrl } from "../media/artwork-url";
 import { findCoverArt } from "../sources/cover-art";
+import { fetchMusicBrainzTracklist } from "../sources/musicbrainz";
 
 vi.mock("../media/palette", () => ({
   extractPaletteFromImage: vi
@@ -21,6 +22,7 @@ vi.mock("../media/artwork-url", () => ({
 }));
 
 vi.mock("../sources/musicbrainz", () => ({
+  fetchMusicBrainzTracklist: vi.fn().mockResolvedValue(["Feel the Love", "Fire"]),
   searchMusicBrainzAlbums: vi.fn().mockResolvedValue([
     {
       title: "Kids See Ghosts",
@@ -67,6 +69,12 @@ describe("App flow", () => {
 
     expect(wrapper.findComponent(Alert).exists()).toBe(true);
     expect(wrapper.text()).toContain("Kids See Ghosts");
+    expect(fetchMusicBrainzTracklist).toHaveBeenCalledWith("rg-1");
+    expect(wrapper.find('[data-test="tracklist-input"]').element).toHaveProperty(
+      "value",
+      "Feel the Love\nFire",
+    );
+    expect(wrapper.text()).toContain("1) Feel the Love");
     expect(createExportableArtworkUrl).toHaveBeenCalledWith("https://example.com/search-front.jpg");
     expect(wrapper.find(".poster-art").attributes("src")).toBe("blob:search-front-exportable");
     expect(findCoverArt).not.toHaveBeenCalled();
@@ -80,5 +88,20 @@ describe("App flow", () => {
     await editorTitleInput.setValue("My Custom Poster Title");
 
     expect(wrapper.text()).toContain("My Custom Poster Title");
+  });
+
+  it("persists the tracklist visibility preference between drafts", async () => {
+    const wrapper = mount(App);
+
+    const showTracklistCheckbox = wrapper.find('[data-test="show-tracklist-input"]');
+    expect((showTracklistCheckbox.element as HTMLInputElement).checked).toBe(true);
+
+    await showTracklistCheckbox.setValue(false);
+    expect(window.localStorage.getItem("album-poster-generator:show-tracklist")).toBe("false");
+
+    await wrapper.findComponent(Button).trigger("click");
+    expect(
+      (wrapper.find('[data-test="show-tracklist-input"]').element as HTMLInputElement).checked,
+    ).toBe(false);
   });
 });

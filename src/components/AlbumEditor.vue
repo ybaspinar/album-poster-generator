@@ -45,6 +45,10 @@ function updateTracklist(value: string | number): void {
   emit("patch", { tracklist });
 }
 
+function updateShowTracklist(event: Event): void {
+  emit("patch", { showTracklist: (event.target as HTMLInputElement).checked });
+}
+
 function updatePalette(index: number, value: string | number): void {
   const palette = [...props.draft.palette];
   palette[index] = String(value);
@@ -163,7 +167,23 @@ function fontLabel(font: PosterFont): string {
         </div>
 
         <div class="grid gap-2">
-          <Label for="poster-tracklist">Tracklist</Label>
+          <div class="flex items-center justify-between gap-3">
+            <Label for="poster-tracklist">Tracklist</Label>
+            <label
+              for="poster-show-tracklist"
+              class="flex items-center gap-2 text-xs font-medium text-muted-foreground"
+            >
+              <input
+                id="poster-show-tracklist"
+                data-test="show-tracklist-input"
+                type="checkbox"
+                class="size-4 rounded border-input accent-primary"
+                :checked="draft.showTracklist"
+                @change="updateShowTracklist"
+              />
+              Show on poster
+            </label>
+          </div>
           <textarea
             id="poster-tracklist"
             data-test="tracklist-input"

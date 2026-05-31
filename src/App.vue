@@ -19,8 +19,11 @@ import { exportElementAsPng } from "./export/png";
 import { createExportableArtworkUrl, type ExportableArtworkUrlResult } from "./media/artwork-url";
 import { extractPaletteFromImage } from "./media/palette";
 import { findCoverArt } from "./sources/cover-art";
+import { fetchMusicBrainzTracklist } from "./sources/musicbrainz";
 
-const draft = ref<AlbumDraft>(createEmptyAlbumDraft());
+const showTracklistPreferenceKey = "album-poster-generator:show-tracklist";
+
+const draft = ref<AlbumDraft>(createAlbumDraft({ showTracklist: readShowTracklistPreference() }));
 const selectedPresetId = ref<ExportPresetId>("a4-portrait");
 const exporting = ref(false);
 const status = ref("");
@@ -49,12 +52,15 @@ watch(
 );
 
 async function selectAlbum(album: AlbumDraftInput): Promise<void> {
+  const tracklist = album.sourceId ? await fetchMusicBrainzTracklist(album.sourceId) : [];
   const exportableArtwork = album.artworkUrl
     ? await makeArtworkExportable(album.artworkUrl)
     : createExportableArtworkResult(album.artworkUrl ?? "");
 
   draft.value = mergeFetchedAlbum(draft.value, {
     ...album,
+    tracklist,
+    showTracklist: readShowTracklistPreference(),
     artworkUrl: exportableArtwork.artworkUrl,
   });
   status.value = exportableArtwork.ok
@@ -83,12 +89,32 @@ async function selectAlbum(album: AlbumDraftInput): Promise<void> {
 }
 
 function startManual(): void {
-  draft.value = createAlbumDraft();
+  draft.value = createAlbumDraft({ showTracklist: readShowTracklistPreference() });
   status.value = "Manual draft ready.";
 }
 
 function patchDraft(patch: Partial<AlbumDraft>): void {
+  if (typeof patch.showTracklist === "boolean") {
+    writeShowTracklistPreference(patch.showTracklist);
+  }
+
   draft.value = applyDraftPatch(draft.value, patch);
+}
+
+function readShowTracklistPreference(): boolean {
+  try {
+    return window.localStorage.getItem(showTracklistPreferenceKey) !== "false";
+  } catch {
+    return true;
+  }
+}
+
+function writeShowTracklistPreference(showTracklist: boolean): void {
+  try {
+    window.localStorage.setItem(showTracklistPreferenceKey, String(showTracklist));
+  } catch {
+    // Ignore unavailable storage; the in-memory draft still updates.
+  }
 }
 
 async function makeArtworkExportable(artworkUrl: string): Promise<ExportableArtworkUrlResult> {

@@ -86,6 +86,7 @@ export interface AlbumDraft {
   artworkSource: ArtworkSource;
   palette: string[];
   tracklist: string[];
+  showTracklist: boolean;
   source: AlbumSource;
   sourceId: string;
   font: PosterFont;
@@ -101,6 +102,7 @@ export interface AlbumDraftInput {
   artworkSource?: ArtworkSource;
   palette?: string[];
   tracklist?: string[];
+  showTracklist?: boolean;
   source?: AlbumSource;
   sourceId?: string;
   font?: PosterFont;
@@ -127,6 +129,7 @@ export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
     artworkSource: input.artworkSource ?? "manual",
     palette: normalizePalette(input.palette),
     tracklist: normalizeTracklist(input.tracklist),
+    showTracklist: input.showTracklist ?? true,
     source: input.source ?? "manual",
     sourceId: input.sourceId ?? "",
     font: input.font ?? defaultPosterFont,

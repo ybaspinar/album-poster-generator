@@ -4,3 +4,6 @@ node_modules/
 dist/
 coverage/
 .vite/
+graphify-out/
+.graphify_*.json
+.graphify_*.txt

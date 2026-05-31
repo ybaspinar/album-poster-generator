@@ -26,11 +26,18 @@ describe("AlbumEditor", () => {
     expect(tracklistTextarea.exists()).toBe(true);
     expect((tracklistTextarea.element as HTMLTextAreaElement).value).toBe("");
 
+    const showTracklistCheckbox = wrapper.find('[data-test="show-tracklist-input"]');
+    expect(showTracklistCheckbox.exists()).toBe(true);
+    expect((showTracklistCheckbox.element as HTMLInputElement).checked).toBe(true);
+
+    await showTracklistCheckbox.setValue(false);
+    expect(wrapper.emitted("patch")?.[1]).toEqual([{ showTracklist: false }]);
+
     await tracklistTextarea.setValue("Foo\n\n  Xox  \nLast Song");
-    expect(wrapper.emitted("patch")?.[1]).toEqual([{ tracklist: ["Foo", "Xox", "Last Song"] }]);
+    expect(wrapper.emitted("patch")?.[2]).toEqual([{ tracklist: ["Foo", "Xox", "Last Song"] }]);
 
     await wrapper.find('[data-test="palette-input-0"]').setValue("#abcdef");
-    expect(wrapper.emitted("patch")?.[2]).toEqual([
+    expect(wrapper.emitted("patch")?.[3]).toEqual([
       { palette: ["#abcdef", "#222222", "#333333", "#444444", "#555555", "#666666"] },
     ]);
 

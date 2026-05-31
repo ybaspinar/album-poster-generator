@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { AlbumDraftInput } from "../domain/album";
 import { createAlbumSearchCacheKey, type StorageLike } from "./album-search-cache";
 import {
+  fetchMusicBrainzTracklist,
   normalizeSearchParams,
   paramsDisplayLabel,
   searchMusicBrainzAlbums,
@@ -18,6 +19,34 @@ class MemoryStorage implements StorageLike {
   setItem(key: string, value: string): void {
     this.values.set(key, value);
   }
+}
+
+function createReleaseListResponse(): Response {
+  return new Response(
+    JSON.stringify({
+      releases: [
+        {
+          id: "release-1",
+          title: "Kids See Ghosts",
+        },
+      ],
+    }),
+    { status: 200 },
+  );
+}
+
+function createReleaseDetailResponse(): Response {
+  return new Response(
+    JSON.stringify({
+      id: "release-1",
+      media: [
+        {
+          tracks: [{ title: "Feel the Love" }, { title: "Fire" }, { title: "4th Dimension" }],
+        },
+      ],
+    }),
+    { status: 200 },
+  );
 }
 
 function createMusicBrainzResponse(): Response {
@@ -287,6 +316,52 @@ describe("searchMusicBrainzAlbums", () => {
       "https://musicbrainz.org/ws/2/release-group?query=artist%3A%22daft%20punk%22%20AND%20releasegroup%3A%22random%20access%20memories%22&fmt=json&limit=12",
       { headers: { Accept: "application/json" } },
     );
+  });
+});
+
+describe("fetchMusicBrainzTracklist", () => {
+  it("fetches track titles through the first release in a release group", async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(createReleaseListResponse())
+      .mockResolvedValueOnce(createReleaseDetailResponse());
+
+    await expect(fetchMusicBrainzTracklist("rg-1", fetcher)).resolves.toEqual([
+      "Feel the Love",
+      "Fire",
+      "4th Dimension",
+    ]);
+
+    expect(fetcher).toHaveBeenNthCalledWith(
+      1,
+      "https://musicbrainz.org/ws/2/release?release-group=rg-1&fmt=json&limit=5",
+      { headers: { Accept: "application/json" } },
+    );
+    expect(fetcher).toHaveBeenNthCalledWith(
+      2,
+      "https://musicbrainz.org/ws/2/release/release-1?inc=recordings&fmt=json",
+      { headers: { Accept: "application/json" } },
+    );
+  });
+
+  it("returns an empty list when the release group has no releases", async () => {
+    const fetcher = vi.fn().mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          releases: [],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    await expect(fetchMusicBrainzTracklist("rg-1", fetcher)).resolves.toEqual([]);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
+  it("returns an empty list when tracklist lookup fails", async () => {
+    const fetcher = vi.fn().mockResolvedValueOnce(new Response("rate limited", { status: 503 }));
+
+    await expect(fetchMusicBrainzTracklist("rg-1", fetcher)).resolves.toEqual([]);
   });
 });
 
