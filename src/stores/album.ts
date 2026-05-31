@@ -1,8 +1,9 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import type { AlbumDraft, AlbumDraftInput } from "../domain/album";
-import type { ExportPresetId } from "../export/presets";
 import { createAlbumDraft } from "../domain/album";
+import type { ExportPresetId } from "../export/presets";
+import { applyDraftPatch, mergeFetchedAlbum } from "../editor/draft";
 import type { MusicBrainzEdition } from "../sources/musicbrainz";
 
 const showTracklistPreferenceKey = "album-poster-generator:show-tracklist";
@@ -71,6 +72,21 @@ export const useAlbumStore = defineStore("album", () => {
     writeShowTracklistPreference(showTracklist);
   }
 
+  function loadFetchedAlbum(album: AlbumDraftInput, tracklist: string[]): void {
+    draft.value = mergeFetchedAlbum(draft.value, {
+      ...album,
+      tracklist,
+      showTracklist: readShowTracklistPreference(),
+    });
+  }
+
+  function patchDraft(patch: Partial<AlbumDraft>): void {
+    if (typeof patch.showTracklist === "boolean") {
+      updateShowTracklistPreference(patch.showTracklist);
+    }
+    draft.value = applyDraftPatch(draft.value, patch);
+  }
+
   return {
     // State
     draft,
@@ -90,5 +106,7 @@ export const useAlbumStore = defineStore("album", () => {
     clearPendingAlbum,
     updateShowTracklistPreference,
     readShowTracklistPreference,
+    loadFetchedAlbum,
+    patchDraft,
   };
 });

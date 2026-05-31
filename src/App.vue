@@ -19,7 +19,7 @@ import ExportPanel from "./components/ExportPanel.vue";
 import PosterPreview from "./components/PosterPreview.vue";
 import { createAlbumDraft, type AlbumDraft, type AlbumDraftInput } from "./domain/album";
 import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
-import { createExportFilename, type ExportPresetId, getExportPreset } from "./export/presets";
+import { createExportFilename, getExportPreset } from "./export/presets";
 import { exportElementAsPng } from "./export/png";
 import { createExportableArtworkUrl, type ExportableArtworkUrlResult } from "./media/artwork-url";
 import { extractPaletteFromImage } from "./media/palette";
@@ -35,9 +35,9 @@ import { useAlbumStore } from "./stores/album";
 const store = useAlbumStore();
 const { draft, selectedPresetId, exporting, status, pendingAlbum, pendingEditions } =
   storeToRefs(store);
+const editionDialogOpen = computed(() => store.editionDialogOpen);
 
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
-const editionDialogOpen = computed(() => store.editionDialogOpen);
 
 let paletteRequestId = 0;
 
@@ -54,7 +54,7 @@ watch(
       const palette = await extractPaletteFromImage(artworkUrl);
 
       if (requestId === paletteRequestId) {
-        draft.value = applyDraftPatch(draft.value, { palette });
+        store.patchDraft({ palette });
       }
     } catch {
       // Palette extraction is best-effort. Keep the current swatches if artwork cannot be read.
