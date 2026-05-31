@@ -1,47 +1,83 @@
 <script setup lang="ts">
-import { nextTick, ref, watch } from "vue";
+import { computed, nextTick, ref, watch } from "vue";
 import { useDebounceFn } from "@vueuse/core";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import type { AlbumDraftInput } from "../domain/album";
 import { addRecentSearch, readRecentSearches } from "../sources/search-recent";
-import { searchMusicBrainzAlbums } from "../sources/musicbrainz";
+import {
+  paramsDisplayLabel,
+  searchMusicBrainzAlbums,
+  type MusicBrainzSearchParams,
+} from "../sources/musicbrainz";
 
 const emit = defineEmits<{
   select: [album: AlbumDraftInput];
 }>();
 
-const query = ref("");
+const artist = ref("");
+const title = ref("");
+const year = ref("");
+const type = ref<"any" | "album" | "ep" | "single" | "other">("any");
+
 const results = ref<AlbumDraftInput[]>([]);
 const status = ref("");
 const loading = ref(false);
 const selectedIndex = ref(-1);
 const showRecents = ref(false);
 const recents = ref<string[]>([]);
-const searchInputRef = ref<HTMLInputElement | null>(null);
+const artistInputRef = ref<HTMLInputElement | null>(null);
+
+const hasSearchableContent = computed(() => {
+  return (
+    artist.value.trim().length > 0 || title.value.trim().length > 0 || year.value.trim().length > 0
+  );
+});
+
+function currentParams(): MusicBrainzSearchParams {
+  return {
+    artist: artist.value,
+    title: title.value,
+    year: year.value,
+    type: type.value === "any" ? undefined : type.value,
+  };
+}
 
 function updateRecents(): void {
   recents.value = readRecentSearches();
 }
 
-function focusInput(): void {
-  if (!query.value.trim()) {
+function focusArtistInput(): void {
+  if (!hasSearchableContent.value) {
     updateRecents();
     showRecents.value = recents.value.length > 0;
   }
 }
 
-function blurInput(): void {
-  // Delay hiding so clicks on recent items register.
+function blurArtistInput(): void {
   setTimeout(() => {
     showRecents.value = false;
   }, 150);
 }
 
 function selectRecent(q: string): void {
-  query.value = q;
+  // Try to parse "artist - title" pattern back into fields
+  const dashSplit = q.split(/\s+-\s+/);
+  if (dashSplit.length === 2) {
+    artist.value = dashSplit[0];
+    title.value = dashSplit[1];
+  } else {
+    title.value = q;
+  }
   showRecents.value = false;
   performSearch();
 }
@@ -52,11 +88,14 @@ function clearResults(): void {
   status.value = "";
 }
 
-function clearQuery(): void {
-  query.value = "";
+function clearAllFields(): void {
+  artist.value = "";
+  title.value = "";
+  year.value = "";
+  type.value = "";
   clearResults();
   nextTick(() => {
-    const el = searchInputRef.value?.$el?.querySelector?.("input") ?? searchInputRef.value;
+    const el = artistInputRef.value?.$el?.querySelector?.("input") ?? artistInputRef.value;
     if (el && typeof el.focus === "function") {
       el.focus();
     }
@@ -64,9 +103,7 @@ function clearQuery(): void {
 }
 
 async function performSearch(): Promise<void> {
-  const trimmed = query.value.trim();
-
-  if (!trimmed) {
+  if (!hasSearchableContent.value) {
     clearResults();
     return;
   }
@@ -77,12 +114,14 @@ async function performSearch(): Promise<void> {
   selectedIndex.value = -1;
 
   try {
-    results.value = await searchMusicBrainzAlbums(trimmed);
+    const params = currentParams();
+    results.value = await searchMusicBrainzAlbums(params);
     status.value = results.value.length
       ? `${results.value.length} result${results.value.length === 1 ? "" : "s"} found.`
       : "No results found. Start manually or adjust the query.";
     if (results.value.length) {
-      addRecentSearch(trimmed);
+      const label = paramsDisplayLabel(currentParams());
+      if (label) addRecentSearch(label);
     }
   } catch (error) {
     status.value = error instanceof Error ? error.message : "MusicBrainz search failed.";
@@ -94,17 +133,21 @@ async function performSearch(): Promise<void> {
 
 const debouncedSearch = useDebounceFn(performSearch, 350);
 
-watch(query, (value, oldValue) => {
-  if (value.trim() !== oldValue?.trim()) {
-    if (value.trim().length >= 3) {
-      debouncedSearch();
-    } else if (!value.trim()) {
-      clearResults();
-      updateRecents();
-      showRecents.value = recents.value.length > 0;
-    }
+function anyFieldChanged(): void {
+  if (
+    artist.value.trim().length >= 2 ||
+    title.value.trim().length >= 2 ||
+    year.value.trim().length >= 2
+  ) {
+    debouncedSearch();
+  } else if (!hasSearchableContent.value) {
+    clearResults();
+    updateRecents();
+    showRecents.value = recents.value.length > 0;
   }
-});
+}
+
+watch([artist, title, year], anyFieldChanged);
 
 function onKeyDown(event: KeyboardEvent): void {
   if (!results.value.length && !showRecents.value) return;
@@ -126,7 +169,9 @@ function onKeyDown(event: KeyboardEvent): void {
     } else if (selectedIndex.value >= 0 && results.value[selectedIndex.value]) {
       emit("select", results.value[selectedIndex.value]);
       clearResults();
-      query.value = "";
+      artist.value = "";
+      title.value = "";
+      year.value = "";
     } else {
       debouncedSearch.cancel();
       performSearch();
@@ -140,7 +185,9 @@ function onKeyDown(event: KeyboardEvent): void {
 function selectResult(album: AlbumDraftInput): void {
   emit("select", album);
   clearResults();
-  query.value = "";
+  artist.value = "";
+  title.value = "";
+  year.value = "";
 }
 </script>
 
@@ -152,50 +199,81 @@ function selectResult(album: AlbumDraftInput): void {
     <CardContent class="grid gap-4">
       <form data-test="search-form" class="grid gap-3" @submit.prevent="performSearch">
         <div class="grid gap-2">
-          <Label for="album-search">Album search</Label>
+          <Label for="album-artist">Artist</Label>
           <div class="relative">
             <Input
-              id="album-search"
-              ref="searchInputRef"
-              v-model="query"
-              data-test="search-input"
+              id="album-artist"
+              ref="artistInputRef"
+              v-model="artist"
+              data-test="artist-input"
               type="search"
-              aria-label="Album search example: Kids See Ghosts"
-              placeholder="Kids See Ghosts"
+              placeholder="Kanye West"
               autocomplete="off"
-              @focus="focusInput"
-              @blur="blurInput"
+              @focus="focusArtistInput"
+              @blur="blurArtistInput"
               @keydown="onKeyDown"
             />
-            <button
-              v-if="query"
-              type="button"
-              class="absolute right-2 top-1/2 -translate-y-1/2 rounded p-0.5 text-muted-foreground hover:text-foreground"
-              aria-label="Clear search"
-              @click="clearQuery"
-            >
-              <span class="sr-only">Clear</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M18 6 6 18" />
-                <path d="m6 6 12 12" />
-              </svg>
-            </button>
           </div>
-          <p class="text-xs text-muted-foreground">Tip: try “artist - album” for better results.</p>
         </div>
-        <Button type="submit" :disabled="loading">
-          {{ loading ? "Searching…" : "Search" }}
-        </Button>
+
+        <div class="grid gap-2">
+          <Label for="album-title">Album title</Label>
+          <div class="relative">
+            <Input
+              id="album-title"
+              v-model="title"
+              data-test="title-input"
+              type="search"
+              placeholder="Kids See Ghosts"
+              autocomplete="off"
+              @keydown="onKeyDown"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="grid gap-2">
+            <Label for="album-year">Year</Label>
+            <Input
+              id="album-year"
+              v-model="year"
+              data-test="year-input"
+              type="search"
+              placeholder="2018"
+              autocomplete="off"
+              @keydown="onKeyDown"
+            />
+          </div>
+          <div class="grid gap-2">
+            <Label for="album-type">Type</Label>
+            <Select v-model="type">
+              <SelectTrigger id="album-type" data-test="type-select" class="w-full">
+                <SelectValue placeholder="Any" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="any">Any</SelectItem>
+                <SelectItem value="album">Album</SelectItem>
+                <SelectItem value="ep">EP</SelectItem>
+                <SelectItem value="single">Single</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div class="flex gap-2">
+          <Button type="submit" class="flex-1" :disabled="loading || !hasSearchableContent">
+            {{ loading ? "Searching…" : "Search" }}
+          </Button>
+          <Button
+            v-if="hasSearchableContent"
+            type="button"
+            variant="outline"
+            @click="clearAllFields"
+          >
+            Clear
+          </Button>
+        </div>
       </form>
 
       <div

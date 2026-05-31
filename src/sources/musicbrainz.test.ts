@@ -1,7 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import type { AlbumDraftInput } from "../domain/album";
 import { createAlbumSearchCacheKey, type StorageLike } from "./album-search-cache";
-import { searchMusicBrainzAlbums } from "./musicbrainz";
+import {
+  normalizeSearchParams,
+  paramsDisplayLabel,
+  searchMusicBrainzAlbums,
+  type MusicBrainzSearchParams,
+} from "./musicbrainz";
 
 class MemoryStorage implements StorageLike {
   private values = new Map<string, string>();
@@ -51,7 +56,7 @@ function createCoverArtResponse(): Response {
 }
 
 describe("searchMusicBrainzAlbums", () => {
-  it("normalizes and enriches release group search results", async () => {
+  it("normalizes and enriches release group search results (string query)", async () => {
     const fetcher = vi
       .fn()
       .mockResolvedValueOnce(createMusicBrainzResponse())
@@ -85,6 +90,46 @@ describe("searchMusicBrainzAlbums", () => {
     expect(fetcher).toHaveBeenNthCalledWith(2, "https://coverartarchive.org/release-group/rg-1", {
       headers: { Accept: "application/json" },
     });
+  });
+
+  it("normalizes and enriches release group search results (structured params)", async () => {
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(createMusicBrainzResponse())
+      .mockResolvedValueOnce(createCoverArtResponse());
+    const storage = new MemoryStorage();
+
+    const params: MusicBrainzSearchParams = {
+      artist: "Kanye West",
+      title: "Kids See Ghosts",
+      year: "2018",
+      type: "album",
+    };
+
+    await expect(
+      searchMusicBrainzAlbums(params, { fetcher, storage, now: () => 1_000 }),
+    ).resolves.toEqual([
+      {
+        id: "rg-1",
+        title: "Kids See Ghosts",
+        artist: "Kanye West & Kid Cudi",
+        releaseDate: "2018-06-08",
+        source: "musicbrainz",
+        sourceId: "rg-1",
+        artworkUrl: "https://example.com/front-full.jpg",
+        artworkSource: "cover-art-archive",
+      },
+    ]);
+
+    expect(fetcher).toHaveBeenNthCalledWith(
+      1,
+      "https://musicbrainz.org/ws/2/release-group?query=artist%3A%22Kanye%20West%22%20AND%20releasegroup%3A%22Kids%20See%20Ghosts%22%20AND%20date%3A2018%20AND%20primarytype%3AAlbum&fmt=json&limit=12",
+      {
+        headers: {
+          Accept: "application/json",
+        },
+      },
+    );
   });
 
   it("returns cached results and skips network calls", async () => {
@@ -188,10 +233,17 @@ describe("searchMusicBrainzAlbums", () => {
     ]);
   });
 
-  it("returns an empty list for blank queries without fetching", async () => {
+  it("returns an empty list for blank string queries without fetching", async () => {
     const fetcher = vi.fn();
 
     await expect(searchMusicBrainzAlbums("  ", { fetcher })).resolves.toEqual([]);
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it("returns an empty list for empty structured params without fetching", async () => {
+    const fetcher = vi.fn();
+
+    await expect(searchMusicBrainzAlbums({}, { fetcher })).resolves.toEqual([]);
     expect(fetcher).not.toHaveBeenCalled();
   });
 
@@ -203,7 +255,7 @@ describe("searchMusicBrainzAlbums", () => {
     );
   });
 
-  it("uses fielded query when input looks like artist - album", async () => {
+  it("uses fielded query when string input looks like artist - album", async () => {
     const fetcher = vi
       .fn()
       .mockResolvedValueOnce(
@@ -235,5 +287,45 @@ describe("searchMusicBrainzAlbums", () => {
       "https://musicbrainz.org/ws/2/release-group?query=artist%3A%22daft%20punk%22%20AND%20releasegroup%3A%22random%20access%20memories%22&fmt=json&limit=12",
       { headers: { Accept: "application/json" } },
     );
+  });
+});
+
+describe("normalizeSearchParams", () => {
+  it("produces a deterministic normalized string", () => {
+    expect(
+      normalizeSearchParams({ artist: "Kanye West", title: "Donda", year: "2021", type: "album" }),
+    ).toBe("a:kanye west|t:donda|y:2021|ty:album");
+  });
+
+  it("ignores empty fields", () => {
+    expect(normalizeSearchParams({ artist: "Björk" })).toBe("a:björk");
+  });
+
+  it("normalizes case and trims", () => {
+    expect(normalizeSearchParams({ title: "  Vespertine  ", artist: "  BJÖRK  " })).toBe(
+      "a:björk|t:vespertine",
+    );
+  });
+
+  it("returns empty string when all fields are empty", () => {
+    expect(normalizeSearchParams({})).toBe("");
+  });
+});
+
+describe("paramsDisplayLabel", () => {
+  it("shows artist - title when both present", () => {
+    expect(paramsDisplayLabel({ artist: "Daft Punk", title: "RAM" })).toBe("Daft Punk - RAM");
+  });
+
+  it("shows title only when no artist", () => {
+    expect(paramsDisplayLabel({ title: "Vespertine" })).toBe("Vespertine");
+  });
+
+  it("shows artist only when no title", () => {
+    expect(paramsDisplayLabel({ artist: "Björk" })).toBe("Björk");
+  });
+
+  it("returns empty string when no identifying fields", () => {
+    expect(paramsDisplayLabel({ year: "2020" })).toBe("");
   });
 });

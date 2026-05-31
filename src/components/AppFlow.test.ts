@@ -32,6 +32,10 @@ vi.mock("../sources/musicbrainz", () => ({
       artworkSource: "cover-art-archive",
     },
   ]),
+  paramsDisplayLabel: vi.fn((params) => {
+    if (params.artist && params.title) return `${params.artist} - ${params.title}`;
+    return params.title || params.artist || "";
+  }),
 }));
 
 vi.mock("../sources/cover-art", () => ({
@@ -49,7 +53,8 @@ describe("App flow", () => {
     expect(wrapper.findComponent(Alert).exists()).toBe(false);
     expect(wrapper.findAllComponents(Button).length).toBeGreaterThanOrEqual(2);
 
-    await wrapper.find('[data-test="search-input"]').setValue("kids see ghosts");
+    await wrapper.find('[data-test="artist-input"]').setValue("kanye");
+    await wrapper.find('[data-test="title-input"]').setValue("kids see ghosts");
     await wrapper.find('[data-test="search-form"]').trigger("submit");
     await Promise.resolve();
     await Promise.resolve();
@@ -69,7 +74,10 @@ describe("App flow", () => {
       wrapper.findAll<HTMLInputElement>('input[type="color"]').map((input) => input.element.value),
     ).toEqual(["#112233", "#445566", "#778899", "#aabbcc", "#ddeeff", "#010203"]);
 
-    await wrapper.find('[data-test="title-input"]').setValue("My Custom Poster Title");
+    // The editor title input is the second [data-test="title-input"] after the search title.
+    const editorTitleInput = wrapper.findAll('[data-test="title-input"]')[1];
+    expect(editorTitleInput.exists()).toBe(true);
+    await editorTitleInput.setValue("My Custom Poster Title");
 
     expect(wrapper.text()).toContain("My Custom Poster Title");
   });

@@ -6,8 +6,11 @@ import { Input } from "@/components/ui/input";
 import AlbumSearch from "./AlbumSearch.vue";
 
 vi.mock("../sources/musicbrainz", () => ({
-  searchMusicBrainzAlbums: vi.fn().mockImplementation(async (query: string) => {
-    if (query.toLowerCase().includes("vespertine")) {
+  searchMusicBrainzAlbums: vi.fn().mockImplementation(async (params) => {
+    const artist = params?.artist?.toLowerCase() ?? "";
+    const title = params?.title?.toLowerCase() ?? "";
+
+    if (artist.includes("björk") || title.includes("vespertine")) {
       return [
         {
           title: "Vespertine",
@@ -20,7 +23,7 @@ vi.mock("../sources/musicbrainz", () => ({
         },
       ];
     }
-    if (query.toLowerCase().includes("kid")) {
+    if (artist.includes("kanye") || title.includes("kid")) {
       return [
         {
           title: "Kids See Ghosts",
@@ -35,6 +38,10 @@ vi.mock("../sources/musicbrainz", () => ({
     }
     return [];
   }),
+  paramsDisplayLabel: vi.fn((params) => {
+    if (params.artist && params.title) return `${params.artist} - ${params.title}`;
+    return params.title || params.artist || "";
+  }),
 }));
 
 vi.mock("../sources/search-recent", () => ({
@@ -47,10 +54,11 @@ describe("AlbumSearch", () => {
     const wrapper = mount(AlbumSearch);
 
     expect(wrapper.findComponent(Card).exists()).toBe(true);
-    expect(wrapper.findComponent(Input).exists()).toBe(true);
+    expect(wrapper.findAllComponents(Input).length).toBeGreaterThanOrEqual(3);
     expect(wrapper.findAllComponents(Button).length).toBeGreaterThanOrEqual(1);
 
-    await wrapper.find('[data-test="search-input"]').setValue("vespertine");
+    await wrapper.find('[data-test="artist-input"]').setValue("Björk");
+    await wrapper.find('[data-test="title-input"]').setValue("Vespertine");
     await wrapper.find('[data-test="search-form"]').trigger("submit");
     await Promise.resolve();
     await Promise.resolve();
@@ -66,9 +74,33 @@ describe("AlbumSearch", () => {
     });
   });
 
-  it("shows recent searches on focus when input is empty", async () => {
+  it("searches by artist only", async () => {
     const wrapper = mount(AlbumSearch);
-    const input = wrapper.find('[data-test="search-input"]');
+
+    await wrapper.find('[data-test="artist-input"]').setValue("Kanye");
+    await wrapper.find('[data-test="search-form"]').trigger("submit");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(wrapper.find('[data-test="result-0"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain("Kids See Ghosts");
+  });
+
+  it("searches by title only", async () => {
+    const wrapper = mount(AlbumSearch);
+
+    await wrapper.find('[data-test="title-input"]').setValue("Vespertine");
+    await wrapper.find('[data-test="search-form"]').trigger("submit");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(wrapper.find('[data-test="result-0"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain("Vespertine");
+  });
+
+  it("shows recent searches on artist input focus when all fields are empty", async () => {
+    const wrapper = mount(AlbumSearch);
+    const input = wrapper.find('[data-test="artist-input"]');
 
     await input.trigger("focus");
     await Promise.resolve();
@@ -80,7 +112,7 @@ describe("AlbumSearch", () => {
 
   it("selects a recent search on click", async () => {
     const wrapper = mount(AlbumSearch);
-    const input = wrapper.find('[data-test="search-input"]');
+    const input = wrapper.find('[data-test="artist-input"]');
 
     await input.trigger("focus");
     await Promise.resolve();
@@ -88,49 +120,54 @@ describe("AlbumSearch", () => {
     const recentButtons = wrapper.findAll("button").filter((b) => b.text() === "vespertine");
     expect(recentButtons.length).toBeGreaterThan(0);
 
-    // mousedown.prevent is used in the component
     await recentButtons[0].trigger("mousedown");
     await Promise.resolve();
     await Promise.resolve();
 
-    expect((wrapper.find('input[type="search"]').element as HTMLInputElement).value).toBe(
+    expect((wrapper.find('[data-test="title-input"]').element as HTMLInputElement).value).toBe(
       "vespertine",
     );
     expect(wrapper.find('[data-test="result-0"]').exists()).toBe(true);
   });
 
-  it("clears query and results when clear button is clicked", async () => {
+  it("clears all fields when clear button is clicked", async () => {
     const wrapper = mount(AlbumSearch);
 
-    await wrapper.find('[data-test="search-input"]').setValue("vespertine");
+    await wrapper.find('[data-test="artist-input"]').setValue("Björk");
+    await wrapper.find('[data-test="title-input"]').setValue("Vespertine");
+    await wrapper.find('[data-test="year-input"]').setValue("2001");
     await wrapper.find('[data-test="search-form"]').trigger("submit");
     await Promise.resolve();
     await Promise.resolve();
 
     expect(wrapper.find('[data-test="result-0"]').exists()).toBe(true);
 
-    const clearButton = wrapper.find("button[aria-label='Clear search']");
-    expect(clearButton.exists()).toBe(true);
+    const clearButton = wrapper
+      .findAll("button")
+      .find((b) => b.text().toLowerCase().includes("clear"));
+    expect(clearButton?.exists()).toBe(true);
 
-    await clearButton.trigger("click");
+    await clearButton?.trigger("click");
     await Promise.resolve();
 
-    expect((wrapper.find('input[type="search"]').element as HTMLInputElement).value).toBe("");
+    expect((wrapper.find('[data-test="artist-input"]').element as HTMLInputElement).value).toBe("");
+    expect((wrapper.find('[data-test="title-input"]').element as HTMLInputElement).value).toBe("");
+    expect((wrapper.find('[data-test="year-input"]').element as HTMLInputElement).value).toBe("");
     expect(wrapper.find('[data-test="result-0"]').exists()).toBe(false);
   });
 
   it("navigates results with arrow keys and selects with enter", async () => {
     const wrapper = mount(AlbumSearch);
 
-    await wrapper.find('[data-test="search-input"]').setValue("kid");
+    await wrapper.find('[data-test="artist-input"]').setValue("Kanye");
     await wrapper.find('[data-test="search-form"]').trigger("submit");
     await Promise.resolve();
     await Promise.resolve();
 
     expect(wrapper.find('[data-test="result-0"]').exists()).toBe(true);
 
-    await wrapper.find('[data-test="search-input"]').trigger("keydown", { key: "ArrowDown" });
-    await wrapper.find('[data-test="search-input"]').trigger("keydown", { key: "Enter" });
+    await wrapper.find('[data-test="artist-input"]').trigger("keydown", { key: "ArrowDown" });
+    await wrapper.find('[data-test="artist-input"]').trigger("keydown", { key: "Enter" });
     await Promise.resolve();
 
     expect(wrapper.emitted("select")?.[0]?.[0]).toMatchObject({
