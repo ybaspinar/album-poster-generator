@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from "vue";
-import type { AlbumDraft, PosterFont } from "../domain/album";
+import type { AlbumDraft, PosterFont, PosterLayout } from "../domain/album";
 import { loadGoogleFont, getFontFamilyString } from "../services/google-fonts";
 
 const props = defineProps<{
@@ -17,6 +17,12 @@ const fontClass = computed(() => {
     return `font-${font}`;
   }
   return "";
+});
+
+const layoutClass = computed(() => {
+  const layout: PosterLayout = props.draft.layout;
+  if (layout === "medium") return "";
+  return `poster-layout-${layout}`;
 });
 
 function getFontFamily(_font: PosterFont): string {
@@ -55,7 +61,7 @@ watch(
   <article
     data-export-poster
     class="poster-page"
-    :class="fontClass"
+    :class="[fontClass, layoutClass]"
     aria-label="Album poster preview"
     :style="{ fontFamily: getFontFamily(draft.font) }"
   >
