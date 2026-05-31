@@ -152,7 +152,7 @@ function fontLabel(font: PosterFont): string {
   <Accordion
     type="multiple"
     class="flex flex-col gap-4"
-    :default-value="['info', 'tracklist', 'artwork', 'typography', 'colors', 'layout']"
+    :default-value="['info', 'tracklist', 'artwork', 'typography', 'swatches', 'layout']"
   >
     <AccordionItem value="info">
       <Card>
@@ -332,9 +332,9 @@ function fontLabel(font: PosterFont): string {
       </Card>
     </AccordionItem>
 
-    <AccordionItem value="colors">
+    <AccordionItem value="swatches">
       <Card>
-        <AccordionTrigger header="Colors" />
+        <AccordionTrigger header="Swatches" />
         <AccordionContent>
           <div class="grid gap-3 px-1">
             <div class="flex items-center justify-between gap-3">
@@ -397,9 +397,7 @@ function fontLabel(font: PosterFont): string {
         <AccordionTrigger header="Layout" />
         <AccordionContent>
           <div class="px-1 py-2">
-            <p class="text-sm text-muted-foreground">
-              Additional layout options will appear here.
-            </p>
+            <p class="text-sm text-muted-foreground">Additional layout options will appear here.</p>
           </div>
         </AccordionContent>
       </Card>
