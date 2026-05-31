@@ -28,7 +28,6 @@ export function quantizePixelsToPalette(pixels: Uint8ClampedArray, maxColors = 6
 }
 
 export async function extractPaletteFromImage(url: string, maxColors = 6): Promise<string[]> {
-  const image = await loadImage(url);
   const canvas = document.createElement("canvas");
   const context = canvas.getContext("2d", { willReadFrequently: true });
 
@@ -36,6 +35,7 @@ export async function extractPaletteFromImage(url: string, maxColors = 6): Promi
     return cloneDefaultPalette();
   }
 
+  const image = await loadImage(url);
   const size = 96;
   canvas.width = size;
   canvas.height = size;
@@ -60,7 +60,10 @@ function clampChannel(value: number): number {
 function loadImage(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
-    image.crossOrigin = "anonymous";
+    // Only set crossOrigin for HTTP URLs, not blob URLs
+    if (url.startsWith("http")) {
+      image.crossOrigin = "anonymous";
+    }
     image.addEventListener("load", () => resolve(image));
     image.addEventListener("error", () =>
       reject(new Error("Image could not be loaded for palette extraction.")),
