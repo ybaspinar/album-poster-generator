@@ -79,6 +79,17 @@ export const posterFontOptions: PosterFont[] = [
 ];
 export const defaultPosterFont: PosterFont = "gotham";
 
+export type PosterLayout = "small" | "medium" | "large" | "edge-to-edge";
+
+export const defaultPosterLayout: PosterLayout = "medium";
+
+export const posterLayoutOptions: PosterLayout[] = [
+  "small",
+  "medium",
+  "large",
+  "edge-to-edge",
+];
+
 export interface AlbumDraft {
   id: string;
   title: string;
@@ -97,6 +108,7 @@ export interface AlbumDraft {
   source: AlbumSource;
   sourceId: string;
   font: PosterFont;
+  layout: PosterLayout;
 }
 
 export interface AlbumDraftInput {
@@ -117,6 +129,7 @@ export interface AlbumDraftInput {
   source?: AlbumSource;
   sourceId?: string;
   font?: PosterFont;
+  layout?: PosterLayout;
 }
 
 export const defaultPalette = ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"];
@@ -148,6 +161,7 @@ export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
     source: input.source ?? "manual",
     sourceId: input.sourceId ?? "",
     font: input.font ?? defaultPosterFont,
+    layout: input.layout ?? defaultPosterLayout,
   };
 }
 
