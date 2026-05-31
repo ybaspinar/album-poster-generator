@@ -90,6 +90,15 @@ export const posterLayoutOptions: PosterLayout[] = [
   "edge-to-edge",
 ];
 
+export type PosterBackgroundMode = "default" | "solid" | "gradient" | "artwork";
+export type GradientDirection = "horizontal" | "vertical" | "radial";
+
+export const defaultPosterBackgroundMode: PosterBackgroundMode = "default";
+export const defaultBackgroundSolidColor = "#1a1a2e";
+export const defaultBackgroundGradientFrom = "#1a1a2e";
+export const defaultBackgroundGradientTo = "#16213e";
+export const defaultBackgroundGradientDirection: GradientDirection = "vertical";
+
 export interface AlbumDraft {
   id: string;
   title: string;
@@ -109,6 +118,12 @@ export interface AlbumDraft {
   sourceId: string;
   font: PosterFont;
   layout: PosterLayout;
+  backgroundMode: PosterBackgroundMode;
+  backgroundSolidColor: string;
+  backgroundGradientFrom: string;
+  backgroundGradientTo: string;
+  backgroundGradientDirection: GradientDirection;
+  backgroundBlur: boolean;
 }
 
 export interface AlbumDraftInput {
@@ -130,6 +145,12 @@ export interface AlbumDraftInput {
   sourceId?: string;
   font?: PosterFont;
   layout?: PosterLayout;
+  backgroundMode?: PosterBackgroundMode;
+  backgroundSolidColor?: string;
+  backgroundGradientFrom?: string;
+  backgroundGradientTo?: string;
+  backgroundGradientDirection?: GradientDirection;
+  backgroundBlur?: boolean;
 }
 
 export const defaultPalette = ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"];
@@ -162,6 +183,13 @@ export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
     sourceId: input.sourceId ?? "",
     font: input.font ?? defaultPosterFont,
     layout: input.layout ?? defaultPosterLayout,
+    backgroundMode: input.backgroundMode ?? defaultPosterBackgroundMode,
+    backgroundSolidColor: input.backgroundSolidColor ?? defaultBackgroundSolidColor,
+    backgroundGradientFrom: input.backgroundGradientFrom ?? defaultBackgroundGradientFrom,
+    backgroundGradientTo: input.backgroundGradientTo ?? defaultBackgroundGradientTo,
+    backgroundGradientDirection:
+      input.backgroundGradientDirection ?? defaultBackgroundGradientDirection,
+    backgroundBlur: input.backgroundBlur ?? false,
   };
 }
 
