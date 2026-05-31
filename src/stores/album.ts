@@ -1,6 +1,12 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import type { AlbumDraft, AlbumDraftInput, PosterLayout } from "../domain/album";
+import type {
+  AlbumDraft,
+  AlbumDraftInput,
+  GradientDirection,
+  PosterBackgroundMode,
+  PosterLayout,
+} from "../domain/album";
 import { createAlbumDraft, defaultPosterLayout } from "../domain/album";
 import type { ExportPresetId } from "../export/presets";
 import { applyDraftPatch, mergeFetchedAlbum } from "../editor/draft";
@@ -50,12 +56,50 @@ function writeLayoutPreference(layout: PosterLayout): void {
   }
 }
 
+const backgroundPreferenceKey = "album-poster-generator:background";
+
+interface BackgroundSettings {
+  mode: PosterBackgroundMode;
+  solidColor: string;
+  gradientFrom: string;
+  gradientTo: string;
+  gradientDirection: GradientDirection;
+  blur: boolean;
+}
+
+function readBackgroundPreference(): Partial<BackgroundSettings> | null {
+  try {
+    const stored = window.localStorage.getItem(backgroundPreferenceKey);
+    if (stored) {
+      return JSON.parse(stored) as BackgroundSettings;
+    }
+  } catch {
+    // Ignore unavailable storage
+  }
+  return null;
+}
+
+function writeBackgroundPreference(settings: BackgroundSettings): void {
+  try {
+    window.localStorage.setItem(backgroundPreferenceKey, JSON.stringify(settings));
+  } catch {
+    // Ignore unavailable storage
+  }
+}
+
 export const useAlbumStore = defineStore("album", () => {
   // State
-  const draft = ref<AlbumDraft>(
+  const savedBackground = readBackgroundPreference();
+const draft = ref<AlbumDraft>(
   createAlbumDraft({
     showTracklist: readShowTracklistPreference(),
     layout: readLayoutPreference(),
+    backgroundMode: savedBackground?.mode,
+    backgroundSolidColor: savedBackground?.solidColor,
+    backgroundGradientFrom: savedBackground?.gradientFrom,
+    backgroundGradientTo: savedBackground?.gradientTo,
+    backgroundGradientDirection: savedBackground?.gradientDirection,
+    backgroundBlur: savedBackground?.blur,
   }),
 );
   const selectedPresetId = ref<ExportPresetId>("a4-portrait");
@@ -117,6 +161,17 @@ export const useAlbumStore = defineStore("album", () => {
     }
     if (typeof patch.layout === "string") {
       writeLayoutPreference(patch.layout);
+    }
+    if (typeof patch.backgroundMode === "string" || typeof patch.backgroundBlur === "boolean") {
+      const current = draft.value;
+      writeBackgroundPreference({
+        mode: patch.backgroundMode ?? current.backgroundMode,
+        solidColor: patch.backgroundSolidColor ?? current.backgroundSolidColor,
+        gradientFrom: patch.backgroundGradientFrom ?? current.backgroundGradientFrom,
+        gradientTo: patch.backgroundGradientTo ?? current.backgroundGradientTo,
+        gradientDirection: patch.backgroundGradientDirection ?? current.backgroundGradientDirection,
+        blur: patch.backgroundBlur ?? current.backgroundBlur,
+      });
     }
     draft.value = applyDraftPatch(draft.value, patch);
   }
