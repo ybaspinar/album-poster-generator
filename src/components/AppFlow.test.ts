@@ -1,6 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { describe, expect, it, vi } from "vitest";
 import App from "../App.vue";
+import { findCoverArt } from "../sources/cover-art";
 
 vi.mock("../sources/musicbrainz", () => ({
   searchMusicBrainzAlbums: vi.fn().mockResolvedValue([
@@ -10,19 +11,21 @@ vi.mock("../sources/musicbrainz", () => ({
       releaseDate: "2018-06-08",
       source: "musicbrainz",
       sourceId: "rg-1",
+      artworkUrl: "https://example.com/search-front.jpg",
+      artworkSource: "cover-art-archive",
     },
   ]),
 }));
 
 vi.mock("../sources/cover-art", () => ({
   findCoverArt: vi.fn().mockResolvedValue({
-    artworkUrl: "https://example.com/front.jpg",
+    artworkUrl: "https://example.com/fallback-front.jpg",
     artworkSource: "cover-art-archive",
   }),
 }));
 
 describe("App flow", () => {
-  it("searches, selects a result, and allows manual title override", async () => {
+  it("searches, selects a result, uses search artwork, and allows manual title override", async () => {
     const wrapper = mount(App);
 
     await wrapper.find('[data-test="search-input"]').setValue("kids see ghosts");
@@ -34,6 +37,10 @@ describe("App flow", () => {
     await Promise.resolve();
 
     expect(wrapper.text()).toContain("Kids See Ghosts");
+    expect(wrapper.find(".poster-art").attributes("src")).toBe(
+      "https://example.com/search-front.jpg",
+    );
+    expect(findCoverArt).not.toHaveBeenCalled();
 
     await wrapper.find('[data-test="title-input"]').setValue("My Custom Poster Title");
 

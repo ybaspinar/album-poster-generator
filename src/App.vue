@@ -25,7 +25,7 @@ async function selectAlbum(album: AlbumDraftInput): Promise<void> {
   draft.value = mergeFetchedAlbum(draft.value, album);
   status.value = "Album data loaded. You can override every field.";
 
-  if (album.sourceId) {
+  if (album.sourceId && !album.artworkUrl) {
     try {
       draft.value = applyDraftPatch(draft.value, await findCoverArt(album.sourceId));
     } catch (error) {

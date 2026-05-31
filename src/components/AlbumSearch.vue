@@ -55,11 +55,17 @@ async function search(): Promise<void> {
         class="result-button"
         @click="emit('select', result)"
       >
-        <strong>{{ result.title }}</strong>
-        <span
-          >{{ result.artist || "Unknown artist" }} ·
-          {{ result.releaseDate || "Unknown date" }}</span
-        >
+        <div class="result-thumbnail" aria-hidden="true">
+          <img v-if="result.artworkUrl" :src="result.artworkUrl" alt="" loading="lazy" />
+          <span v-else class="result-thumbnail-placeholder">No art</span>
+        </div>
+        <div class="result-copy">
+          <strong>{{ result.title }}</strong>
+          <span>
+            {{ result.artist || "Unknown artist" }} ·
+            {{ result.releaseDate || "Unknown date" }}
+          </span>
+        </div>
       </button>
     </div>
   </section>
