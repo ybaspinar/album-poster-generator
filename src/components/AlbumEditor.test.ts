@@ -29,6 +29,8 @@ describe("AlbumEditor", () => {
     const showTracklistCheckbox = wrapper.find('[data-test="show-tracklist-input"]');
     expect(showTracklistCheckbox.exists()).toBe(true);
     expect((showTracklistCheckbox.element as HTMLInputElement).checked).toBe(true);
+    expect(wrapper.find("button#poster-tracklist-columns").exists()).toBe(true);
+    expect(wrapper.find("button#poster-tracklist-size").exists()).toBe(true);
 
     await showTracklistCheckbox.setValue(false);
     expect(wrapper.emitted("patch")?.[1]).toEqual([{ showTracklist: false }]);

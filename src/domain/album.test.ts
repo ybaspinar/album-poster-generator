@@ -14,6 +14,8 @@ describe("album draft model", () => {
       palette: ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"],
       tracklist: [],
       showTracklist: true,
+      tracklistColumns: "3",
+      tracklistSize: "medium",
       showSwatches: true,
       swatchShape: "square",
       source: "manual",
@@ -35,11 +37,20 @@ describe("album draft model", () => {
     expect(draft.source).toBe("manual");
   });
 
-  it("defaults to an empty tracklist", () => {
+  it("defaults to an empty medium three-column tracklist", () => {
     const draft = createAlbumDraft();
 
     expect(draft.tracklist).toEqual([]);
     expect(draft.showTracklist).toBe(true);
+    expect(draft.tracklistColumns).toBe("3");
+    expect(draft.tracklistSize).toBe("medium");
+  });
+
+  it("supports tracklist layout customization", () => {
+    const draft = createAlbumDraft({ tracklistColumns: "2", tracklistSize: "small" });
+
+    expect(draft.tracklistColumns).toBe("2");
+    expect(draft.tracklistSize).toBe("small");
   });
 
   it("shows square swatches by default and supports hiding circular swatches", () => {

@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { AlbumDraft, PosterFont, SwatchShape } from "../domain/album";
+import type { AlbumDraft, PosterFont, SwatchShape, TracklistColumns, TracklistSize } from "../domain/album";
 import { posterFontOptions } from "../domain/album";
 import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
 import { loadGoogleFont } from "../services/google-fonts";
@@ -47,6 +47,14 @@ function updateTracklist(value: string | number): void {
 
 function updateShowTracklist(event: Event): void {
   emit("patch", { showTracklist: (event.target as HTMLInputElement).checked });
+}
+
+function updateTracklistColumns(value: string): void {
+  emit("patch", { tracklistColumns: value as TracklistColumns });
+}
+
+function updateTracklistSize(value: string): void {
+  emit("patch", { tracklistSize: value as TracklistSize });
 }
 
 function updateShowSwatches(event: Event): void {
@@ -203,6 +211,38 @@ function fontLabel(font: PosterFont): string {
           <p class="text-muted-foreground text-xs">
             One track per line. Numbers are added on the poster.
           </p>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-2">
+              <Label for="poster-tracklist-columns">Tracklist columns</Label>
+              <Select :model-value="draft.tracklistColumns" @update:model-value="updateTracklistColumns">
+                <SelectTrigger id="poster-tracklist-columns" class="w-full">
+                  <SelectValue placeholder="Columns" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="1">1 column</SelectItem>
+                    <SelectItem value="2">2 columns</SelectItem>
+                    <SelectItem value="3">3 columns</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div class="grid gap-2">
+              <Label for="poster-tracklist-size">Tracklist size</Label>
+              <Select :model-value="draft.tracklistSize" @update:model-value="updateTracklistSize">
+                <SelectTrigger id="poster-tracklist-size" class="w-full">
+                  <SelectValue placeholder="Size" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="small">Small</SelectItem>
+                    <SelectItem value="medium">Medium</SelectItem>
+                    <SelectItem value="large">Large</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
 
         <div class="grid gap-2">

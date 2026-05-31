@@ -100,6 +100,10 @@ watch(
       <ol
         v-if="draft.showTracklist && draft.tracklist.length"
         class="poster-tracklist"
+        :class="[
+          `poster-tracklist-columns-${draft.tracklistColumns}`,
+          `poster-tracklist-size-${draft.tracklistSize}`,
+        ]"
         aria-label="Tracklist"
       >
         <li v-for="(track, index) in draft.tracklist" :key="`${track}-${index}`">

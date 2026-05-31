@@ -57,6 +57,8 @@ describe("PosterPreview", () => {
     const metaRow = wrapper.find(".poster-meta-row");
     const tracklist = wrapper.find(".poster-tracklist");
     expect(tracklist.exists()).toBe(true);
+    expect(tracklist.classes()).toContain("poster-tracklist-columns-3");
+    expect(tracklist.classes()).toContain("poster-tracklist-size-medium");
     expect(metaRow.find(".poster-tracklist").exists()).toBe(false);
     expect(metaRow.element.nextElementSibling).toBe(tracklist.element);
     expect(tracklist.text()).toContain("1) Foo");
@@ -101,13 +103,22 @@ describe("PosterPreview", () => {
     expect(trackTitleRule).not.toContain("white-space: nowrap");
   });
 
-  it("limits the poster tracklist to three columns with readable row spacing", () => {
+  it("supports configurable tracklist columns and text size", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({ tracklist: ["Long Song Name"], tracklistColumns: "2", tracklistSize: "small" }),
+      },
+    });
     const css = readFileSync("src/styles/globals.css", "utf8");
-    const tracklistRule = css.match(/\.poster-tracklist \{(?<body>[^}]+)\}/)?.groups?.body;
+    const twoColumnRule = css.match(/\.poster-tracklist-columns-2 \{(?<body>[^}]+)\}/)?.groups
+      ?.body;
+    const smallRule = css.match(/\.poster-tracklist-size-small \{(?<body>[^}]+)\}/)?.groups
+      ?.body;
 
-    expect(tracklistRule).toBeDefined();
-    expect(tracklistRule).toContain("grid-template-columns: repeat(3, minmax(0, 1fr))");
-    expect(tracklistRule).toContain("row-gap: 0.8cqw");
+    expect(wrapper.find(".poster-tracklist").classes()).toContain("poster-tracklist-columns-2");
+    expect(wrapper.find(".poster-tracklist").classes()).toContain("poster-tracklist-size-small");
+    expect(twoColumnRule).toContain("grid-template-columns: repeat(2, minmax(0, 1fr))");
+    expect(smallRule).toContain("font-size: clamp(0.5rem, 0.95cqw, 0.66rem)");
   });
 
   it("hides swatches and supports circular swatches", () => {
