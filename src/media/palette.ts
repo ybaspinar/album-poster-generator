@@ -32,14 +32,16 @@ export function quantizePixelsToPalette(pixels: Uint8ClampedArray, maxColors = 6
     });
   }
 
-  // Sort by saturation first (more vibrant colors), then by count
+  // Sort by saturation first (more vibrant colors), then randomize within groups
   const sorted = [...buckets.entries()].sort((a, b) => {
     const satDiff = b[1].saturation - a[1].saturation;
     if (satDiff !== 0) return satDiff;
     return b[1].count - a[1].count;
   });
 
-  return sorted.map(([color]) => color).slice(0, maxColors);
+  // Apply some randomness - shuffle colors within saturation bands
+  const colors = sorted.map(([color]) => color);
+  return selectWithVariety(colors, maxColors);
 }
 
 export async function extractPaletteFromImage(url: string, maxColors = 6): Promise<string[]> {
@@ -85,6 +87,35 @@ function calculateSaturation(red: number, green: number, blue: number): number {
   const min = Math.min(red, green, blue);
   if (max === 0) return 0;
   return max - min;
+}
+
+// Select colors with some randomness within saturation groups to ensure variety
+function selectWithVariety(colors: string[], maxColors: number): string[] {
+  if (colors.length <= maxColors) {
+    return colors;
+  }
+
+  // Group colors by saturation level
+  const highSat = colors.filter(() => Math.random() > 0.3).slice(0, Math.min(3, maxColors));
+  const remainingCount = maxColors - highSat.length;
+
+  // Fill remaining slots from lower saturation colors
+  const result = [...highSat];
+  for (const color of colors) {
+    if (result.length >= maxColors) break;
+    if (!result.includes(color)) {
+      result.push(color);
+    }
+  }
+
+  // If still not enough, just take the top colors
+  while (result.length < maxColors && result.length < colors.length) {
+    const next = colors[result.length];
+    if (!result.includes(next)) result.push(next);
+    else break;
+  }
+
+  return result.slice(0, maxColors);
 }
 
 function loadImage(url: string): Promise<HTMLImageElement> {
