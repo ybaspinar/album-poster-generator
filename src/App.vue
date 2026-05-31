@@ -98,17 +98,24 @@ async function exportPoster(): Promise<void> {
 </script>
 
 <template>
-  <main class="min-h-screen bg-background p-6 text-foreground md:p-10">
+  <main
+    data-test="app-shell"
+    data-brand="ink-slate"
+    class="min-h-screen bg-transparent px-5 py-6 text-foreground md:px-8 md:py-10 xl:px-12"
+  >
     <div
-      class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(320px,520px)_minmax(420px,1fr)] lg:items-start"
+      data-test="app-workspace"
+      class="mx-auto grid max-w-[112rem] gap-6 lg:grid-cols-[420px_minmax(0,1fr)] lg:items-start xl:grid-cols-[440px_minmax(0,1fr)] 2xl:grid-cols-[460px_minmax(0,1fr)]"
     >
-      <section class="grid min-w-0 gap-4">
-        <Card>
-          <CardHeader>
-            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+      <section class="grid min-w-0 gap-4 xl:gap-5">
+        <Card class="border-border/80 bg-card/92 shadow-2xl shadow-black/10 backdrop-blur">
+          <CardHeader class="gap-5 pb-5">
+            <p class="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-primary">
               Album Poster Generator
             </p>
-            <CardTitle class="text-4xl tracking-tight md:text-5xl">
+            <CardTitle
+              class="max-w-[12ch] text-4xl leading-[0.95] tracking-tight md:text-5xl xl:text-6xl"
+            >
               Make print-ready album posters.
             </CardTitle>
             <CardDescription>
@@ -116,7 +123,7 @@ async function exportPoster(): Promise<void> {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button type="button" @click="startManual">Start manually</Button>
+            <Button type="button" size="lg" @click="startManual">Start manually</Button>
           </CardContent>
         </Card>
 
@@ -134,15 +141,22 @@ async function exportPoster(): Promise<void> {
         </Alert>
       </section>
 
-      <section class="min-w-0 lg:sticky lg:top-10">
-        <Card>
-          <CardHeader>
+      <section
+        data-test="preview-stage"
+        class="min-w-0 lg:sticky lg:top-10 lg:min-h-[calc(100vh-6rem)]"
+      >
+        <Card
+          class="min-h-full border-border/80 bg-card/80 shadow-2xl shadow-black/20 backdrop-blur"
+        >
+          <CardHeader class="border-b border-border/70">
             <CardTitle>Preview</CardTitle>
             <CardDescription
               >Only the poster surface is captured during PNG export.</CardDescription
             >
           </CardHeader>
-          <CardContent class="grid place-items-center overflow-auto">
+          <CardContent
+            class="grid min-h-[calc(100vh-14rem)] place-items-center overflow-auto p-6 xl:p-10 2xl:p-12"
+          >
             <PosterPreview :draft="draft" />
           </CardContent>
         </Card>
