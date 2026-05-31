@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/select";
 import type {
   AlbumDraft,
+  GradientDirection,
+  PosterBackgroundMode,
   PosterFont,
   PosterLayout,
   SwatchShape,
@@ -110,6 +112,30 @@ function updateLayout(value: string): void {
   emit("patch", { layout: value as PosterLayout });
 }
 
+function updateBackgroundMode(value: string): void {
+  emit("patch", { backgroundMode: value as PosterBackgroundMode });
+}
+
+function updateBackgroundSolidColor(value: string | number): void {
+  emit("patch", { backgroundSolidColor: String(value) });
+}
+
+function updateBackgroundGradientFrom(value: string | number): void {
+  emit("patch", { backgroundGradientFrom: String(value) });
+}
+
+function updateBackgroundGradientTo(value: string | number): void {
+  emit("patch", { backgroundGradientTo: String(value) });
+}
+
+function updateBackgroundGradientDirection(value: string): void {
+  emit("patch", { backgroundGradientDirection: value as GradientDirection });
+}
+
+function updateBackgroundBlur(event: Event): void {
+  emit("patch", { backgroundBlur: (event.target as HTMLInputElement).checked });
+}
+
 function fontLabel(font: PosterFont): string {
   const labels: Record<PosterFont, string> = {
     gotham: "Gotham (built-in sans-serif)",
@@ -157,7 +183,7 @@ function fontLabel(font: PosterFont): string {
   <Accordion
     type="multiple"
     class="flex flex-col gap-4"
-    :default-value="['info', 'tracklist', 'artwork', 'typography', 'swatches', 'layout']"
+    :default-value="['info', 'tracklist', 'artwork', 'typography', 'swatches', 'background', 'layout']"
   >
     <AccordionItem value="info">
       <Card>
@@ -391,6 +417,107 @@ function fontLabel(font: PosterFont): string {
                   @update:model-value="updatePalette(index, $event)"
                 />
               </div>
+            </div>
+          </div>
+        </AccordionContent>
+      </Card>
+    </AccordionItem>
+
+    <AccordionItem value="background">
+      <Card>
+        <AccordionTrigger header="Background" />
+        <AccordionContent>
+          <div class="grid gap-3 px-1">
+            <div class="grid gap-2">
+              <Label for="poster-background-mode">Mode</Label>
+              <Select
+                :model-value="draft.backgroundMode"
+                @update:model-value="updateBackgroundMode"
+              >
+                <SelectTrigger id="poster-background-mode" class="w-full">
+                  <SelectValue placeholder="Select background" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="default">Default</SelectItem>
+                    <SelectItem value="solid">Solid</SelectItem>
+                    <SelectItem value="gradient">Gradient</SelectItem>
+                    <SelectItem value="artwork">Artwork</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div v-if="draft.backgroundMode === 'solid'" class="grid gap-2">
+              <Label for="poster-background-color">Background color</Label>
+              <Input
+                id="poster-background-color"
+                type="color"
+                class="h-10 p-1"
+                :model-value="draft.backgroundSolidColor"
+                @update:model-value="updateBackgroundSolidColor"
+              />
+            </div>
+
+            <template v-if="draft.backgroundMode === 'gradient'">
+              <div class="grid grid-cols-2 gap-3">
+                <div class="grid gap-2">
+                  <Label for="poster-bg-from">From</Label>
+                  <Input
+                    id="poster-bg-from"
+                    type="color"
+                    class="h-10 p-1"
+                    :model-value="draft.backgroundGradientFrom"
+                    @update:model-value="updateBackgroundGradientFrom"
+                  />
+                </div>
+                <div class="grid gap-2">
+                  <Label for="poster-bg-to">To</Label>
+                  <Input
+                    id="poster-bg-to"
+                    type="color"
+                    class="h-10 p-1"
+                    :model-value="draft.backgroundGradientTo"
+                    @update:model-value="updateBackgroundGradientTo"
+                  />
+                </div>
+              </div>
+              <div class="grid gap-2">
+                <Label for="poster-bg-direction">Direction</Label>
+                <Select
+                  :model-value="draft.backgroundGradientDirection"
+                  @update:model-value="updateBackgroundGradientDirection"
+                >
+                  <SelectTrigger id="poster-bg-direction" class="w-full">
+                    <SelectValue placeholder="Direction" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="horizontal">Horizontal</SelectItem>
+                      <SelectItem value="vertical">Vertical</SelectItem>
+                      <SelectItem value="radial">Radial</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            </template>
+
+            <div
+              v-if="draft.backgroundMode === 'artwork'"
+              class="text-sm text-muted-foreground"
+            >
+              Album artwork will fill the poster background. Caption will remain on top.
+            </div>
+
+            <div class="flex items-center gap-2 pt-1">
+              <input
+                id="poster-bg-blur"
+                type="checkbox"
+                class="size-4 rounded border-input accent-primary"
+                :checked="draft.backgroundBlur"
+                @change="updateBackgroundBlur"
+              />
+              <Label for="poster-bg-blur" class="text-sm font-medium">Frosted overlay</Label>
             </div>
           </div>
         </AccordionContent>
