@@ -95,8 +95,8 @@ describe("PosterPreview", () => {
 
   it("allows long track names to use available space instead of truncating", () => {
     const css = readFileSync("src/styles/globals.css", "utf8");
-    const trackTitleRule = css.match(/\.poster-tracklist span:last-child \{(?<body>[^}]+)\}/)?.groups
-      ?.body;
+    const trackTitleRule = css.match(/\.poster-tracklist span:last-child \{(?<body>[^}]+)\}/)
+      ?.groups?.body;
 
     expect(trackTitleRule).toBeDefined();
     expect(trackTitleRule).not.toContain("text-overflow: ellipsis");
@@ -106,14 +106,17 @@ describe("PosterPreview", () => {
   it("supports configurable tracklist columns and text size", () => {
     const wrapper = mount(PosterPreview, {
       props: {
-        draft: createAlbumDraft({ tracklist: ["Long Song Name"], tracklistColumns: "2", tracklistSize: "small" }),
+        draft: createAlbumDraft({
+          tracklist: ["Long Song Name"],
+          tracklistColumns: "2",
+          tracklistSize: "small",
+        }),
       },
     });
     const css = readFileSync("src/styles/globals.css", "utf8");
     const twoColumnRule = css.match(/\.poster-tracklist-columns-2 \{(?<body>[^}]+)\}/)?.groups
       ?.body;
-    const smallRule = css.match(/\.poster-tracklist-size-small \{(?<body>[^}]+)\}/)?.groups
-      ?.body;
+    const smallRule = css.match(/\.poster-tracklist-size-small \{(?<body>[^}]+)\}/)?.groups?.body;
 
     expect(wrapper.find(".poster-tracklist").classes()).toContain("poster-tracklist-columns-2");
     expect(wrapper.find(".poster-tracklist").classes()).toContain("poster-tracklist-size-small");

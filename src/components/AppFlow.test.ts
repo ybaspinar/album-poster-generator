@@ -129,7 +129,10 @@ describe("App flow", () => {
         artworkUrl: "https://example.com/deluxe-cover.jpg",
       },
     ]);
-    mockedFetchMusicBrainzTracklistForRelease.mockResolvedValueOnce(["State of Grace", "The Moment I Knew"]);
+    mockedFetchMusicBrainzTracklistForRelease.mockResolvedValueOnce([
+      "State of Grace",
+      "The Moment I Knew",
+    ]);
     const wrapper = mount(App);
 
     await wrapper.find('[data-test="artist-input"]').setValue("taylor swift");
@@ -160,9 +163,7 @@ describe("App flow", () => {
       "value",
       "State of Grace\nThe Moment I Knew",
     );
-    expect(createExportableArtworkUrl).toHaveBeenCalledWith(
-      "https://example.com/deluxe-cover.jpg",
-    );
+    expect(createExportableArtworkUrl).toHaveBeenCalledWith("https://example.com/deluxe-cover.jpg");
   });
 
   it("persists the tracklist visibility preference between drafts", async () => {

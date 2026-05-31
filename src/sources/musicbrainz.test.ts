@@ -323,7 +323,8 @@ describe("searchMusicBrainzAlbums", () => {
 
 describe("fetchMusicBrainzEditions", () => {
   it("normalizes editions for a release group", async () => {
-    const fetcher = vi.fn()
+    const fetcher = vi
+      .fn()
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify({
@@ -391,14 +392,12 @@ describe("fetchMusicBrainzEditions", () => {
       "https://musicbrainz.org/ws/2/release?release-group=rg-red&inc=media&fmt=json&limit=25",
       { headers: { Accept: "application/json" } },
     );
-    expect(fetcher).toHaveBeenCalledWith(
-      "https://coverartarchive.org/release/release-standard",
-      { headers: { Accept: "application/json" } },
-    );
-    expect(fetcher).toHaveBeenCalledWith(
-      "https://coverartarchive.org/release/release-deluxe",
-      { headers: { Accept: "application/json" } },
-    );
+    expect(fetcher).toHaveBeenCalledWith("https://coverartarchive.org/release/release-standard", {
+      headers: { Accept: "application/json" },
+    });
+    expect(fetcher).toHaveBeenCalledWith("https://coverartarchive.org/release/release-deluxe", {
+      headers: { Accept: "application/json" },
+    });
   });
 });
 

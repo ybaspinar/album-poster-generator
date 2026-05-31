@@ -168,15 +168,15 @@ export async function fetchMusicBrainzEditions(
 
   const data = (await response.json()) as MusicBrainzReleaseListResponse;
   const releases = data.releases ?? [];
-  
+
   // Fetch cover art for each release
   const editions = await Promise.all(
     releases.map(async (release) => {
       const baseEdition = normalizeEdition(release)[0];
       if (!baseEdition) return null;
-      
-      const artworkUrl = release.id ? await fetchReleaseCoverArt(release.id, fetcher) : "";
-      return { ...baseEdition, artworkUrl };
+
+      const artworkUrl = release.id ? await fetchReleaseCoverArt(release.id, fetcher) : undefined;
+      return { ...baseEdition, artworkUrl: artworkUrl || undefined } as MusicBrainzEdition;
     }),
   );
 

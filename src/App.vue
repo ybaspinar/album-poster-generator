@@ -44,7 +44,9 @@ const status = ref("");
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
 const pendingAlbum = ref<AlbumDraftInput | null>(null);
 const pendingEditions = ref<MusicBrainzEdition[]>([]);
-const editionDialogOpen = computed(() => pendingAlbum.value !== null && pendingEditions.value.length > 1);
+const editionDialogOpen = computed(
+  () => pendingAlbum.value !== null && pendingEditions.value.length > 1,
+);
 let paletteRequestId = 0;
 
 watch(
@@ -321,7 +323,9 @@ async function exportPoster(): Promise<void> {
                 <span class="text-xs font-normal text-muted-foreground">
                   {{ edition.releaseDate || "Unknown date" }}
                   <template v-if="edition.country"> · {{ edition.country }}</template>
-                  <template v-if="edition.formats.length"> · {{ edition.formats.join(", ") }}</template>
+                  <template v-if="edition.formats.length">
+                    · {{ edition.formats.join(", ") }}</template
+                  >
                   <template v-if="edition.trackCount"> · {{ edition.trackCount }} tracks</template>
                 </span>
               </span>

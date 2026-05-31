@@ -15,7 +15,7 @@ describe("PostHog production debugging", () => {
     expect(main).toContain("logs:");
     expect(main).toContain('serviceName: "album-poster-generator-web"');
     expect(main).toContain("environment: import.meta.env.MODE");
-    expect(main).toContain("serviceVersion: import.meta.env.VITE_APP_VERSION || \"dev\"");
+    expect(main).toContain('serviceVersion: import.meta.env.VITE_APP_VERSION || "dev"');
     expect(main).toContain('posthog.logger.info("app initialized"');
     expect(main).not.toContain("captureConsoleLogs: true");
   });
