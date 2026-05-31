@@ -22,6 +22,12 @@ describe("album draft model", () => {
       sourceId: "",
       font: "gotham",
       layout: "medium",
+      backgroundMode: "default",
+      backgroundSolidColor: "#1a1a2e",
+      backgroundGradientFrom: "#1a1a2e",
+      backgroundGradientTo: "#16213e",
+      backgroundGradientDirection: "vertical",
+      backgroundBlur: false,
     });
   });
 
