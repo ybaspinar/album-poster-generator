@@ -7,6 +7,9 @@ describe("export presets", () => {
       "a4-portrait",
       "a3-portrait",
       "poster-12x18",
+      "poster-50x70cm",
+      "poster-40x60cm",
+      "poster-30x40cm",
       "square",
     ]);
     expect(getExportPreset("a4-portrait")).toMatchObject({
@@ -24,6 +27,27 @@ describe("export presets", () => {
       heightPx: 5400,
       dpi: 300,
     });
+    expect(getExportPreset("poster-50x70cm")).toMatchObject({
+      label: "50×70 cm Poster",
+      widthPx: 5906,
+      heightPx: 8268,
+      dpi: 300,
+      filenameSuffix: "50x70cm",
+    });
+    expect(getExportPreset("poster-40x60cm")).toMatchObject({
+      label: "40×60 cm Poster",
+      widthPx: 4724,
+      heightPx: 7087,
+      dpi: 300,
+      filenameSuffix: "40x60cm",
+    });
+    expect(getExportPreset("poster-30x40cm")).toMatchObject({
+      label: "30×40 cm Poster",
+      widthPx: 3543,
+      heightPx: 4724,
+      dpi: 300,
+      filenameSuffix: "30x40cm",
+    });
     expect(getExportPreset("square")).toMatchObject({
       widthPx: 3600,
       heightPx: 3600,
@@ -39,5 +63,12 @@ describe("export presets", () => {
         getExportPreset("a4-portrait"),
       ),
     ).toBe("kanye-west-kid-cudi-kids-see-ghosts-a4.png");
+    expect(
+      createExportFilename(
+        "Kanye West & Kid Cudi",
+        "Kids See Ghosts",
+        getExportPreset("poster-50x70cm"),
+      ),
+    ).toBe("kanye-west-kid-cudi-kids-see-ghosts-50x70cm.png");
   });
 });

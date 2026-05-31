@@ -1,4 +1,11 @@
-export type ExportPresetId = "a4-portrait" | "a3-portrait" | "poster-12x18" | "square";
+export type ExportPresetId =
+  | "a4-portrait"
+  | "a3-portrait"
+  | "poster-12x18"
+  | "poster-50x70cm"
+  | "poster-40x60cm"
+  | "poster-30x40cm"
+  | "square";
 
 export interface ExportPreset {
   id: ExportPresetId;
@@ -41,6 +48,36 @@ export const exportPresets: ExportPreset[] = [
     heightPx: 5400,
     dpi: 300,
     filenameSuffix: "12x18",
+  },
+  {
+    id: "poster-50x70cm",
+    label: "50×70 cm Poster",
+    widthIn: 19.69,
+    heightIn: 27.56,
+    widthPx: 5906,
+    heightPx: 8268,
+    dpi: 300,
+    filenameSuffix: "50x70cm",
+  },
+  {
+    id: "poster-40x60cm",
+    label: "40×60 cm Poster",
+    widthIn: 15.75,
+    heightIn: 23.62,
+    widthPx: 4724,
+    heightPx: 7087,
+    dpi: 300,
+    filenameSuffix: "40x60cm",
+  },
+  {
+    id: "poster-30x40cm",
+    label: "30×40 cm Poster",
+    widthIn: 11.81,
+    heightIn: 15.75,
+    widthPx: 3543,
+    heightPx: 4724,
+    dpi: 300,
+    filenameSuffix: "30x40cm",
   },
   {
     id: "square",
