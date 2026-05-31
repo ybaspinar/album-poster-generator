@@ -165,6 +165,8 @@
     sans-serif;
   background: var(--paper);
   box-shadow: 0 8px 40px rgba(23, 23, 23, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
 .poster-page.poster-layout-small {
@@ -322,4 +324,57 @@
 
 .poster-swatches-square .poster-swatch {
   border-radius: 0;
+}
+
+/* Background: frosted blur overlay */
+.poster-page.poster-bg-frosted::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  backdrop-filter: blur(18px) saturate(1.15);
+  background: rgba(255, 255, 255, 0.18);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Background: artwork mode */
+.poster-page.poster-bg-artwork {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.poster-page.poster-bg-artwork .poster-art-frame {
+  display: none;
+}
+
+/* When artwork is background, caption needs a white gradient strip for readability */
+.poster-page.poster-bg-artwork .poster-caption {
+  position: relative;
+}
+
+.poster-page.poster-bg-artwork .poster-caption::after {
+  content: "";
+  position: absolute;
+  inset: -60% -7.5% -8%;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.92) 0%,
+    rgba(255, 255, 255, 0.78) 35%,
+    rgba(255, 255, 255, 0.45) 60%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+.poster-page.poster-bg-artwork .poster-caption > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Ensure frosted overlay stays above background but below content */
+.poster-page.poster-bg-frosted > * {
+  position: relative;
+  z-index: 2;
 }
