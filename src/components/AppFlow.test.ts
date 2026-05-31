@@ -4,12 +4,20 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { describe, expect, it, vi } from "vitest";
 import App from "../App.vue";
+import { createExportableArtworkUrl } from "../media/artwork-url";
 import { findCoverArt } from "../sources/cover-art";
 
 vi.mock("../media/palette", () => ({
   extractPaletteFromImage: vi
     .fn()
     .mockResolvedValue(["#112233", "#445566", "#778899", "#aabbcc", "#ddeeff", "#010203"]),
+}));
+
+vi.mock("../media/artwork-url", () => ({
+  createExportableArtworkUrl: vi.fn().mockResolvedValue({
+    ok: true,
+    artworkUrl: "blob:search-front-exportable",
+  }),
 }));
 
 vi.mock("../sources/musicbrainz", () => ({
@@ -49,12 +57,13 @@ describe("App flow", () => {
     await wrapper.find('[data-test="result-0"]').trigger("click");
     await Promise.resolve();
     await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
 
     expect(wrapper.findComponent(Alert).exists()).toBe(true);
     expect(wrapper.text()).toContain("Kids See Ghosts");
-    expect(wrapper.find(".poster-art").attributes("src")).toBe(
-      "https://example.com/search-front.jpg",
-    );
+    expect(createExportableArtworkUrl).toHaveBeenCalledWith("https://example.com/search-front.jpg");
+    expect(wrapper.find(".poster-art").attributes("src")).toBe("blob:search-front-exportable");
     expect(findCoverArt).not.toHaveBeenCalled();
     expect(
       wrapper.findAll<HTMLInputElement>('input[type="color"]').map((input) => input.element.value),

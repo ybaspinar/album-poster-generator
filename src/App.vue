@@ -16,6 +16,7 @@ import {
 import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
 import { createExportFilename, type ExportPresetId, getExportPreset } from "./export/presets";
 import { exportElementAsPng } from "./export/png";
+import { createExportableArtworkUrl, type ExportableArtworkUrlResult } from "./media/artwork-url";
 import { extractPaletteFromImage } from "./media/palette";
 import { findCoverArt } from "./sources/cover-art";
 
@@ -48,12 +49,32 @@ watch(
 );
 
 async function selectAlbum(album: AlbumDraftInput): Promise<void> {
-  draft.value = mergeFetchedAlbum(draft.value, album);
-  status.value = "Album data loaded. You can override every field.";
+  const exportableArtwork = album.artworkUrl
+    ? await makeArtworkExportable(album.artworkUrl)
+    : createExportableArtworkResult(album.artworkUrl ?? "");
+
+  draft.value = mergeFetchedAlbum(draft.value, {
+    ...album,
+    artworkUrl: exportableArtwork.artworkUrl,
+  });
+  status.value = exportableArtwork.ok
+    ? "Album data loaded. You can override every field."
+    : exportableArtwork.message;
 
   if (album.sourceId && !album.artworkUrl) {
     try {
-      draft.value = applyDraftPatch(draft.value, await findCoverArt(album.sourceId));
+      const coverArt = await findCoverArt(album.sourceId);
+      const exportableCoverArt = coverArt.artworkUrl
+        ? await makeArtworkExportable(coverArt.artworkUrl)
+        : createExportableArtworkResult(coverArt.artworkUrl ?? "");
+      draft.value = applyDraftPatch(draft.value, {
+        ...coverArt,
+        artworkUrl: exportableCoverArt.artworkUrl,
+      });
+
+      if (!exportableCoverArt.ok) {
+        status.value = exportableCoverArt.message;
+      }
     } catch (error) {
       status.value =
         error instanceof Error ? error.message : "Artwork lookup failed. Add artwork manually.";
@@ -68,6 +89,14 @@ function startManual(): void {
 
 function patchDraft(patch: Partial<AlbumDraft>): void {
   draft.value = applyDraftPatch(draft.value, patch);
+}
+
+async function makeArtworkExportable(artworkUrl: string): Promise<ExportableArtworkUrlResult> {
+  return createExportableArtworkUrl(artworkUrl);
+}
+
+function createExportableArtworkResult(artworkUrl: string): ExportableArtworkUrlResult {
+  return { ok: true, artworkUrl };
 }
 
 async function exportPoster(): Promise<void> {

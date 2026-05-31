@@ -23,4 +23,16 @@ describe("PosterPreview", () => {
     expect(wrapper.find("img").attributes("src")).toBe("https://example.com/cover.jpg");
     expect(wrapper.findAll(".poster-swatch")).toHaveLength(6);
   });
+
+  it("loads remote artwork with anonymous CORS for PNG export", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          artworkUrl: "https://example.com/cover.jpg",
+        }),
+      },
+    });
+
+    expect(wrapper.find("img").attributes("crossorigin")).toBe("anonymous");
+  });
 });

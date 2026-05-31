@@ -12,6 +12,7 @@ defineProps<{
       <img
         v-if="draft.artworkUrl"
         :src="draft.artworkUrl"
+        crossorigin="anonymous"
         :alt="`${draft.title || 'Album'} artwork`"
         class="poster-art"
       />

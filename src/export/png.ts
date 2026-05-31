@@ -7,7 +7,7 @@ export async function exportElementAsPng(
   filename: string,
 ): Promise<void> {
   const dataUrl = await toPng(element, {
-    cacheBust: true,
+    cacheBust: false,
     pixelRatio: 1,
     width: preset.widthPx,
     height: preset.heightPx,

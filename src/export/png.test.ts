@@ -38,7 +38,7 @@ describe("exportElementAsPng", () => {
 
     const { toPng } = await import("html-to-image");
     expect(toPng).toHaveBeenCalledWith(element, {
-      cacheBust: true,
+      cacheBust: false,
       pixelRatio: 1,
       width: 2480,
       height: 3508,
