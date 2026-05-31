@@ -167,6 +167,22 @@
   box-shadow: 0 8px 40px rgba(23, 23, 23, 0.1);
 }
 
+.poster-page.poster-layout-small {
+  padding: 3% 4%;
+}
+
+.poster-page.poster-layout-large {
+  padding: 7% 10%;
+}
+
+.poster-page.poster-layout-edge-to-edge {
+  padding: 0;
+}
+
+.poster-page.poster-layout-edge-to-edge .poster-caption {
+  padding: 0 3% 3%;
+}
+
 .poster-art-frame {
   width: 100%;
   aspect-ratio: 1;
