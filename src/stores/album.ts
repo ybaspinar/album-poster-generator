@@ -1,12 +1,13 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import type { AlbumDraft, AlbumDraftInput } from "../domain/album";
-import { createAlbumDraft } from "../domain/album";
+import type { AlbumDraft, AlbumDraftInput, PosterLayout } from "../domain/album";
+import { createAlbumDraft, defaultPosterLayout } from "../domain/album";
 import type { ExportPresetId } from "../export/presets";
 import { applyDraftPatch, mergeFetchedAlbum } from "../editor/draft";
 import type { MusicBrainzEdition } from "../sources/musicbrainz";
 
 const showTracklistPreferenceKey = "album-poster-generator:show-tracklist";
+const layoutPreferenceKey = "album-poster-generator:layout";
 
 function readShowTracklistPreference(): boolean {
   try {
@@ -24,9 +25,39 @@ function writeShowTracklistPreference(showTracklist: boolean): void {
   }
 }
 
+function readLayoutPreference(): PosterLayout {
+  try {
+    const stored = window.localStorage.getItem(layoutPreferenceKey);
+    if (
+      stored === "small" ||
+      stored === "medium" ||
+      stored === "large" ||
+      stored === "edge-to-edge"
+    ) {
+      return stored;
+    }
+  } catch {
+    // Ignore unavailable storage
+  }
+  return defaultPosterLayout;
+}
+
+function writeLayoutPreference(layout: PosterLayout): void {
+  try {
+    window.localStorage.setItem(layoutPreferenceKey, layout);
+  } catch {
+    // Ignore unavailable storage
+  }
+}
+
 export const useAlbumStore = defineStore("album", () => {
   // State
-  const draft = ref<AlbumDraft>(createAlbumDraft({ showTracklist: readShowTracklistPreference() }));
+  const draft = ref<AlbumDraft>(
+  createAlbumDraft({
+    showTracklist: readShowTracklistPreference(),
+    layout: readLayoutPreference(),
+  }),
+);
   const selectedPresetId = ref<ExportPresetId>("a4-portrait");
   const exporting = ref(false);
   const status = ref("");
@@ -83,6 +114,9 @@ export const useAlbumStore = defineStore("album", () => {
   function patchDraft(patch: Partial<AlbumDraft>): void {
     if (typeof patch.showTracklist === "boolean") {
       updateShowTracklistPreference(patch.showTracklist);
+    }
+    if (typeof patch.layout === "string") {
+      writeLayoutPreference(patch.layout);
     }
     draft.value = applyDraftPatch(draft.value, patch);
   }
