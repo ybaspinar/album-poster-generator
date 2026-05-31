@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import AlbumEditor from "./components/AlbumEditor.vue";
 import AlbumSearch from "./components/AlbumSearch.vue";
 import ExportPanel from "./components/ExportPanel.vue";
@@ -95,28 +98,55 @@ async function exportPoster(): Promise<void> {
 </script>
 
 <template>
-  <main class="app-shell app-grid">
-    <section class="workspace-panel controls-column">
-      <div class="hero-panel compact">
-        <p class="eyebrow">Album Poster Generator</p>
-        <h1>Make print-ready album posters.</h1>
-        <p class="hero-copy">
-          Fetch metadata, override anything, and keep the poster browser-only.
-        </p>
-        <button type="button" @click="startManual">Start manually</button>
-      </div>
-      <AlbumSearch @select="selectAlbum" />
-      <AlbumEditor :draft="draft" @patch="patchDraft" />
-      <ExportPanel
-        :selected-preset-id="selectedPresetId"
-        :exporting="exporting"
-        @select-preset="selectedPresetId = $event"
-        @export-poster="exportPoster"
-      />
-      <p v-if="status" class="status-text">{{ status }}</p>
-    </section>
-    <section class="workspace-panel preview-column">
-      <PosterPreview :draft="draft" />
-    </section>
+  <main class="min-h-screen bg-background p-6 text-foreground md:p-10">
+    <div
+      class="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[minmax(320px,520px)_minmax(420px,1fr)] lg:items-start"
+    >
+      <section class="grid min-w-0 gap-4">
+        <Card>
+          <CardHeader>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+              Album Poster Generator
+            </p>
+            <CardTitle class="text-4xl tracking-tight md:text-5xl">
+              Make print-ready album posters.
+            </CardTitle>
+            <CardDescription>
+              Fetch metadata, override anything, and keep the poster browser-only.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button type="button" @click="startManual">Start manually</Button>
+          </CardContent>
+        </Card>
+
+        <AlbumSearch @select="selectAlbum" />
+        <AlbumEditor :draft="draft" @patch="patchDraft" />
+        <ExportPanel
+          :selected-preset-id="selectedPresetId"
+          :exporting="exporting"
+          @select-preset="selectedPresetId = $event"
+          @export-poster="exportPoster"
+        />
+
+        <Alert v-if="status">
+          <AlertDescription>{{ status }}</AlertDescription>
+        </Alert>
+      </section>
+
+      <section class="min-w-0 lg:sticky lg:top-10">
+        <Card>
+          <CardHeader>
+            <CardTitle>Preview</CardTitle>
+            <CardDescription
+              >Only the poster surface is captured during PNG export.</CardDescription
+            >
+          </CardHeader>
+          <CardContent class="grid place-items-center overflow-auto">
+            <PosterPreview :draft="draft" />
+          </CardContent>
+        </Card>
+      </section>
+    </div>
   </main>
 </template>

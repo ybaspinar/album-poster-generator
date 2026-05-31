@@ -1,4 +1,7 @@
 import { mount } from "@vue/test-utils";
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { describe, expect, it, vi } from "vitest";
 import App from "../App.vue";
 import { findCoverArt } from "../sources/cover-art";
@@ -34,6 +37,10 @@ describe("App flow", () => {
   it("searches, selects a result, uses search artwork, updates swatches, and allows manual title override", async () => {
     const wrapper = mount(App);
 
+    expect(wrapper.findAllComponents(Card).length).toBeGreaterThanOrEqual(4);
+    expect(wrapper.findComponent(Alert).exists()).toBe(false);
+    expect(wrapper.findAllComponents(Button).length).toBeGreaterThanOrEqual(2);
+
     await wrapper.find('[data-test="search-input"]').setValue("kids see ghosts");
     await wrapper.find('[data-test="search-form"]').trigger("submit");
     await Promise.resolve();
@@ -43,6 +50,7 @@ describe("App flow", () => {
     await Promise.resolve();
     await Promise.resolve();
 
+    expect(wrapper.findComponent(Alert).exists()).toBe(true);
     expect(wrapper.text()).toContain("Kids See Ghosts");
     expect(wrapper.find(".poster-art").attributes("src")).toBe(
       "https://example.com/search-front.jpg",
