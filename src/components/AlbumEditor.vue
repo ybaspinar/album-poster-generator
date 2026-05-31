@@ -20,6 +20,7 @@ import {
 import type {
   AlbumDraft,
   PosterFont,
+  PosterLayout,
   SwatchShape,
   TracklistColumns,
   TracklistSize,
@@ -103,6 +104,10 @@ function uploadArtwork(event: Event): void {
 
 function selectFont(value: string): void {
   emit("patch", { font: value as PosterFont });
+}
+
+function updateLayout(value: string): void {
+  emit("patch", { layout: value as PosterLayout });
 }
 
 function fontLabel(font: PosterFont): string {
@@ -396,8 +401,21 @@ function fontLabel(font: PosterFont): string {
       <Card>
         <AccordionTrigger header="Layout" />
         <AccordionContent>
-          <div class="px-1 py-2">
-            <p class="text-sm text-muted-foreground">Additional layout options will appear here.</p>
+          <div class="grid gap-2 px-1">
+            <Label for="poster-layout">Spacing</Label>
+            <Select :model-value="draft.layout" @update:model-value="updateLayout">
+              <SelectTrigger id="poster-layout" class="w-full">
+                <SelectValue placeholder="Select layout" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="small">Small</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="large">Large</SelectItem>
+                  <SelectItem value="edge-to-edge">Edge to Edge</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </div>
         </AccordionContent>
       </Card>
