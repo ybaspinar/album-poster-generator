@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from "vue";
-import { useDebounceFn } from "@vueuse/core";
+import { computed, nextTick, ref } from "vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -131,27 +130,15 @@ async function performSearch(): Promise<void> {
   }
 }
 
-const debouncedSearch = useDebounceFn(performSearch, 350);
-
-function anyFieldChanged(): void {
-  if (
-    artist.value.trim().length >= 2 ||
-    title.value.trim().length >= 2 ||
-    year.value.trim().length >= 2
-  ) {
-    debouncedSearch();
-  } else if (!hasSearchableContent.value) {
+function onSearchInput(): void {
+  if (!hasSearchableContent.value) {
     clearResults();
     updateRecents();
     showRecents.value = recents.value.length > 0;
   }
 }
 
-watch([artist, title, year], anyFieldChanged);
-
 function onKeyDown(event: KeyboardEvent): void {
-  if (!results.value.length && !showRecents.value) return;
-
   if (event.key === "ArrowDown") {
     event.preventDefault();
     if (showRecents.value) {
@@ -173,7 +160,6 @@ function onKeyDown(event: KeyboardEvent): void {
       title.value = "";
       year.value = "";
     } else {
-      debouncedSearch.cancel();
       performSearch();
     }
   } else if (event.key === "Escape") {
@@ -211,13 +197,14 @@ function selectResult(album: AlbumDraftInput): void {
               autocomplete="off"
               @focus="focusArtistInput"
               @blur="blurArtistInput"
+              @input="onSearchInput"
               @keydown="onKeyDown"
             />
           </div>
         </div>
 
         <div class="grid gap-2">
-          <Label for="album-title">Album title</Label>
+          <Label for="album-title">Title</Label>
           <div class="relative">
             <Input
               id="album-title"
@@ -226,6 +213,7 @@ function selectResult(album: AlbumDraftInput): void {
               type="search"
               placeholder="Kids See Ghosts"
               autocomplete="off"
+              @input="onSearchInput"
               @keydown="onKeyDown"
             />
           </div>
@@ -241,6 +229,7 @@ function selectResult(album: AlbumDraftInput): void {
               type="search"
               placeholder="2018"
               autocomplete="off"
+              @input="onSearchInput"
               @keydown="onKeyDown"
             />
           </div>

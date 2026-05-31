@@ -1,9 +1,10 @@
 import { mount } from "@vue/test-utils";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import AlbumSearch from "./AlbumSearch.vue";
+import { searchMusicBrainzAlbums } from "../sources/musicbrainz";
 
 vi.mock("../sources/musicbrainz", () => ({
   searchMusicBrainzAlbums: vi.fn().mockImplementation(async (params) => {
@@ -49,7 +50,12 @@ vi.mock("../sources/search-recent", () => ({
   addRecentSearch: vi.fn(),
 }));
 
+const mockedSearchMusicBrainzAlbums = vi.mocked(searchMusicBrainzAlbums);
+
 describe("AlbumSearch", () => {
+  beforeEach(() => {
+    mockedSearchMusicBrainzAlbums.mockClear();
+  });
   it("uses shadcn surfaces and emits the selected album result", async () => {
     const wrapper = mount(AlbumSearch);
 
@@ -74,6 +80,19 @@ describe("AlbumSearch", () => {
     });
   });
 
+  it("does not search while typing", async () => {
+    const wrapper = mount(AlbumSearch);
+
+    await wrapper.find('[data-test="artist-input"]').setValue("Kanye");
+    await wrapper.find('[data-test="title-input"]').setValue("Kids");
+    await wrapper.find('[data-test="year-input"]').setValue("2018");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(mockedSearchMusicBrainzAlbums).not.toHaveBeenCalled();
+    expect(wrapper.find('[data-test="result-0"]').exists()).toBe(false);
+  });
+
   it("searches by artist only", async () => {
     const wrapper = mount(AlbumSearch);
 
@@ -86,8 +105,10 @@ describe("AlbumSearch", () => {
     expect(wrapper.text()).toContain("Kids See Ghosts");
   });
 
-  it("searches by title only", async () => {
+  it("labels the title field plainly and searches by title only", async () => {
     const wrapper = mount(AlbumSearch);
+
+    expect(wrapper.find('label[for="album-title"]').text()).toBe("Title");
 
     await wrapper.find('[data-test="title-input"]').setValue("Vespertine");
     await wrapper.find('[data-test="search-form"]').trigger("submit");
@@ -96,6 +117,19 @@ describe("AlbumSearch", () => {
 
     expect(wrapper.find('[data-test="result-0"]').exists()).toBe(true);
     expect(wrapper.text()).toContain("Vespertine");
+  });
+
+  it("searches when enter is pressed without a highlighted result", async () => {
+    const wrapper = mount(AlbumSearch);
+
+    await wrapper.find('[data-test="artist-input"]').setValue("Kanye");
+    await wrapper.find('[data-test="artist-input"]').trigger("keydown", { key: "Enter" });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(mockedSearchMusicBrainzAlbums).toHaveBeenCalledTimes(1);
+    expect(wrapper.find('[data-test="result-0"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain("Kids See Ghosts");
   });
 
   it("shows recent searches on artist input focus when all fields are empty", async () => {
