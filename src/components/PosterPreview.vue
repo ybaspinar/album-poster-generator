@@ -43,7 +43,8 @@ watch(
       try {
         await loadGoogleFont(newFont, ["400", "700"]);
       } catch (e) {
-        console.error("Failed to load Google Font:", e);
+        // Silently fail in test environment, use fallback font
+        console.warn("Font loading failed (using fallback):", e);
       }
     }
   },

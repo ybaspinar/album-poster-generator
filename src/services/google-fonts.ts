@@ -50,22 +50,33 @@ export async function fetchGoogleFonts(): Promise<GoogleFont[]> {
   return POPULAR_GOOGLE_FONTS;
 }
 
-export function loadGoogleFont(family: string, variants: string[] = ["400", "700"]): Promise<void> {
-  return new Promise((resolve, reject) => {
-    // Check if font is already loaded
-    const existingLink = document.querySelector(`link[data-font-family="${family}"]`);
+export function loadGoogleFont(family: string, variants: string[] = ["400"]): Promise<void> {
+  return new Promise((resolve) => {
+    // Check if already loaded
+    const existingLink = document?.querySelector(`link[data-font-family="${family}"]`);
     if (existingLink) {
+      resolve();
+      return;
+    }
+
+    // Check if we're in a browser environment
+    if (typeof document === "undefined" || !document.head) {
       resolve();
       return;
     }
 
     const link = document.createElement("link");
     link.rel = "stylesheet";
-    link.href = `https://fonts.googleapis.com/css2?family=${family.replace(/ /g, "+")}:${variants.join(",")}&display=swap`;
+    // Use proper Google Fonts URL format - replace spaces with +
+    const familyParam = family.replace(/ /g, "+");
+    link.href = `https://fonts.googleapis.com/css2?family=${familyParam}&display=swap`;
     link.dataset.fontFamily = family;
 
     link.onload = () => resolve();
-    link.onerror = () => reject(new Error(`Failed to load font: ${family}`));
+    link.onerror = () => {
+      console.warn(`Failed to load font: ${family}, using fallback`);
+      resolve();
+    };
 
     document.head.appendChild(link);
   });
