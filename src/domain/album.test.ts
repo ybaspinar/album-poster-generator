@@ -21,6 +21,7 @@ describe("album draft model", () => {
       source: "manual",
       sourceId: "",
       font: "gotham",
+      layout: "medium",
     });
   });
 
