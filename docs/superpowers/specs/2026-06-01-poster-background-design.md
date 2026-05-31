@@ -63,7 +63,22 @@ Draft creation defaults to `backgroundMode: "default"` and `backgroundBlur: fals
 
 ## Persistence
 
-Background fields are **not** persisted to localStorage individually — they live only in the draft state (same as title, artist, font, etc.). The layout preference stays in localStorage as a user-level setting; background is poster-specific content.
+Background settings are saved to `localStorage` as a single JSON blob under key `album-poster-generator:background`:
+
+```json
+{
+  "mode": "gradient",
+  "solidColor": "#1a1a2e",
+  "gradientFrom": "#1a1a2e",
+  "gradientTo": "#16213e",
+  "gradientDirection": "vertical",
+  "blur": false
+}
+```
+
+- On draft creation, saved background is applied (user's last settings persist across sessions)
+- On `patchDraft`, when any background-related field changes, the whole blob is written back
+- Defaults are used when nothing is stored yet
 
 ## UI — New Background Card
 
@@ -118,6 +133,10 @@ AlbumEditor.vue → new Background card
 
 domain/album.ts
 └── New types + defaults, added to AlbumDraft / AlbumDraftInput
+
+stores/album.ts
+└── localStorage read/write for background settings (single JSON blob)
+    └── Applied in createAlbumDraft and patchDraft
 ```
 
 ## Files to Modify
