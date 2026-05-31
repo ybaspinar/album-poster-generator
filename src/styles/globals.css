@@ -217,7 +217,6 @@
 .poster-meta-left {
   display: grid;
   gap: 1cqw;
-  height: 100%;
 }
 
 .poster-release {
@@ -236,14 +235,11 @@
 
 .poster-swatches {
   display: flex;
-  gap: 8px;
-  align-items: end;
-  height: 100%;
+  gap: 14px;
 }
 
 .poster-swatch {
   display: block;
-  height: 100%;
+  width: clamp(24px, 4vw, 44px);
   aspect-ratio: 1;
-  width: auto;
 }
