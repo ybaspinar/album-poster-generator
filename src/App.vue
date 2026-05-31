@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
+import { computed, watch } from "vue";
+import { storeToRefs } from "pinia";
 import posthog from "posthog-js";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -16,12 +17,7 @@ import AlbumEditor from "./components/AlbumEditor.vue";
 import AlbumSearch from "./components/AlbumSearch.vue";
 import ExportPanel from "./components/ExportPanel.vue";
 import PosterPreview from "./components/PosterPreview.vue";
-import {
-  createAlbumDraft,
-  createEmptyAlbumDraft,
-  type AlbumDraft,
-  type AlbumDraftInput,
-} from "./domain/album";
+import { createAlbumDraft, type AlbumDraft, type AlbumDraftInput } from "./domain/album";
 import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
 import { createExportFilename, type ExportPresetId, getExportPreset } from "./export/presets";
 import { exportElementAsPng } from "./export/png";
@@ -34,19 +30,15 @@ import {
   fetchMusicBrainzTracklistForRelease,
   type MusicBrainzEdition,
 } from "./sources/musicbrainz";
+import { useAlbumStore } from "./stores/album";
 
-const showTracklistPreferenceKey = "album-poster-generator:show-tracklist";
+const store = useAlbumStore();
+const { draft, selectedPresetId, exporting, status, pendingAlbum, pendingEditions } =
+  storeToRefs(store);
 
-const draft = ref<AlbumDraft>(createAlbumDraft({ showTracklist: readShowTracklistPreference() }));
-const selectedPresetId = ref<ExportPresetId>("a4-portrait");
-const exporting = ref(false);
-const status = ref("");
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
-const pendingAlbum = ref<AlbumDraftInput | null>(null);
-const pendingEditions = ref<MusicBrainzEdition[]>([]);
-const editionDialogOpen = computed(
-  () => pendingAlbum.value !== null && pendingEditions.value.length > 1,
-);
+const editionDialogOpen = computed(() => store.editionDialogOpen);
+
 let paletteRequestId = 0;
 
 watch(
@@ -74,9 +66,8 @@ async function selectAlbum(album: AlbumDraftInput): Promise<void> {
   const editions = album.sourceId ? await fetchMusicBrainzEditions(album.sourceId) : [];
 
   if (editions.length > 1) {
-    pendingAlbum.value = album;
-    pendingEditions.value = editions;
-    status.value = "Choose an album edition to load its exact tracklist.";
+    store.setPendingAlbum(album, editions);
+    store.setStatus("Choose an album edition to load its exact tracklist.");
     return;
   }
 
@@ -90,8 +81,7 @@ async function selectEdition(edition: MusicBrainzEdition): Promise<void> {
   }
 
   const album = pendingAlbum.value;
-  pendingAlbum.value = null;
-  pendingEditions.value = [];
+  store.clearPendingAlbum();
   const tracklist = await fetchMusicBrainzTracklistForRelease(edition.id);
 
   await loadAlbumDraft(
@@ -106,9 +96,8 @@ async function selectEdition(edition: MusicBrainzEdition): Promise<void> {
 }
 
 function cancelEditionSelection(): void {
-  pendingAlbum.value = null;
-  pendingEditions.value = [];
-  status.value = "Album selection cancelled.";
+  store.clearPendingAlbum();
+  store.setStatus("Album selection cancelled.");
 }
 
 async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Promise<void> {
@@ -119,7 +108,7 @@ async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Prom
   draft.value = mergeFetchedAlbum(draft.value, {
     ...album,
     tracklist,
-    showTracklist: readShowTracklistPreference(),
+    showTracklist: store.readShowTracklistPreference(),
     artworkUrl: exportableArtwork.artworkUrl,
   });
   status.value = exportableArtwork.ok
@@ -148,33 +137,17 @@ async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Prom
 }
 
 function startManual(): void {
-  draft.value = createAlbumDraft({ showTracklist: readShowTracklistPreference() });
+  draft.value = createAlbumDraft({ showTracklist: store.readShowTracklistPreference() });
   status.value = "Manual draft ready.";
   posthog.capture("manual_draft_started");
 }
 
 function patchDraft(patch: Partial<AlbumDraft>): void {
   if (typeof patch.showTracklist === "boolean") {
-    writeShowTracklistPreference(patch.showTracklist);
+    store.updateShowTracklistPreference(patch.showTracklist);
   }
 
   draft.value = applyDraftPatch(draft.value, patch);
-}
-
-function readShowTracklistPreference(): boolean {
-  try {
-    return window.localStorage.getItem(showTracklistPreferenceKey) !== "false";
-  } catch {
-    return true;
-  }
-}
-
-function writeShowTracklistPreference(showTracklist: boolean): void {
-  try {
-    window.localStorage.setItem(showTracklistPreferenceKey, String(showTracklist));
-  } catch {
-    // Ignore unavailable storage; the in-memory draft still updates.
-  }
 }
 
 async function makeArtworkExportable(artworkUrl: string): Promise<ExportableArtworkUrlResult> {
@@ -277,9 +250,9 @@ async function exportPoster(): Promise<void> {
         >
           <CardHeader class="border-b border-border/70">
             <CardTitle>Preview</CardTitle>
-            <CardDescription
-              >Only the poster surface is captured during PNG export.</CardDescription
-            >
+            <CardDescription>
+              Only the poster surface is captured during PNG export.
+            </CardDescription>
           </CardHeader>
           <CardContent
             class="grid min-h-[calc(100vh-14rem)] place-items-center overflow-auto p-6 xl:p-10 2xl:p-12"
@@ -324,8 +297,8 @@ async function exportPoster(): Promise<void> {
                   {{ edition.releaseDate || "Unknown date" }}
                   <template v-if="edition.country"> · {{ edition.country }}</template>
                   <template v-if="edition.formats.length">
-                    · {{ edition.formats.join(", ") }}</template
-                  >
+                    · {{ edition.formats.join(", ") }}
+                  </template>
                   <template v-if="edition.trackCount"> · {{ edition.trackCount }} tracks</template>
                 </span>
               </span>

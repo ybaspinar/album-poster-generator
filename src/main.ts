@@ -1,4 +1,5 @@
 import { createApp } from "vue";
+import { createPinia } from "pinia";
 import posthog from "posthog-js";
 import App from "./App.vue";
 import "./styles/globals.css";
@@ -18,6 +19,9 @@ posthog.logger.info("app initialized", {
 });
 
 const app = createApp(App);
+const pinia = createPinia();
+
+app.use(pinia);
 
 app.config.errorHandler = (err) => {
   posthog.captureException(err);

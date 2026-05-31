@@ -1,4 +1,5 @@
 import { mount } from "@vue/test-utils";
+import { createPinia, setActivePinia } from "pinia";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -57,6 +58,7 @@ const mockedFetchMusicBrainzEditions = vi.mocked(fetchMusicBrainzEditions);
 const mockedFetchMusicBrainzTracklistForRelease = vi.mocked(fetchMusicBrainzTracklistForRelease);
 
 beforeEach(() => {
+  setActivePinia(createPinia());
   mockedFetchMusicBrainzEditions.mockReset();
   mockedFetchMusicBrainzEditions.mockResolvedValue([]);
   mockedFetchMusicBrainzTracklistForRelease.mockReset();
