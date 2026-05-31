@@ -85,6 +85,7 @@ export interface AlbumDraft {
   artworkUrl: string;
   artworkSource: ArtworkSource;
   palette: string[];
+  tracklist: string[];
   source: AlbumSource;
   sourceId: string;
   font: PosterFont;
@@ -99,6 +100,7 @@ export interface AlbumDraftInput {
   artworkUrl?: string;
   artworkSource?: ArtworkSource;
   palette?: string[];
+  tracklist?: string[];
   source?: AlbumSource;
   sourceId?: string;
   font?: PosterFont;
@@ -124,6 +126,7 @@ export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
     artworkUrl: input.artworkUrl ?? "",
     artworkSource: input.artworkSource ?? "manual",
     palette: normalizePalette(input.palette),
+    tracklist: normalizeTracklist(input.tracklist),
     source: input.source ?? "manual",
     sourceId: input.sourceId ?? "",
     font: input.font ?? defaultPosterFont,
@@ -133,4 +136,8 @@ export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
 function normalizePalette(palette: string[] | undefined): string[] {
   const values = palette?.filter((value) => /^#[0-9a-f]{6}$/i.test(value)) ?? [];
   return [...values, ...defaultPalette].slice(0, 6);
+}
+
+function normalizeTracklist(tracklist: string[] | undefined): string[] {
+  return tracklist?.map(normalizeAlbumText).filter(Boolean) ?? [];
 }

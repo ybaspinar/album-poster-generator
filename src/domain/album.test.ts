@@ -12,6 +12,7 @@ describe("album draft model", () => {
       artworkUrl: "",
       artworkSource: "manual",
       palette: ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"],
+      tracklist: [],
       source: "manual",
       sourceId: "",
       font: "gotham",
@@ -29,5 +30,19 @@ describe("album draft model", () => {
     expect(draft.artist).toBe("Kanye West");
     expect(draft.palette).toHaveLength(6);
     expect(draft.source).toBe("manual");
+  });
+
+  it("defaults to an empty tracklist", () => {
+    const draft = createAlbumDraft();
+
+    expect(draft.tracklist).toEqual([]);
+  });
+
+  it("normalizes tracklist entries", () => {
+    const draft = createAlbumDraft({
+      tracklist: ["  Foo  ", "", "  Xox", "\t", "Last Song  "],
+    });
+
+    expect(draft.tracklist).toEqual(["Foo", "Xox", "Last Song"]);
   });
 });

@@ -42,6 +42,36 @@ describe("PosterPreview", () => {
     expect(metaRow.find(".poster-artist").text()).toBe("Kanye West & Kid Cudi");
   });
 
+  it("renders a numbered tracklist under the artist metadata", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          artist: "Test Artist",
+          tracklist: ["Foo", "Xox", "Last Song"],
+        }),
+      },
+    });
+
+    const tracklist = wrapper.find(".poster-tracklist");
+    expect(tracklist.exists()).toBe(true);
+    expect(tracklist.text()).toContain("1) Foo");
+    expect(tracklist.text()).toContain("2) Xox");
+    expect(tracklist.text()).toContain("3) Last Song");
+  });
+
+  it("does not render a tracklist block when there are no tracks", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          artist: "Test Artist",
+          tracklist: [],
+        }),
+      },
+    });
+
+    expect(wrapper.find(".poster-tracklist").exists()).toBe(false);
+  });
+
   it("loads remote artwork with anonymous CORS for PNG export", () => {
     const wrapper = mount(PosterPreview, {
       props: {

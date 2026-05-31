@@ -42,9 +42,8 @@ watch(
     if (!BUILTIN_FONTS.includes(newFont as (typeof BUILTIN_FONTS)[number])) {
       try {
         await loadGoogleFont(newFont, ["400", "700"]);
-      } catch (e) {
+      } catch {
         // Silently fail in test environment, use fallback font
-        console.warn("Font loading failed (using fallback):", e);
       }
     }
   },
@@ -82,6 +81,12 @@ watch(
             {{ draft.metadataLine || draft.releaseDate || "Release date" }}
           </p>
           <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
+          <ol v-if="draft.tracklist.length" class="poster-tracklist" aria-label="Tracklist">
+            <li v-for="(track, index) in draft.tracklist" :key="`${track}-${index}`">
+              <span>{{ index + 1 }}) </span>
+              <span>{{ track }}</span>
+            </li>
+          </ol>
         </div>
         <div class="poster-swatches" aria-label="Poster palette">
           <span

@@ -233,6 +233,33 @@
   text-transform: uppercase;
 }
 
+.poster-tracklist {
+  display: grid;
+  gap: 0.45cqw;
+  max-width: 44cqw;
+  margin: 1.5cqw 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--poster-muted);
+  font-size: clamp(0.58rem, 1.15cqw, 0.78rem);
+  line-height: 1.25;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.poster-tracklist li {
+  display: grid;
+  grid-template-columns: 2.4em 1fr;
+  gap: 0.5em;
+}
+
+.poster-tracklist span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .poster-swatches {
   display: flex;
   gap: 14px;

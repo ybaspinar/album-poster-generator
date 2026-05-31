@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,8 @@ const emit = defineEmits<{
   patch: [patch: Partial<AlbumDraft>];
 }>();
 
+const tracklistText = computed(() => props.draft.tracklist.join("\n"));
+
 function updateField(
   field: keyof Pick<
     AlbumDraft,
@@ -31,6 +34,15 @@ function updateField(
   value: string | number,
 ): void {
   emit("patch", { [field]: String(value) });
+}
+
+function updateTracklist(value: string | number): void {
+  const tracklist = String(value)
+    .split("\n")
+    .map((track) => track.replace(/\s+/g, " ").trim())
+    .filter(Boolean);
+
+  emit("patch", { tracklist });
 }
 
 function updatePalette(index: number, value: string | number): void {
@@ -148,6 +160,21 @@ function fontLabel(font: PosterFont): string {
             :model-value="draft.metadataLine"
             @update:model-value="updateField('metadataLine', $event)"
           />
+        </div>
+
+        <div class="grid gap-2">
+          <Label for="poster-tracklist">Tracklist</Label>
+          <textarea
+            id="poster-tracklist"
+            data-test="tracklist-input"
+            class="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 dark:bg-input/30 min-h-28 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
+            :value="tracklistText"
+            placeholder="One track per line"
+            @input="updateTracklist(($event.target as HTMLTextAreaElement).value)"
+          />
+          <p class="text-muted-foreground text-xs">
+            One track per line. Numbers are added on the poster.
+          </p>
         </div>
 
         <div class="grid gap-2">

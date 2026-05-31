@@ -69,14 +69,12 @@ export function loadGoogleFont(family: string, variants: string[] = ["400"]): Pr
     link.rel = "stylesheet";
     // Use proper Google Fonts URL format - replace spaces with +
     const familyParam = family.replace(/ /g, "+");
-    link.href = `https://fonts.googleapis.com/css2?family=${familyParam}&display=swap`;
+    const weights = variants.join(";");
+    link.href = `https://fonts.googleapis.com/css2?family=${familyParam}:wght@${weights}&display=swap`;
     link.dataset.fontFamily = family;
 
     link.onload = () => resolve();
-    link.onerror = () => {
-      console.warn(`Failed to load font: ${family}, using fallback`);
-      resolve();
-    };
+    link.onerror = () => resolve();
 
     document.head.appendChild(link);
   });
