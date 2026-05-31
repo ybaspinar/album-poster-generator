@@ -14,6 +14,7 @@ describe("album draft model", () => {
       palette: ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"],
       source: "manual",
       sourceId: "",
+      font: "gotham",
     });
   });
 

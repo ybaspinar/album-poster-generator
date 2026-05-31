@@ -2,8 +2,19 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { AlbumDraft } from "../domain/album";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import type { AlbumDraft, PosterFont } from "../domain/album";
+import { posterFontOptions } from "../domain/album";
 import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
+import GoogleFontSelector from "./GoogleFontSelector.vue";
 
 const props = defineProps<{
   draft: AlbumDraft;
@@ -14,7 +25,7 @@ const emit = defineEmits<{
 }>();
 
 function updateField(
-  field: keyof Pick<AlbumDraft, "title" | "artist" | "releaseDate" | "metadataLine" | "artworkUrl">,
+  field: keyof Pick<AlbumDraft, "title" | "artist" | "releaseDate" | "metadataLine" | "artworkUrl" | "font">,
   value: string | number,
 ): void {
   emit("patch", { [field]: String(value) });
@@ -43,6 +54,19 @@ function uploadArtwork(event: Event): void {
   }
 
   emit("patch", { artworkUrl: createArtworkObjectUrl(file), artworkSource: "manual" });
+}
+
+function selectFont(value: string): void {
+  emit("patch", { font: value as PosterFont });
+}
+
+function fontLabel(font: PosterFont): string {
+  const labels: Record<PosterFont, string> = {
+    gotham: "Gotham (sans-serif)",
+    inter: "Inter (system)",
+    system: "System default",
+  };
+  return labels[font];
 }
 </script>
 
@@ -109,6 +133,29 @@ function uploadArtwork(event: Event): void {
             @change="uploadArtwork"
           />
         </div>
+
+        <div class="grid gap-2">
+          <Label for="poster-font">Font</Label>
+          <Select :model-value="draft.font" @update:model-value="selectFont">
+            <SelectTrigger id="poster-font" class="w-full">
+              <SelectValue placeholder="Select font" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem v-for="font in posterFontOptions" :key="font" :value="font">
+                  {{ fontLabel(font) }}
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Separator class="my-2" />
+
+        <GoogleFontSelector
+          :model-value="draft.font"
+          @update:model-value="selectFont"
+        />
       </div>
 
       <div class="grid grid-cols-3 gap-3" aria-label="Palette editor">

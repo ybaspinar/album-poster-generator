@@ -53,4 +53,33 @@ describe("PosterPreview", () => {
 
     expect(wrapper.find("img").attributes("crossorigin")).toBe("anonymous");
   });
+
+  it("applies font inline style for predefined fonts", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          font: "inter",
+        }),
+      },
+    });
+
+    expect(wrapper.find("article").classes()).toContain("font-inter");
+    expect(wrapper.find("article").attributes("style")).toContain("font-family:");
+  });
+
+  it("applies inline style for Google fonts without class", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          // Using a Google Font (not in predefined list)
+          font: "Roboto" as any,
+        }),
+      },
+    });
+
+    expect(wrapper.find("article").classes()).not.toContain("font-Roboto");
+    const style = wrapper.find("article").attributes("style");
+    expect(style).toContain("font-family:");
+    expect(style).toContain("Roboto");
+  });
 });

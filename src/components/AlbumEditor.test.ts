@@ -26,5 +26,9 @@ describe("AlbumEditor", () => {
     expect(wrapper.emitted("patch")?.[1]).toEqual([
       { palette: ["#abcdef", "#222222", "#333333", "#444444", "#555555", "#666666"] },
     ]);
+
+    // Verify font select and Google font selector components exist
+    expect(wrapper.find("button#poster-font").exists()).toBe(true);
+    expect(wrapper.vm.draft.font).toBe("gotham");
   });
 });
