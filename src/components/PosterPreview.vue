@@ -25,6 +25,36 @@ const layoutClass = computed(() => {
   return `poster-layout-${layout}`;
 });
 
+const backgroundStyle = computed(() => {
+  const mode = props.draft.backgroundMode;
+  if (mode === "solid") {
+    return { background: props.draft.backgroundSolidColor };
+  }
+  if (mode === "gradient") {
+    const from = props.draft.backgroundGradientFrom;
+    const to = props.draft.backgroundGradientTo;
+    const dir = props.draft.backgroundGradientDirection;
+    if (dir === "horizontal") {
+      return { background: `linear-gradient(to right, ${from}, ${to})` };
+    }
+    if (dir === "radial") {
+      return { background: `radial-gradient(circle, ${from}, ${to})` };
+    }
+    return { background: `linear-gradient(to bottom, ${from}, ${to})` };
+  }
+  if (mode === "artwork" && props.draft.artworkUrl) {
+    return { backgroundImage: `url(${props.draft.artworkUrl})` };
+  }
+  return {};
+});
+
+const backgroundClasses = computed(() => {
+  const classes: string[] = [];
+  if (props.draft.backgroundBlur) classes.push("poster-bg-frosted");
+  if (props.draft.backgroundMode === "artwork") classes.push("poster-bg-artwork");
+  return classes;
+});
+
 function getFontFamily(_font: PosterFont): string {
   const fonts: Record<PosterFont, string> = {
     gotham: "'Gotham', 'Helvetica Neue', Arial, sans-serif",
@@ -61,9 +91,9 @@ watch(
   <article
     data-export-poster
     class="poster-page"
-    :class="[fontClass, layoutClass]"
+    :class="[fontClass, layoutClass, backgroundClasses]"
     aria-label="Album poster preview"
-    :style="{ fontFamily: getFontFamily(draft.font) }"
+    :style="[{ fontFamily: getFontFamily(draft.font) }, backgroundStyle]"
   >
     <div class="poster-art-frame">
       <img
