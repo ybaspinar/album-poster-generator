@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import AlbumEditor from "./components/AlbumEditor.vue";
 import AlbumSearch from "./components/AlbumSearch.vue";
 import ExportPanel from "./components/ExportPanel.vue";
@@ -13,6 +13,7 @@ import {
 import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
 import { createExportFilename, type ExportPresetId, getExportPreset } from "./export/presets";
 import { exportElementAsPng } from "./export/png";
+import { extractPaletteFromImage } from "./media/palette";
 import { findCoverArt } from "./sources/cover-art";
 
 const draft = ref<AlbumDraft>(createEmptyAlbumDraft());
@@ -20,6 +21,28 @@ const selectedPresetId = ref<ExportPresetId>("a4-portrait");
 const exporting = ref(false);
 const status = ref("");
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
+let paletteRequestId = 0;
+
+watch(
+  () => draft.value.artworkUrl,
+  async (artworkUrl) => {
+    const requestId = ++paletteRequestId;
+
+    if (!artworkUrl) {
+      return;
+    }
+
+    try {
+      const palette = await extractPaletteFromImage(artworkUrl);
+
+      if (requestId === paletteRequestId) {
+        draft.value = applyDraftPatch(draft.value, { palette });
+      }
+    } catch {
+      // Palette extraction is best-effort. Keep the current swatches if artwork cannot be read.
+    }
+  },
+);
 
 async function selectAlbum(album: AlbumDraftInput): Promise<void> {
   draft.value = mergeFetchedAlbum(draft.value, album);
