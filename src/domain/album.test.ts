@@ -89,28 +89,28 @@ describe("album draft model", () => {
     expect(createAlbumDraft().typography).toEqual({
       title: {
         color: "#111111",
-        size: 100,
+        size: 48,
         weight: 700,
         italic: false,
         uppercase: true,
       },
       artist: {
         color: "#111111",
-        size: 100,
+        size: 16,
         weight: 400,
         italic: false,
         uppercase: true,
       },
       metadata: {
         color: "#111111",
-        size: 100,
+        size: 13,
         weight: 400,
         italic: false,
         uppercase: true,
       },
       tracklist: {
         color: "#6f6a60",
-        size: 100,
+        size: 11,
         weight: 400,
         italic: false,
         uppercase: true,
@@ -123,14 +123,14 @@ describe("album draft model", () => {
       typography: {
         title: {
           color: "#abcdef",
-          size: 180,
+          size: 96,
           weight: 900,
           italic: true,
           uppercase: false,
         },
         artist: {
           color: "bad",
-          size: 999,
+          size: 200,
           weight: 123,
           italic: true,
           uppercase: false,
@@ -140,14 +140,14 @@ describe("album draft model", () => {
 
     expect(draft.typography.title).toEqual({
       color: "#abcdef",
-      size: 180,
+      size: 96,
       weight: 900,
       italic: true,
       uppercase: false,
     });
     expect(draft.typography.artist).toEqual({
       color: "#111111",
-      size: 180,
+      size: 96,
       weight: 400,
       italic: true,
       uppercase: false,

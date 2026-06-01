@@ -217,7 +217,7 @@
   line-height: 0.88;
   letter-spacing: -0.07em;
   color: var(--poster-title-color, var(--ink));
-  font-size: calc(3.2rem * var(--poster-title-size, 100) / 100);
+  font-size: var(--poster-title-size);
   font-style: var(--poster-title-style, normal);
   font-weight: var(--poster-title-weight, 700);
   text-transform: var(--poster-title-transform, uppercase);
@@ -243,7 +243,7 @@
 .poster-release {
   margin: 0;
   color: var(--poster-metadata-color, var(--ink));
-  font-size: calc(0.82rem * var(--poster-metadata-size, 100) / 100);
+  font-size: var(--poster-metadata-size);
   font-style: var(--poster-metadata-style, normal);
   font-weight: var(--poster-metadata-weight, 400);
   line-height: 1.32;
@@ -252,7 +252,7 @@
 .poster-artist {
   margin: 0;
   color: var(--poster-artist-color, var(--ink));
-  font-size: calc(1rem * var(--poster-artist-size, 100) / 100);
+  font-size: var(--poster-artist-size);
   font-style: var(--poster-artist-style, normal);
   font-weight: var(--poster-artist-weight, 400);
   line-height: 1.25;
@@ -268,7 +268,7 @@
   padding: 0;
   list-style: none;
   color: var(--poster-tracklist-color, var(--poster-muted));
-  font-size: calc(0.68rem * var(--poster-tracklist-size, 100) / 100);
+  font-size: var(--poster-tracklist-size);
   font-style: var(--poster-tracklist-style, normal);
   font-weight: var(--poster-tracklist-weight, 400);
   line-height: 1.25;

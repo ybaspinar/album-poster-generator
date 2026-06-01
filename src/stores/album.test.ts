@@ -90,7 +90,7 @@ describe("album store typography preferences", () => {
     localStorage.setItem(
       typographyPreferenceKey,
       JSON.stringify({
-        title: { color: "#ff0000", size: 140, weight: 900, italic: true, uppercase: false },
+        title: { color: "#ff0000", size: 64, weight: 900, italic: true, uppercase: false },
       }),
     );
 
@@ -98,7 +98,7 @@ describe("album store typography preferences", () => {
 
     expect(store.draft.typography.title).toMatchObject({
       color: "#ff0000",
-      size: 140,
+      size: 64,
       weight: 900,
       italic: true,
       uppercase: false,
@@ -111,13 +111,13 @@ describe("album store typography preferences", () => {
     store.patchDraft({
       typography: {
         ...store.draft.typography,
-        title: { ...store.draft.typography.title, color: "#ff0000", size: 140 },
+        title: { ...store.draft.typography.title, color: "#ff0000", size: 64 },
       },
     });
 
     expect(JSON.parse(localStorage.getItem(typographyPreferenceKey) ?? "{}").title).toMatchObject({
       color: "#ff0000",
-      size: 140,
+      size: 64,
     });
   });
 });

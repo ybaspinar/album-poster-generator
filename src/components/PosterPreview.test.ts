@@ -151,8 +151,8 @@ describe("PosterPreview", () => {
 
     expect(metaRowRule).toContain("grid-template-columns: minmax(0, 1fr) auto");
     expect(metaLeftRule).toContain("max-width: 48cqw");
-    expect(releaseRule).toContain("0.82rem");
-    expect(artistRule).toContain("1rem");
+    expect(releaseRule).toContain("var(--poster-metadata-size)");
+    expect(artistRule).toContain("var(--poster-artist-size)");
     expect(artistRule).toContain("letter-spacing: 0.15em");
     expect(swatchesRule).toContain("gap: clamp(8px, 1.2cqw, 12px)");
     expect(swatchesRule).toContain("min-height: 2.4em");
@@ -200,10 +200,10 @@ describe("PosterPreview", () => {
           releaseDate: "2021",
           tracklist: ["Jail"],
           typography: {
-            title: { color: "#ff0000", size: 140, weight: 900, italic: true, uppercase: false },
-            artist: { color: "#00ff00", size: 80, weight: 700, italic: false, uppercase: false },
-            metadata: { color: "#0000ff", size: 90, weight: 500, italic: true, uppercase: true },
-            tracklist: { color: "#123456", size: 120, weight: 800, italic: true, uppercase: false },
+            title: { color: "#ff0000", size: 64, weight: 900, italic: true, uppercase: false },
+            artist: { color: "#00ff00", size: 20, weight: 700, italic: false, uppercase: false },
+            metadata: { color: "#0000ff", size: 14, weight: 500, italic: true, uppercase: true },
+            tracklist: { color: "#123456", size: 12, weight: 800, italic: true, uppercase: false },
           },
         }),
       },
@@ -211,7 +211,7 @@ describe("PosterPreview", () => {
     const style = wrapper.find(".poster-page").attributes("style");
 
     expect(style).toContain("--poster-title-color: #ff0000");
-    expect(style).toContain("--poster-title-size: 140%");
+    expect(style).toContain("--poster-title-size: 64px");
     expect(style).toContain("--poster-title-weight: 900");
     expect(style).toContain("--poster-title-style: italic");
     expect(style).toContain("--poster-title-transform: none");

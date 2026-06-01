@@ -89,11 +89,11 @@ describe("AlbumEditor", () => {
       },
     ]);
 
-    await wrapper.find('[data-test="typography-title-size-input"]').setValue("140");
+    await wrapper.find('[data-test="typography-title-size-input"]').setValue("64");
     expect(wrapper.emitted("patch")?.[1]).toEqual([
       {
         typography: expect.objectContaining({
-          title: expect.objectContaining({ size: 140 }),
+          title: expect.objectContaining({ size: 64 }),
         }),
       },
     ]);

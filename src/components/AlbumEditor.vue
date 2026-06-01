@@ -473,15 +473,15 @@ function fontLabel(font: PosterFont): string {
                 <div class="flex items-center justify-between gap-3">
                   <Label :for="`typography-${section.key}-size`">Size</Label>
                   <span class="text-xs tabular-nums text-muted-foreground">
-                    {{ draft.typography[section.key].size }}%
+                    {{ draft.typography[section.key].size }}px
                   </span>
                 </div>
                 <Input
                   :id="`typography-${section.key}-size`"
                   :data-test="`typography-${section.key}-size-input`"
                   type="number"
-                  min="60"
-                  max="180"
+                  min="8"
+                  max="96"
                   step="1"
                   class="h-9"
                   :model-value="draft.typography[section.key].size"

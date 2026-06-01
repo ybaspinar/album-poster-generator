@@ -76,7 +76,7 @@ function typographyVariables(
 ): Record<string, string> {
   return {
     [`--poster-${section}-color`]: style.color,
-    [`--poster-${section}-size`]: `${style.size}%`,
+    [`--poster-${section}-size`]: `${style.size}px`,
     [`--poster-${section}-weight`]: String(style.weight),
     [`--poster-${section}-style`]: style.italic ? "italic" : "normal",
     [`--poster-${section}-transform`]: style.uppercase ? "uppercase" : "none",

@@ -112,28 +112,28 @@ export type TypographyInput = Partial<Record<TypographySection, Partial<Typograp
 export const defaultTypography: TypographySettings = {
   title: {
     color: "#111111",
-    size: 100,
+    size: 48,
     weight: 700,
     italic: false,
     uppercase: true,
   },
   artist: {
     color: "#111111",
-    size: 100,
+    size: 16,
     weight: 400,
     italic: false,
     uppercase: true,
   },
   metadata: {
     color: "#111111",
-    size: 100,
+    size: 13,
     weight: 400,
     italic: false,
     uppercase: true,
   },
   tracklist: {
     color: "#6f6a60",
-    size: 100,
+    size: 11,
     weight: 400,
     italic: false,
     uppercase: true,
@@ -273,7 +273,7 @@ function normalizeTypographyColor(value: string | undefined, fallback: string): 
 
 function normalizeTypographySize(value: number | undefined, fallback: number): number {
   if (typeof value !== "number" || !Number.isFinite(value)) return fallback;
-  return Math.min(180, Math.max(60, Math.round(value)));
+  return Math.min(96, Math.max(8, Math.round(value)));
 }
 
 function normalizeTypographyWeight(
