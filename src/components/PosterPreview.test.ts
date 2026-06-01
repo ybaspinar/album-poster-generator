@@ -159,6 +159,37 @@ describe("PosterPreview", () => {
     expect(swatchRule).toContain("width: clamp(18px, 3cqw, 34px)");
   });
 
+  it("keeps artwork mode close to the standard poster layout without frame effects", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          backgroundMode: "artwork",
+          artworkUrl: "https://example.com/cover.jpg",
+          tracklist: ["Stargazing", "Carousel"],
+        }),
+      },
+    });
+    const css = readFileSync("src/styles/globals.css", "utf8");
+    const artworkFrameRule = css.match(
+      /\.poster-page\.poster-bg-artwork \.poster-art-frame \{(?<body>[^}]+)\}/,
+    )?.groups?.body;
+    const artworkPageRule = css.match(/\.poster-page\.poster-bg-artwork \{(?<body>[^}]+)\}/)?.groups
+      ?.body;
+    const captionRule = css.match(
+      /\.poster-page\.poster-bg-artwork \.poster-caption \{(?<body>[^}]+)\}/,
+    )?.groups?.body;
+
+    expect(wrapper.find(".poster-art-frame").exists()).toBe(true);
+    expect(wrapper.find(".poster-page").classes()).toContain("poster-bg-artwork");
+    expect(artworkFrameRule).toBeDefined();
+    expect(artworkFrameRule).not.toContain("display: none");
+    expect(artworkPageRule).not.toContain("border:");
+    expect(artworkPageRule).not.toContain("box-shadow:");
+    expect(captionRule ?? "").not.toContain("grid-template-areas");
+    expect(captionRule ?? "").not.toContain("text-align: right");
+    expect(captionRule).toContain("z-index: 2");
+  });
+
   it("loads remote artwork with anonymous CORS for PNG export", () => {
     const wrapper = mount(PosterPreview, {
       props: {
