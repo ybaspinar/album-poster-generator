@@ -151,8 +151,8 @@ describe("PosterPreview", () => {
 
     expect(metaRowRule).toContain("grid-template-columns: minmax(0, 1fr) auto");
     expect(metaLeftRule).toContain("max-width: 48cqw");
-    expect(releaseRule).toContain("font-size: clamp(0.72rem, 1.45cqw, 0.95rem)");
-    expect(artistRule).toContain("font-size: clamp(0.86rem, 1.8cqw, 1.18rem)");
+    expect(releaseRule).toContain("clamp(0.72rem, 1.45cqw, 0.95rem)");
+    expect(artistRule).toContain("clamp(0.86rem, 1.8cqw, 1.18rem)");
     expect(artistRule).toContain("letter-spacing: 0.15em");
     expect(swatchesRule).toContain("gap: clamp(8px, 1.2cqw, 12px)");
     expect(swatchesRule).toContain("min-height: 2.4em");
@@ -189,6 +189,34 @@ describe("PosterPreview", () => {
     expect(captionRule ?? "").not.toContain("text-align: right");
     expect(captionRule).toContain("z-index: 2");
     expect(wrapper.find(".poster-page").attributes("style")).toContain("--poster-bg-blur: 10px");
+  });
+
+  it("applies typography customizations to poster sections", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          title: "Donda",
+          artist: "Kanye West",
+          releaseDate: "2021",
+          tracklist: ["Jail"],
+          typography: {
+            title: { color: "#ff0000", size: 140, weight: 900, italic: true, uppercase: false },
+            artist: { color: "#00ff00", size: 80, weight: 700, italic: false, uppercase: false },
+            metadata: { color: "#0000ff", size: 90, weight: 500, italic: true, uppercase: true },
+            tracklist: { color: "#123456", size: 120, weight: 800, italic: true, uppercase: false },
+          },
+        }),
+      },
+    });
+    const style = wrapper.find(".poster-page").attributes("style");
+
+    expect(style).toContain("--poster-title-color: #ff0000");
+    expect(style).toContain("--poster-title-size: 140%");
+    expect(style).toContain("--poster-title-weight: 900");
+    expect(style).toContain("--poster-title-style: italic");
+    expect(style).toContain("--poster-title-transform: none");
+    expect(style).toContain("--poster-artist-color: #00ff00");
+    expect(style).toContain("--poster-tracklist-color: #123456");
   });
 
   it("loads remote artwork with anonymous CORS for PNG export", () => {

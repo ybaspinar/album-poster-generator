@@ -28,6 +28,10 @@ const layoutClass = computed(() => {
 const posterStyle = computed(() => ({
   fontFamily: getFontFamily(props.draft.font),
   "--poster-bg-blur": `${props.draft.backgroundBlurAmount}px`,
+  ...typographyVariables("title", props.draft.typography.title),
+  ...typographyVariables("artist", props.draft.typography.artist),
+  ...typographyVariables("metadata", props.draft.typography.metadata),
+  ...typographyVariables("tracklist", props.draft.typography.tracklist),
 }));
 
 const backgroundStyle = computed(() => {
@@ -59,6 +63,25 @@ const backgroundClasses = computed(() => {
   if (props.draft.backgroundMode === "artwork") classes.push("poster-bg-artwork");
   return classes;
 });
+
+function typographyVariables(
+  section: "title" | "artist" | "metadata" | "tracklist",
+  style: {
+    color: string;
+    size: number;
+    weight: number;
+    italic: boolean;
+    uppercase: boolean;
+  },
+): Record<string, string> {
+  return {
+    [`--poster-${section}-color`]: style.color,
+    [`--poster-${section}-size`]: `${style.size}%`,
+    [`--poster-${section}-weight`]: String(style.weight),
+    [`--poster-${section}-style`]: style.italic ? "italic" : "normal",
+    [`--poster-${section}-transform`]: style.uppercase ? "uppercase" : "none",
+  };
+}
 
 function getFontFamily(_font: PosterFont): string {
   const fonts: Record<PosterFont, string> = {

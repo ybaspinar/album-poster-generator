@@ -26,6 +26,9 @@ import type {
   SwatchShape,
   TracklistColumns,
   TracklistSize,
+  TypographySection,
+  TypographyStyle,
+  TypographyWeight,
 } from "../domain/album";
 import { posterFontOptions } from "../domain/album";
 import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
@@ -38,6 +41,21 @@ const props = defineProps<{
 const emit = defineEmits<{
   patch: [patch: Partial<AlbumDraft>];
 }>();
+
+const typographySections: Array<{ key: TypographySection; label: string }> = [
+  { key: "title", label: "Title" },
+  { key: "artist", label: "Artist" },
+  { key: "metadata", label: "Date / metadata" },
+  { key: "tracklist", label: "Tracklist" },
+];
+
+const typographyWeights: Array<{ value: TypographyWeight; label: string }> = [
+  { value: 400, label: "Regular" },
+  { value: 500, label: "Medium" },
+  { value: 700, label: "Bold" },
+  { value: 800, label: "Extra bold" },
+  { value: 900, label: "Black" },
+];
 
 function updateField(
   field: keyof Pick<
@@ -139,6 +157,44 @@ function updateBackgroundBlur(event: Event): void {
 function updateBackgroundBlurAmount(value: string | number): void {
   const amount = Number(value);
   emit("patch", { backgroundBlurAmount: Number.isFinite(amount) ? amount : 0 });
+}
+
+function updateTypography(section: TypographySection, patch: Partial<TypographyStyle>): void {
+  emit("patch", {
+    typography: {
+      ...props.draft.typography,
+      [section]: {
+        ...props.draft.typography[section],
+        ...patch,
+      },
+    },
+  });
+}
+
+function updateTypographyColor(section: TypographySection, value: string | number): void {
+  updateTypography(section, { color: String(value) });
+}
+
+function updateTypographySize(section: TypographySection, value: string | number): void {
+  const size = Number(value);
+  updateTypography(section, { size: Number.isFinite(size) ? size : 100 });
+}
+
+function updateTypographyWeight(section: TypographySection, value: string): void {
+  const weight = Number(value);
+  updateTypography(section, {
+    weight: (weight === 400 || weight === 500 || weight === 700 || weight === 800 || weight === 900
+      ? weight
+      : 400) as TypographyWeight,
+  });
+}
+
+function updateTypographyItalic(section: TypographySection, event: Event): void {
+  updateTypography(section, { italic: (event.target as HTMLInputElement).checked });
+}
+
+function updateTypographyUppercase(section: TypographySection, event: Event): void {
+  updateTypography(section, { uppercase: (event.target as HTMLInputElement).checked });
 }
 
 function fontLabel(font: PosterFont): string {
@@ -370,6 +426,88 @@ function fontLabel(font: PosterFont): string {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div
+              v-for="section in typographySections"
+              :key="section.key"
+              class="grid gap-3 rounded-md border border-border/60 p-3"
+            >
+              <div class="text-sm font-semibold">{{ section.label }}</div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="grid gap-2">
+                  <Label :for="`typography-${section.key}-color`">Color</Label>
+                  <Input
+                    :id="`typography-${section.key}-color`"
+                    :data-test="`typography-${section.key}-color-input`"
+                    type="color"
+                    class="h-10 p-1"
+                    :model-value="draft.typography[section.key].color"
+                    @update:model-value="updateTypographyColor(section.key, $event)"
+                  />
+                </div>
+                <div class="grid gap-2">
+                  <Label :for="`typography-${section.key}-weight`">Weight</Label>
+                  <Select
+                    :model-value="String(draft.typography[section.key].weight)"
+                    @update:model-value="updateTypographyWeight(section.key, String($event))"
+                  >
+                    <SelectTrigger :id="`typography-${section.key}-weight`" class="w-full">
+                      <SelectValue placeholder="Weight" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem
+                          v-for="weight in typographyWeights"
+                          :key="weight.value"
+                          :value="String(weight.value)"
+                        >
+                          {{ weight.label }}
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div class="grid gap-2">
+                <div class="flex items-center justify-between gap-3">
+                  <Label :for="`typography-${section.key}-size`">Size</Label>
+                  <span class="text-xs text-muted-foreground">
+                    {{ draft.typography[section.key].size }}%
+                  </span>
+                </div>
+                <Input
+                  :id="`typography-${section.key}-size`"
+                  :data-test="`typography-${section.key}-size-input`"
+                  type="range"
+                  min="60"
+                  max="180"
+                  step="1"
+                  class="h-10 p-0"
+                  :model-value="draft.typography[section.key].size"
+                  @update:model-value="updateTypographySize(section.key, $event)"
+                />
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <label class="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    class="size-4 rounded border-input accent-primary"
+                    :checked="draft.typography[section.key].italic"
+                    @change="updateTypographyItalic(section.key, $event)"
+                  />
+                  Italic
+                </label>
+                <label class="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    class="size-4 rounded border-input accent-primary"
+                    :checked="draft.typography[section.key].uppercase"
+                    @change="updateTypographyUppercase(section.key, $event)"
+                  />
+                  Uppercase
+                </label>
+              </div>
             </div>
           </div>
         </AccordionContent>

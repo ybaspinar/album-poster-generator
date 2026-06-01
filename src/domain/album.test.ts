@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createAlbumDraft, createEmptyAlbumDraft, normalizeAlbumText } from "./album";
+import {
+  createAlbumDraft,
+  createEmptyAlbumDraft,
+  defaultTypography,
+  normalizeAlbumText,
+} from "./album";
 
 describe("album draft model", () => {
   it("creates an empty editable draft", () => {
@@ -29,6 +34,7 @@ describe("album draft model", () => {
       backgroundGradientDirection: "vertical",
       backgroundBlur: false,
       backgroundBlurAmount: 10,
+      typography: defaultTypography,
     });
   });
 
@@ -77,5 +83,74 @@ describe("album draft model", () => {
     });
 
     expect(draft.tracklist).toEqual(["Foo", "Xox", "Last Song"]);
+  });
+
+  it("creates default per-section typography settings", () => {
+    expect(createAlbumDraft().typography).toEqual({
+      title: {
+        color: "#111111",
+        size: 100,
+        weight: 700,
+        italic: false,
+        uppercase: true,
+      },
+      artist: {
+        color: "#111111",
+        size: 100,
+        weight: 400,
+        italic: false,
+        uppercase: true,
+      },
+      metadata: {
+        color: "#111111",
+        size: 100,
+        weight: 400,
+        italic: false,
+        uppercase: true,
+      },
+      tracklist: {
+        color: "#6f6a60",
+        size: 100,
+        weight: 400,
+        italic: false,
+        uppercase: true,
+      },
+    });
+  });
+
+  it("normalizes typography overrides", () => {
+    const draft = createAlbumDraft({
+      typography: {
+        title: {
+          color: "#abcdef",
+          size: 180,
+          weight: 900,
+          italic: true,
+          uppercase: false,
+        },
+        artist: {
+          color: "bad",
+          size: 999,
+          weight: 123,
+          italic: true,
+          uppercase: false,
+        },
+      },
+    });
+
+    expect(draft.typography.title).toEqual({
+      color: "#abcdef",
+      size: 180,
+      weight: 900,
+      italic: true,
+      uppercase: false,
+    });
+    expect(draft.typography.artist).toEqual({
+      color: "#111111",
+      size: 180,
+      weight: 400,
+      italic: true,
+      uppercase: false,
+    });
   });
 });

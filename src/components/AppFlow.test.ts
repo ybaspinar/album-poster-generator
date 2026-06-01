@@ -99,7 +99,9 @@ describe("App flow", () => {
     expect(wrapper.find(".poster-art").attributes("src")).toBe("blob:search-front-exportable");
     expect(findCoverArt).not.toHaveBeenCalled();
     expect(
-      wrapper.findAll<HTMLInputElement>('input[type="color"]').map((input) => input.element.value),
+      wrapper
+        .findAll<HTMLInputElement>('[data-test^="palette-input-"]')
+        .map((input) => input.element.value),
     ).toEqual(["#112233", "#445566", "#778899", "#aabbcc", "#ddeeff", "#010203"]);
 
     // The editor title input is the second [data-test="title-input"] after the search title.

@@ -6,6 +6,7 @@ import type {
   GradientDirection,
   PosterBackgroundMode,
   PosterLayout,
+  TypographySettings,
 } from "../domain/album";
 import { createAlbumDraft, defaultPosterLayout } from "../domain/album";
 import { exportPresets, type ExportPresetId } from "../export/presets";
@@ -16,6 +17,7 @@ const showTracklistPreferenceKey = "album-poster-generator:show-tracklist";
 const layoutPreferenceKey = "album-poster-generator:layout";
 const exportPresetPreferenceKey = "album-poster-generator:export-preset";
 const swatchesPreferenceKey = "album-poster-generator:swatches";
+const typographyPreferenceKey = "album-poster-generator:typography";
 
 function readShowTracklistPreference(): boolean {
   try {
@@ -103,6 +105,26 @@ function writeSwatchesPreference(settings: SwatchesSettings): void {
   }
 }
 
+function readTypographyPreference(): Partial<TypographySettings> | null {
+  try {
+    const stored = window.localStorage.getItem(typographyPreferenceKey);
+    if (stored) {
+      return JSON.parse(stored) as Partial<TypographySettings>;
+    }
+  } catch {
+    // Ignore unavailable storage
+  }
+  return null;
+}
+
+function writeTypographyPreference(settings: TypographySettings): void {
+  try {
+    window.localStorage.setItem(typographyPreferenceKey, JSON.stringify(settings));
+  } catch {
+    // Ignore unavailable storage
+  }
+}
+
 const backgroundPreferenceKey = "album-poster-generator:background";
 
 interface BackgroundSettings {
@@ -139,6 +161,7 @@ export const useAlbumStore = defineStore("album", () => {
   // State
   const savedBackground = readBackgroundPreference();
   const savedSwatches = readSwatchesPreference();
+  const savedTypography = readTypographyPreference();
   const draft = ref<AlbumDraft>(
     createAlbumDraft({
       showTracklist: readShowTracklistPreference(),
@@ -152,6 +175,7 @@ export const useAlbumStore = defineStore("album", () => {
       backgroundGradientDirection: savedBackground?.gradientDirection,
       backgroundBlur: savedBackground?.blur,
       backgroundBlurAmount: savedBackground?.blurAmount,
+      typography: savedTypography ?? undefined,
     }),
   );
   const selectedPresetId = ref<ExportPresetId>(readExportPresetPreference());
@@ -221,6 +245,9 @@ export const useAlbumStore = defineStore("album", () => {
         show: patch.showSwatches ?? current.showSwatches,
         shape: patch.swatchShape ?? current.swatchShape,
       });
+    }
+    if (patch.typography) {
+      writeTypographyPreference(patch.typography);
     }
     if (
       typeof patch.backgroundMode === "string" ||

@@ -72,4 +72,30 @@ describe("AlbumEditor", () => {
 
     expect(wrapper.emitted("patch")?.[0]).toEqual([{ backgroundBlurAmount: 3 }]);
   });
+
+  it("lets users customize title typography", async () => {
+    const wrapper = mount(AlbumEditor, {
+      props: {
+        draft: createAlbumDraft(),
+      },
+    });
+
+    await wrapper.find('[data-test="typography-title-color-input"]').setValue("#ff0000");
+    expect(wrapper.emitted("patch")?.[0]).toEqual([
+      {
+        typography: expect.objectContaining({
+          title: expect.objectContaining({ color: "#ff0000" }),
+        }),
+      },
+    ]);
+
+    await wrapper.find('[data-test="typography-title-size-input"]').setValue("140");
+    expect(wrapper.emitted("patch")?.[1]).toEqual([
+      {
+        typography: expect.objectContaining({
+          title: expect.objectContaining({ size: 140 }),
+        }),
+      },
+    ]);
+  });
 });

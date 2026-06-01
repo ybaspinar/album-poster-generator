@@ -218,6 +218,11 @@
   line-height: 0.88;
   letter-spacing: -0.07em;
   text-transform: uppercase;
+  color: var(--poster-title-color, var(--ink));
+  font-size: calc(clamp(2.6rem, 8cqw, 5.8rem) * var(--poster-title-size, 100) / 100);
+  font-style: var(--poster-title-style, normal);
+  font-weight: var(--poster-title-weight, 700);
+  text-transform: var(--poster-title-transform, uppercase);
 }
 
 .poster-rule {
@@ -240,17 +245,23 @@
 
 .poster-release {
   margin: 0;
-  font-size: clamp(0.72rem, 1.45cqw, 0.95rem);
+  color: var(--poster-metadata-color, var(--ink));
+  font-size: calc(clamp(0.72rem, 1.45cqw, 0.95rem) * var(--poster-metadata-size, 100) / 100);
+  font-style: var(--poster-metadata-style, normal);
+  font-weight: var(--poster-metadata-weight, 400);
   line-height: 1.32;
-  text-transform: uppercase;
+  text-transform: var(--poster-metadata-transform, uppercase);
 }
 
 .poster-artist {
   margin: 0;
-  font-size: clamp(0.86rem, 1.8cqw, 1.18rem);
+  color: var(--poster-artist-color, var(--ink));
+  font-size: calc(clamp(0.86rem, 1.8cqw, 1.18rem) * var(--poster-artist-size, 100) / 100);
+  font-style: var(--poster-artist-style, normal);
+  font-weight: var(--poster-artist-weight, 400);
   line-height: 1.25;
   letter-spacing: 0.15em;
-  text-transform: uppercase;
+  text-transform: var(--poster-artist-transform, uppercase);
 }
 
 .poster-tracklist {
@@ -260,11 +271,13 @@
   margin: 2.2cqw 0 0;
   padding: 0;
   list-style: none;
-  color: var(--poster-muted);
-  font-size: clamp(0.58rem, 1.15cqw, 0.78rem);
+  color: var(--poster-tracklist-color, var(--poster-muted));
+  font-size: calc(clamp(0.58rem, 1.15cqw, 0.78rem) * var(--poster-tracklist-size, 100) / 100);
+  font-style: var(--poster-tracklist-style, normal);
+  font-weight: var(--poster-tracklist-weight, 400);
   line-height: 1.25;
   letter-spacing: 0.08em;
-  text-transform: uppercase;
+  text-transform: var(--poster-tracklist-transform, uppercase);
 }
 
 .poster-tracklist-columns-1 {
