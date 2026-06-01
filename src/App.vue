@@ -136,12 +136,6 @@ async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Prom
   }
 }
 
-function startManual(): void {
-  draft.value = createAlbumDraft({ showTracklist: store.readShowTracklistPreference() });
-  status.value = "Manual draft ready.";
-  posthog.capture("manual_draft_started");
-}
-
 function patchDraft(patch: Partial<AlbumDraft>): void {
   if (typeof patch.showTracklist === "boolean") {
     store.updateShowTracklistPreference(patch.showTracklist);
@@ -222,9 +216,6 @@ async function exportPoster(): Promise<void> {
               Fetch metadata, override anything, and keep the poster browser-only.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <Button type="button" size="lg" @click="startManual">Start manually</Button>
-          </CardContent>
         </Card>
 
         <AlbumSearch @select="selectAlbum" />

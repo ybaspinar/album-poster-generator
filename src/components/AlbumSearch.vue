@@ -118,7 +118,7 @@ async function performSearch(): Promise<void> {
     results.value = await searchMusicBrainzAlbums(params);
     status.value = results.value.length
       ? `${results.value.length} result${results.value.length === 1 ? "" : "s"} found.`
-      : "No results found. Start manually or adjust the query.";
+      : "No results found. Adjust the query or fill in details manually.";
     posthog.capture("album_searched", {
       result_count: results.value.length,
       has_artist: Boolean(params.artist),

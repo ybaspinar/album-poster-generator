@@ -6,7 +6,6 @@ Browser-only Vue SPA for creating print-ready album posters.
 
 - Search album metadata through MusicBrainz.
 - Fetch linked cover art when available.
-- Start manually when search is not useful.
 - Override title, artist, release date, metadata line, artwork, and palette.
 - Preview one polished reference-style poster template.
 - Export PNG files for A4, A3, 12×18, and square print presets.
