@@ -472,23 +472,21 @@ function fontLabel(font: PosterFont): string {
               <div class="grid gap-2">
                 <div class="flex items-center justify-between gap-3">
                   <Label :for="`typography-${section.key}-size`">Size</Label>
-                  <span class="text-xs text-muted-foreground">
+                  <span class="text-xs tabular-nums text-muted-foreground">
                     {{ draft.typography[section.key].size }}%
                   </span>
                 </div>
                 <Input
                   :id="`typography-${section.key}-size`"
                   :data-test="`typography-${section.key}-size-input`"
-                  type="range"
+                  type="number"
                   min="60"
                   max="180"
                   step="1"
-                  class="h-10 p-0"
+                  class="h-9"
                   :model-value="draft.typography[section.key].size"
                   @update:model-value="updateTypographySize(section.key, $event)"
                 />
-              </div>
-              <div class="grid grid-cols-2 gap-3">
                 <label class="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                   <input
                     type="checkbox"

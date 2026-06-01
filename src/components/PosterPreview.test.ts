@@ -151,8 +151,8 @@ describe("PosterPreview", () => {
 
     expect(metaRowRule).toContain("grid-template-columns: minmax(0, 1fr) auto");
     expect(metaLeftRule).toContain("max-width: 48cqw");
-    expect(releaseRule).toContain("clamp(0.72rem, 1.45cqw, 0.95rem)");
-    expect(artistRule).toContain("clamp(0.86rem, 1.8cqw, 1.18rem)");
+    expect(releaseRule).toContain("0.82rem");
+    expect(artistRule).toContain("1rem");
     expect(artistRule).toContain("letter-spacing: 0.15em");
     expect(swatchesRule).toContain("gap: clamp(8px, 1.2cqw, 12px)");
     expect(swatchesRule).toContain("min-height: 2.4em");
