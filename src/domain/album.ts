@@ -83,12 +83,7 @@ export type PosterLayout = "small" | "medium" | "large" | "edge-to-edge";
 
 export const defaultPosterLayout: PosterLayout = "medium";
 
-export const posterLayoutOptions: PosterLayout[] = [
-  "small",
-  "medium",
-  "large",
-  "edge-to-edge",
-];
+export const posterLayoutOptions: PosterLayout[] = ["small", "medium", "large", "edge-to-edge"];
 
 export type PosterBackgroundMode = "default" | "solid" | "gradient" | "artwork";
 export type GradientDirection = "horizontal" | "vertical" | "radial";
@@ -98,6 +93,7 @@ export const defaultBackgroundSolidColor = "#1a1a2e";
 export const defaultBackgroundGradientFrom = "#1a1a2e";
 export const defaultBackgroundGradientTo = "#16213e";
 export const defaultBackgroundGradientDirection: GradientDirection = "vertical";
+export const defaultBackgroundBlurAmount = 10;
 
 export interface AlbumDraft {
   id: string;
@@ -124,6 +120,7 @@ export interface AlbumDraft {
   backgroundGradientTo: string;
   backgroundGradientDirection: GradientDirection;
   backgroundBlur: boolean;
+  backgroundBlurAmount: number;
 }
 
 export interface AlbumDraftInput {
@@ -151,6 +148,7 @@ export interface AlbumDraftInput {
   backgroundGradientTo?: string;
   backgroundGradientDirection?: GradientDirection;
   backgroundBlur?: boolean;
+  backgroundBlurAmount?: number;
 }
 
 export const defaultPalette = ["#f28c28", "#c02465", "#f4a35d", "#a98cbd", "#21889b", "#17245c"];
@@ -190,7 +188,13 @@ export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
     backgroundGradientDirection:
       input.backgroundGradientDirection ?? defaultBackgroundGradientDirection,
     backgroundBlur: input.backgroundBlur ?? false,
+    backgroundBlurAmount: normalizeBackgroundBlurAmount(input.backgroundBlurAmount),
   };
+}
+
+function normalizeBackgroundBlurAmount(value: number | undefined): number {
+  if (typeof value !== "number" || !Number.isFinite(value)) return defaultBackgroundBlurAmount;
+  return Math.min(24, Math.max(0, Math.round(value)));
 }
 
 function normalizePalette(palette: string[] | undefined): string[] {

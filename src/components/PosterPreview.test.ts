@@ -188,6 +188,7 @@ describe("PosterPreview", () => {
     expect(captionRule ?? "").not.toContain("grid-template-areas");
     expect(captionRule ?? "").not.toContain("text-align: right");
     expect(captionRule).toContain("z-index: 2");
+    expect(wrapper.find(".poster-page").attributes("style")).toContain("--poster-bg-blur: 10px");
   });
 
   it("loads remote artwork with anonymous CORS for PNG export", () => {

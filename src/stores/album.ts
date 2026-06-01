@@ -8,12 +8,14 @@ import type {
   PosterLayout,
 } from "../domain/album";
 import { createAlbumDraft, defaultPosterLayout } from "../domain/album";
-import type { ExportPresetId } from "../export/presets";
+import { exportPresets, type ExportPresetId } from "../export/presets";
 import { applyDraftPatch, mergeFetchedAlbum } from "../editor/draft";
 import type { MusicBrainzEdition } from "../sources/musicbrainz";
 
 const showTracklistPreferenceKey = "album-poster-generator:show-tracklist";
 const layoutPreferenceKey = "album-poster-generator:layout";
+const exportPresetPreferenceKey = "album-poster-generator:export-preset";
+const swatchesPreferenceKey = "album-poster-generator:swatches";
 
 function readShowTracklistPreference(): boolean {
   try {
@@ -56,6 +58,51 @@ function writeLayoutPreference(layout: PosterLayout): void {
   }
 }
 
+function readExportPresetPreference(): ExportPresetId {
+  try {
+    const stored = window.localStorage.getItem(exportPresetPreferenceKey);
+    if (exportPresets.some((preset) => preset.id === stored)) {
+      return stored as ExportPresetId;
+    }
+  } catch {
+    // Ignore unavailable storage
+  }
+  return "a4-portrait";
+}
+
+function writeExportPresetPreference(id: ExportPresetId): void {
+  try {
+    window.localStorage.setItem(exportPresetPreferenceKey, id);
+  } catch {
+    // Ignore unavailable storage
+  }
+}
+
+interface SwatchesSettings {
+  show: boolean;
+  shape: "square" | "circle";
+}
+
+function readSwatchesPreference(): Partial<SwatchesSettings> | null {
+  try {
+    const stored = window.localStorage.getItem(swatchesPreferenceKey);
+    if (stored) {
+      return JSON.parse(stored) as SwatchesSettings;
+    }
+  } catch {
+    // Ignore unavailable storage
+  }
+  return null;
+}
+
+function writeSwatchesPreference(settings: SwatchesSettings): void {
+  try {
+    window.localStorage.setItem(swatchesPreferenceKey, JSON.stringify(settings));
+  } catch {
+    // Ignore unavailable storage
+  }
+}
+
 const backgroundPreferenceKey = "album-poster-generator:background";
 
 interface BackgroundSettings {
@@ -65,6 +112,7 @@ interface BackgroundSettings {
   gradientTo: string;
   gradientDirection: GradientDirection;
   blur: boolean;
+  blurAmount: number;
 }
 
 function readBackgroundPreference(): Partial<BackgroundSettings> | null {
@@ -90,19 +138,23 @@ function writeBackgroundPreference(settings: BackgroundSettings): void {
 export const useAlbumStore = defineStore("album", () => {
   // State
   const savedBackground = readBackgroundPreference();
-const draft = ref<AlbumDraft>(
-  createAlbumDraft({
-    showTracklist: readShowTracklistPreference(),
-    layout: readLayoutPreference(),
-    backgroundMode: savedBackground?.mode,
-    backgroundSolidColor: savedBackground?.solidColor,
-    backgroundGradientFrom: savedBackground?.gradientFrom,
-    backgroundGradientTo: savedBackground?.gradientTo,
-    backgroundGradientDirection: savedBackground?.gradientDirection,
-    backgroundBlur: savedBackground?.blur,
-  }),
-);
-  const selectedPresetId = ref<ExportPresetId>("a4-portrait");
+  const savedSwatches = readSwatchesPreference();
+  const draft = ref<AlbumDraft>(
+    createAlbumDraft({
+      showTracklist: readShowTracklistPreference(),
+      layout: readLayoutPreference(),
+      showSwatches: savedSwatches?.show,
+      swatchShape: savedSwatches?.shape,
+      backgroundMode: savedBackground?.mode,
+      backgroundSolidColor: savedBackground?.solidColor,
+      backgroundGradientFrom: savedBackground?.gradientFrom,
+      backgroundGradientTo: savedBackground?.gradientTo,
+      backgroundGradientDirection: savedBackground?.gradientDirection,
+      backgroundBlur: savedBackground?.blur,
+      backgroundBlurAmount: savedBackground?.blurAmount,
+    }),
+  );
+  const selectedPresetId = ref<ExportPresetId>(readExportPresetPreference());
   const exporting = ref(false);
   const status = ref("");
   const pendingAlbum = ref<AlbumDraftInput | null>(null);
@@ -119,6 +171,7 @@ const draft = ref<AlbumDraft>(
   }
 
   function setPreset(id: ExportPresetId): void {
+    writeExportPresetPreference(id);
     selectedPresetId.value = id;
   }
 
@@ -162,7 +215,22 @@ const draft = ref<AlbumDraft>(
     if (typeof patch.layout === "string") {
       writeLayoutPreference(patch.layout);
     }
-    if (typeof patch.backgroundMode === "string" || typeof patch.backgroundBlur === "boolean") {
+    if (typeof patch.showSwatches === "boolean" || typeof patch.swatchShape === "string") {
+      const current = draft.value;
+      writeSwatchesPreference({
+        show: patch.showSwatches ?? current.showSwatches,
+        shape: patch.swatchShape ?? current.swatchShape,
+      });
+    }
+    if (
+      typeof patch.backgroundMode === "string" ||
+      typeof patch.backgroundBlur === "boolean" ||
+      typeof patch.backgroundBlurAmount === "number" ||
+      typeof patch.backgroundSolidColor === "string" ||
+      typeof patch.backgroundGradientFrom === "string" ||
+      typeof patch.backgroundGradientTo === "string" ||
+      typeof patch.backgroundGradientDirection === "string"
+    ) {
       const current = draft.value;
       writeBackgroundPreference({
         mode: patch.backgroundMode ?? current.backgroundMode,
@@ -171,6 +239,7 @@ const draft = ref<AlbumDraft>(
         gradientTo: patch.backgroundGradientTo ?? current.backgroundGradientTo,
         gradientDirection: patch.backgroundGradientDirection ?? current.backgroundGradientDirection,
         blur: patch.backgroundBlur ?? current.backgroundBlur,
+        blurAmount: patch.backgroundBlurAmount ?? current.backgroundBlurAmount,
       });
     }
     draft.value = applyDraftPatch(draft.value, patch);

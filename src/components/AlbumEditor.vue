@@ -136,6 +136,11 @@ function updateBackgroundBlur(event: Event): void {
   emit("patch", { backgroundBlur: (event.target as HTMLInputElement).checked });
 }
 
+function updateBackgroundBlurAmount(value: string | number): void {
+  const amount = Number(value);
+  emit("patch", { backgroundBlurAmount: Number.isFinite(amount) ? amount : 0 });
+}
+
 function fontLabel(font: PosterFont): string {
   const labels: Record<PosterFont, string> = {
     gotham: "Gotham (built-in sans-serif)",
@@ -183,7 +188,15 @@ function fontLabel(font: PosterFont): string {
   <Accordion
     type="multiple"
     class="flex flex-col gap-4"
-    :default-value="['info', 'tracklist', 'artwork', 'typography', 'swatches', 'background', 'layout']"
+    :default-value="[
+      'info',
+      'tracklist',
+      'artwork',
+      'typography',
+      'swatches',
+      'background',
+      'layout',
+    ]"
   >
     <AccordionItem value="info">
       <Card>
@@ -502,22 +515,42 @@ function fontLabel(font: PosterFont): string {
               </div>
             </template>
 
-            <div
-              v-if="draft.backgroundMode === 'artwork'"
-              class="text-sm text-muted-foreground"
-            >
+            <div v-if="draft.backgroundMode === 'artwork'" class="text-sm text-muted-foreground">
               Album artwork will fill the poster background. Caption will remain on top.
             </div>
 
-            <div class="flex items-center gap-2 pt-1">
-              <input
-                id="poster-bg-blur"
-                type="checkbox"
-                class="size-4 rounded border-input accent-primary"
-                :checked="draft.backgroundBlur"
-                @change="updateBackgroundBlur"
-              />
-              <Label for="poster-bg-blur" class="text-sm font-medium">Frosted overlay</Label>
+            <div class="grid gap-2 pt-1">
+              <div class="flex items-center gap-2">
+                <input
+                  id="poster-bg-blur"
+                  type="checkbox"
+                  class="size-4 rounded border-input accent-primary"
+                  :checked="draft.backgroundBlur"
+                  @change="updateBackgroundBlur"
+                />
+                <Label for="poster-bg-blur" class="text-sm font-medium">Frosted overlay</Label>
+              </div>
+              <div class="grid gap-2">
+                <div class="flex items-center justify-between gap-3">
+                  <Label for="poster-bg-blur-amount" class="text-sm font-medium">
+                    Blur level
+                  </Label>
+                  <span class="text-xs text-muted-foreground"
+                    >{{ draft.backgroundBlurAmount }}px</span
+                  >
+                </div>
+                <Input
+                  id="poster-bg-blur-amount"
+                  data-test="background-blur-amount-input"
+                  type="range"
+                  min="0"
+                  max="24"
+                  step="1"
+                  class="h-10 p-0"
+                  :model-value="draft.backgroundBlurAmount"
+                  @update:model-value="updateBackgroundBlurAmount"
+                />
+              </div>
             </div>
           </div>
         </AccordionContent>

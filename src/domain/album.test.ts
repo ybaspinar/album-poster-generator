@@ -28,6 +28,7 @@ describe("album draft model", () => {
       backgroundGradientTo: "#16213e",
       backgroundGradientDirection: "vertical",
       backgroundBlur: false,
+      backgroundBlurAmount: 10,
     });
   });
 

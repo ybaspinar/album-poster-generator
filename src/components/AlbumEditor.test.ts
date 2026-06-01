@@ -56,4 +56,20 @@ describe("AlbumEditor", () => {
     expect(wrapper.find("button#poster-font").exists()).toBe(true);
     expect(wrapper.vm.draft.font).toBe("gotham");
   });
+
+  it("lets users adjust the background blur level", async () => {
+    const wrapper = mount(AlbumEditor, {
+      props: {
+        draft: createAlbumDraft({ backgroundBlurAmount: 6 }),
+      },
+    });
+    const blurInput = wrapper.find('[data-test="background-blur-amount-input"]');
+
+    expect(blurInput.exists()).toBe(true);
+    expect((blurInput.element as HTMLInputElement).value).toBe("6");
+
+    await blurInput.setValue("3");
+
+    expect(wrapper.emitted("patch")?.[0]).toEqual([{ backgroundBlurAmount: 3 }]);
+  });
 });

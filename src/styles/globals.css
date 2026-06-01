@@ -331,7 +331,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(var(--poster-bg-blur, 10px)) saturate(1.15);
   background: rgba(255, 255, 255, 0.18);
   z-index: 1;
   pointer-events: none;
@@ -350,7 +350,7 @@
   inset: 0;
   z-index: 0;
   background: rgb(255 255 255 / 58%);
-  backdrop-filter: blur(18px) saturate(1.06);
+  backdrop-filter: blur(var(--poster-bg-blur, 10px)) saturate(1.06);
   pointer-events: none;
 }
 

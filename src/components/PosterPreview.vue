@@ -25,6 +25,11 @@ const layoutClass = computed(() => {
   return `poster-layout-${layout}`;
 });
 
+const posterStyle = computed(() => ({
+  fontFamily: getFontFamily(props.draft.font),
+  "--poster-bg-blur": `${props.draft.backgroundBlurAmount}px`,
+}));
+
 const backgroundStyle = computed(() => {
   const mode = props.draft.backgroundMode;
   if (mode === "solid") {
@@ -93,7 +98,7 @@ watch(
     class="poster-page"
     :class="[fontClass, layoutClass, backgroundClasses]"
     aria-label="Album poster preview"
-    :style="[{ fontFamily: getFontFamily(draft.font) }, backgroundStyle]"
+    :style="[posterStyle, backgroundStyle]"
   >
     <div class="poster-art-frame">
       <img
