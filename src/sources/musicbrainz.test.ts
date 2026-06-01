@@ -23,75 +23,56 @@ class MemoryStorage implements StorageLike {
   }
 }
 
-function createReleaseListResponse(): Response {
-  return new Response(
-    JSON.stringify({
-      releases: [
-        {
-          id: "release-1",
-          title: "Kids See Ghosts",
-        },
-      ],
-    }),
-    { status: 200 },
-  );
+function createProxySearchResponse(): Response {
+  return Response.json([
+    {
+      id: "rg-1",
+      title: "Kids See Ghosts",
+      artist: "Kanye West & Kid Cudi",
+      releaseDate: "2018-06-08",
+      primaryType: "Album",
+    },
+  ]);
 }
 
-function createReleaseDetailResponse(): Response {
-  return new Response(
-    JSON.stringify({
-      id: "release-1",
-      media: [
-        {
-          tracks: [{ title: "Feel the Love" }, { title: "Fire" }, { title: "4th Dimension" }],
-        },
-      ],
-    }),
-    { status: 200 },
-  );
+function createProxyCoverResponse(url = "https://example.com/front-full.jpg"): Response {
+  return Response.json({
+    artworkUrl: url,
+    thumbnails: { large: "https://example.com/front-large.jpg" },
+  });
 }
 
-function createMusicBrainzResponse(): Response {
-  return new Response(
-    JSON.stringify({
-      "release-groups": [
-        {
-          id: "rg-1",
-          title: "Kids See Ghosts",
-          "first-release-date": "2018-06-08",
-          "primary-type": "Album",
-          "artist-credit": [{ name: "Kanye West" }, { name: "Kid Cudi" }],
-        },
-      ],
-    }),
-    { status: 200 },
-  );
+function createProxyEditionsResponse(): Response {
+  return Response.json([
+    {
+      id: "release-standard",
+      title: "Red",
+      releaseDate: "2012-10-22",
+      country: "US",
+      formats: ["CD"],
+      trackCount: 1,
+    },
+    {
+      id: "release-deluxe",
+      title: "Red (Deluxe Edition)",
+      releaseDate: "2012-10-22",
+      country: "US",
+      formats: ["CD", "Digital Media"],
+      trackCount: 2,
+    },
+  ]);
 }
 
-function createCoverArtResponse(): Response {
-  return new Response(
-    JSON.stringify({
-      images: [
-        {
-          front: true,
-          image: "https://example.com/front-full.jpg",
-          thumbnails: {
-            large: "https://example.com/front-large.jpg",
-            small: "https://example.com/front-small.jpg",
-          },
-        },
-      ],
-    }),
-    { status: 200 },
-  );
+function createProxyTracklistResponse(): Response {
+  return Response.json(["Feel the Love", "Fire", "4th Dimension"]);
 }
 
 describe("searchMusicBrainzAlbums", () => {
-  it("normalizes and enriches release group search results (string query)", async () => {
+  it("fetches album search results through the mb-proxy and enriches with proxied cover art", async () => {
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(createMusicBrainzResponse())
-      .mockResolvedValueOnce(createCoverArtResponse());
+      .mockResolvedValueOnce(createProxySearchResponse())
+      .mockResolvedValueOnce(createProxyCoverResponse());
     const storage = new MemoryStorage();
 
     await expect(
@@ -111,23 +92,21 @@ describe("searchMusicBrainzAlbums", () => {
 
     expect(fetcher).toHaveBeenNthCalledWith(
       1,
-      "https://musicbrainz.org/ws/2/release-group?query=kids%20see%20ghosts&fmt=json&limit=12",
-      {
-        headers: {
-          Accept: "application/json",
-        },
-      },
+      "https://mb-proxy.ybaspinar.dev/search?album=kids+see+ghosts",
+      { headers: { Accept: "application/json" } },
     );
-    expect(fetcher).toHaveBeenNthCalledWith(2, "https://coverartarchive.org/release-group/rg-1", {
-      headers: { Accept: "application/json" },
-    });
+    expect(fetcher).toHaveBeenNthCalledWith(
+      2,
+      "https://mb-proxy.ybaspinar.dev/release-group/rg-1/cover",
+      { headers: { Accept: "application/json" } },
+    );
   });
 
-  it("normalizes and enriches release group search results (structured params)", async () => {
+  it("passes structured search params to the mb-proxy", async () => {
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(createMusicBrainzResponse())
-      .mockResolvedValueOnce(createCoverArtResponse());
+      .mockResolvedValueOnce(createProxySearchResponse())
+      .mockResolvedValueOnce(createProxyCoverResponse());
     const storage = new MemoryStorage();
 
     const params: MusicBrainzSearchParams = {
@@ -137,29 +116,12 @@ describe("searchMusicBrainzAlbums", () => {
       type: "album",
     };
 
-    await expect(
-      searchMusicBrainzAlbums(params, { fetcher, storage, now: () => 1_000 }),
-    ).resolves.toEqual([
-      {
-        id: "rg-1",
-        title: "Kids See Ghosts",
-        artist: "Kanye West & Kid Cudi",
-        releaseDate: "2018-06-08",
-        source: "musicbrainz",
-        sourceId: "rg-1",
-        artworkUrl: "https://example.com/front-full.jpg",
-        artworkSource: "cover-art-archive",
-      },
-    ]);
+    await searchMusicBrainzAlbums(params, { fetcher, storage, now: () => 1_000 });
 
     expect(fetcher).toHaveBeenNthCalledWith(
       1,
-      "https://musicbrainz.org/ws/2/release-group?query=artist%3A%22Kanye%20West%22%20AND%20releasegroup%3A%22Kids%20See%20Ghosts%22%20AND%20date%3A2018%20AND%20primarytype%3AAlbum&fmt=json&limit=12",
-      {
-        headers: {
-          Accept: "application/json",
-        },
-      },
+      "https://mb-proxy.ybaspinar.dev/search?artist=Kanye+West&album=Kids+See+Ghosts&year=2018&type=album",
+      { headers: { Accept: "application/json" } },
     );
   });
 
@@ -207,8 +169,8 @@ describe("searchMusicBrainzAlbums", () => {
     );
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(createMusicBrainzResponse())
-      .mockResolvedValueOnce(new Response("", { status: 404 }));
+      .mockResolvedValueOnce(createProxySearchResponse())
+      .mockResolvedValueOnce(Response.json({ artworkUrl: "", thumbnails: {} }));
 
     await expect(
       searchMusicBrainzAlbums("kids see ghosts", {
@@ -234,8 +196,8 @@ describe("searchMusicBrainzAlbums", () => {
     storage.setItem(createAlbumSearchCacheKey("kids see ghosts"), "not-json");
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(createMusicBrainzResponse())
-      .mockResolvedValueOnce(new Response("", { status: 404 }));
+      .mockResolvedValueOnce(createProxySearchResponse())
+      .mockResolvedValueOnce(Response.json({ artworkUrl: "", thumbnails: {} }));
 
     await expect(
       searchMusicBrainzAlbums("kids see ghosts", { fetcher, storage, now: () => 1_000 }),
@@ -246,7 +208,7 @@ describe("searchMusicBrainzAlbums", () => {
   it("returns metadata-only results when cover art enrichment fails", async () => {
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(createMusicBrainzResponse())
+      .mockResolvedValueOnce(createProxySearchResponse())
       .mockRejectedValueOnce(new Error("network failed"));
     const storage = new MemoryStorage();
 
@@ -278,7 +240,7 @@ describe("searchMusicBrainzAlbums", () => {
     expect(fetcher).not.toHaveBeenCalled();
   });
 
-  it("throws a readable error when MusicBrainz fails", async () => {
+  it("throws a readable error when the proxy fails", async () => {
     const fetcher = vi.fn().mockResolvedValue(new Response("rate limited", { status: 503 }));
 
     await expect(searchMusicBrainzAlbums("test", { fetcher })).rejects.toThrow(
@@ -286,25 +248,11 @@ describe("searchMusicBrainzAlbums", () => {
     );
   });
 
-  it("uses fielded query when string input looks like artist - album", async () => {
+  it("uses fielded params when string input looks like artist - album", async () => {
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            "release-groups": [
-              {
-                id: "rg-2",
-                title: "Random Access Memories",
-                "first-release-date": "2013-05-17",
-                "artist-credit": [{ name: "Daft Punk" }],
-              },
-            ],
-          }),
-          { status: 200 },
-        ),
-      )
-      .mockResolvedValueOnce(new Response("", { status: 404 }));
+      .mockResolvedValueOnce(createProxySearchResponse())
+      .mockResolvedValueOnce(Response.json({ artworkUrl: "", thumbnails: {} }));
     const storage = new MemoryStorage();
 
     await searchMusicBrainzAlbums("daft punk - random access memories", {
@@ -315,58 +263,19 @@ describe("searchMusicBrainzAlbums", () => {
 
     expect(fetcher).toHaveBeenNthCalledWith(
       1,
-      "https://musicbrainz.org/ws/2/release-group?query=artist%3A%22daft%20punk%22%20AND%20releasegroup%3A%22random%20access%20memories%22&fmt=json&limit=12",
+      "https://mb-proxy.ybaspinar.dev/search?artist=daft+punk&album=random+access+memories",
       { headers: { Accept: "application/json" } },
     );
   });
 });
 
 describe("fetchMusicBrainzEditions", () => {
-  it("normalizes editions for a release group", async () => {
+  it("normalizes editions from the mb-proxy and enriches release artwork", async () => {
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            releases: [
-              {
-                id: "release-standard",
-                title: "Red",
-                date: "2012-10-22",
-                country: "US",
-                media: [{ format: "CD", tracks: [{ title: "State of Grace" }] }],
-              },
-              {
-                id: "release-deluxe",
-                title: "Red (Deluxe Edition)",
-                date: "2012-10-22",
-                country: "US",
-                media: [
-                  { format: "CD", tracks: [{ title: "State of Grace" }] },
-                  { format: "Digital Media", tracks: [{ title: "The Moment I Knew" }] },
-                ],
-              },
-            ],
-          }),
-          { status: 200 },
-        ),
-      )
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            images: [{ front: true, image: "https://coverartarchive.org/standard.jpg" }],
-          }),
-          { status: 200 },
-        ),
-      )
-      .mockResolvedValueOnce(
-        new Response(
-          JSON.stringify({
-            images: [{ front: true, image: "https://coverartarchive.org/deluxe.jpg" }],
-          }),
-          { status: 200 },
-        ),
-      );
+      .mockResolvedValueOnce(createProxyEditionsResponse())
+      .mockResolvedValueOnce(createProxyCoverResponse("https://coverartarchive.org/standard.jpg"))
+      .mockResolvedValueOnce(createProxyCoverResponse("https://coverartarchive.org/deluxe.jpg"));
 
     await expect(fetchMusicBrainzEditions("rg-red", fetcher)).resolves.toEqual([
       {
@@ -389,24 +298,32 @@ describe("fetchMusicBrainzEditions", () => {
       },
     ]);
     expect(fetcher).toHaveBeenCalledWith(
-      "https://musicbrainz.org/ws/2/release?release-group=rg-red&inc=media&fmt=json&limit=25",
-      { headers: { Accept: "application/json" } },
+      "https://mb-proxy.ybaspinar.dev/release-group/rg-red/editions",
+      {
+        headers: { Accept: "application/json" },
+      },
     );
-    expect(fetcher).toHaveBeenCalledWith("https://coverartarchive.org/release/release-standard", {
-      headers: { Accept: "application/json" },
-    });
-    expect(fetcher).toHaveBeenCalledWith("https://coverartarchive.org/release/release-deluxe", {
-      headers: { Accept: "application/json" },
-    });
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://mb-proxy.ybaspinar.dev/release/release-standard/cover",
+      {
+        headers: { Accept: "application/json" },
+      },
+    );
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://mb-proxy.ybaspinar.dev/release/release-deluxe/cover",
+      {
+        headers: { Accept: "application/json" },
+      },
+    );
   });
 });
 
 describe("fetchMusicBrainzTracklist", () => {
-  it("fetches track titles through the first release in a release group", async () => {
+  it("fetches track titles through the first proxied release in a release group", async () => {
     const fetcher = vi
       .fn()
-      .mockResolvedValueOnce(createReleaseListResponse())
-      .mockResolvedValueOnce(createReleaseDetailResponse());
+      .mockResolvedValueOnce(createProxyEditionsResponse())
+      .mockResolvedValueOnce(createProxyTracklistResponse());
 
     await expect(fetchMusicBrainzTracklist("rg-1", fetcher)).resolves.toEqual([
       "Feel the Love",
@@ -416,32 +333,25 @@ describe("fetchMusicBrainzTracklist", () => {
 
     expect(fetcher).toHaveBeenNthCalledWith(
       1,
-      "https://musicbrainz.org/ws/2/release?release-group=rg-1&fmt=json&limit=5",
+      "https://mb-proxy.ybaspinar.dev/release-group/rg-1/editions",
       { headers: { Accept: "application/json" } },
     );
     expect(fetcher).toHaveBeenNthCalledWith(
       2,
-      "https://musicbrainz.org/ws/2/release/release-1?inc=recordings&fmt=json",
+      "https://mb-proxy.ybaspinar.dev/release/release-standard/tracklist",
       { headers: { Accept: "application/json" } },
     );
   });
 
   it("returns an empty list when the release group has no releases", async () => {
-    const fetcher = vi.fn().mockResolvedValueOnce(
-      new Response(
-        JSON.stringify({
-          releases: [],
-        }),
-        { status: 200 },
-      ),
-    );
+    const fetcher = vi.fn().mockResolvedValueOnce(Response.json([]));
 
     await expect(fetchMusicBrainzTracklist("rg-1", fetcher)).resolves.toEqual([]);
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
 
   it("fetches track titles for a specific release", async () => {
-    const fetcher = vi.fn().mockResolvedValueOnce(createReleaseDetailResponse());
+    const fetcher = vi.fn().mockResolvedValueOnce(createProxyTracklistResponse());
 
     await expect(fetchMusicBrainzTracklistForRelease("release-1", fetcher)).resolves.toEqual([
       "Feel the Love",
@@ -449,8 +359,10 @@ describe("fetchMusicBrainzTracklist", () => {
       "4th Dimension",
     ]);
     expect(fetcher).toHaveBeenCalledWith(
-      "https://musicbrainz.org/ws/2/release/release-1?inc=recordings&fmt=json",
-      { headers: { Accept: "application/json" } },
+      "https://mb-proxy.ybaspinar.dev/release/release-1/tracklist",
+      {
+        headers: { Accept: "application/json" },
+      },
     );
   });
 

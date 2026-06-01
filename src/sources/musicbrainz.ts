@@ -6,7 +6,6 @@ import {
   type StorageLike,
   writeCachedAlbumSearchResults,
 } from "./album-search-cache";
-import { findCoverArt } from "./cover-art";
 
 type Fetcher = typeof fetch;
 
@@ -17,52 +16,22 @@ export interface MusicBrainzSearchParams {
   type?: "album" | "ep" | "single" | "other" | "";
 }
 
-interface MusicBrainzArtistCredit {
-  name?: string;
-}
-
-interface MusicBrainzReleaseGroup {
+interface ProxyAlbumSearchResult {
   id?: string;
   title?: string;
-  "first-release-date"?: string;
-  "artist-credit"?: MusicBrainzArtistCredit[];
+  artist?: string;
+  releaseDate?: string;
+  primaryType?: string;
+  artworkUrl?: string;
+  artworkSource?: string;
 }
 
-interface MusicBrainzReleaseGroupResponse {
-  "release-groups"?: MusicBrainzReleaseGroup[];
-}
-
-interface MusicBrainzReleaseListItem {
-  id?: string;
-  title?: string;
-  date?: string;
-  country?: string;
-  media?: MusicBrainzMedium[];
-}
-
-interface MusicBrainzReleaseListResponse {
-  releases?: MusicBrainzReleaseListItem[];
-}
-
-interface MusicBrainzTrack {
-  title?: string;
-}
-
-interface MusicBrainzMedium {
-  format?: string;
-  tracks?: MusicBrainzTrack[];
-}
-
-interface CoverArtImage {
-  front?: boolean;
-  image?: string;
+interface ProxyCoverArtResponse {
+  artworkUrl?: string;
   thumbnails?: {
     large?: string;
+    small?: string;
   };
-}
-
-interface CoverArtResponse {
-  images?: CoverArtImage[];
 }
 
 export interface MusicBrainzEdition {
@@ -75,19 +44,14 @@ export interface MusicBrainzEdition {
   artworkUrl?: string;
 }
 
-interface MusicBrainzReleaseDetailResponse {
-  media?: MusicBrainzMedium[];
-}
-
 interface SearchMusicBrainzAlbumsOptions {
   fetcher?: Fetcher;
   storage?: StorageLike;
   now?: () => number;
 }
 
-const musicBrainzBaseUrl = "https://musicbrainz.org/ws/2/release-group";
-const musicBrainzReleaseBaseUrl = "https://musicbrainz.org/ws/2/release";
-const searchLimit = 12;
+const defaultProxyBaseUrl = "https://mb-proxy.ybaspinar.dev";
+const acceptJsonInit = { headers: { Accept: "application/json" } } as const;
 
 export function normalizeSearchParams(params: MusicBrainzSearchParams): string {
   const parts: string[] = [];
@@ -135,9 +99,8 @@ export async function searchMusicBrainzAlbums(
   }
 
   const results = await fetchMusicBrainzAlbums(
-    normalizedQuery,
     fetcher,
-    typeof query === "string" ? undefined : query,
+    typeof query === "string" ? stringQueryToSearchParams(normalizedQuery) : query,
   );
   const enrichedResults = await enrichAlbumsWithCoverArt(results, fetcher);
   writeCachedAlbumSearchResults(normalizedQuery, enrichedResults, storage, now);
@@ -155,32 +118,20 @@ export async function fetchMusicBrainzEditions(
     return [];
   }
 
-  const url = `${musicBrainzReleaseBaseUrl}?release-group=${encodeURIComponent(id)}&inc=media&fmt=json&limit=25`;
-  const response = await fetcher(url, {
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
+  try {
+    const editions = await fetchMusicBrainzEditionsRaw(id, fetcher);
+    return Promise.all(
+      editions.map(async (edition) => {
+        const artworkUrl = await fetchCoverArt(
+          `release/${encodeURIComponent(edition.id)}/cover`,
+          fetcher,
+        );
+        return artworkUrl ? { ...edition, artworkUrl } : edition;
+      }),
+    );
+  } catch {
     return [];
   }
-
-  const data = (await response.json()) as MusicBrainzReleaseListResponse;
-  const releases = data.releases ?? [];
-
-  // Fetch cover art for each release
-  const editions = await Promise.all(
-    releases.map(async (release) => {
-      const baseEdition = normalizeEdition(release)[0];
-      if (!baseEdition) return null;
-
-      const artworkUrl = release.id ? await fetchReleaseCoverArt(release.id, fetcher) : undefined;
-      return { ...baseEdition, artworkUrl: artworkUrl || undefined } as MusicBrainzEdition;
-    }),
-  );
-
-  return editions.filter((edition): edition is MusicBrainzEdition => edition !== null);
 }
 
 export async function fetchMusicBrainzTracklist(
@@ -200,88 +151,59 @@ export async function fetchMusicBrainzTracklist(
   }
 }
 
-async function fetchFirstReleaseId(releaseGroupId: string, fetcher: Fetcher): Promise<string> {
-  const url = `${musicBrainzReleaseBaseUrl}?release-group=${encodeURIComponent(releaseGroupId)}&fmt=json&limit=5`;
-  const response = await fetcher(url, {
-    headers: {
-      Accept: "application/json",
-    },
-  });
-
-  if (!response.ok) {
-    return "";
-  }
-
-  const data = (await response.json()) as MusicBrainzReleaseListResponse;
-  return data.releases?.find((release) => release.id)?.id ?? "";
-}
-
 export async function fetchMusicBrainzTracklistForRelease(
   releaseId: string,
   fetcher: Fetcher = fetch,
 ): Promise<string[]> {
-  const url = `${musicBrainzReleaseBaseUrl}/${encodeURIComponent(releaseId)}?inc=recordings&fmt=json`;
-  const response = await fetcher(url, {
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  const id = releaseId.trim();
+  if (!id) return [];
+
+  const response = await fetcher(
+    proxyUrl(`release/${encodeURIComponent(id)}/tracklist`),
+    acceptJsonInit,
+  );
 
   if (!response.ok) {
     return [];
   }
 
-  const data = (await response.json()) as MusicBrainzReleaseDetailResponse;
-  return (data.media ?? []).flatMap((medium) =>
-    (medium.tracks ?? [])
-      .map((track) => track.title?.replace(/\s+/g, " ").trim())
-      .filter((title): title is string => Boolean(title)),
-  );
+  const data = (await response.json()) as unknown;
+  if (!Array.isArray(data)) return [];
+  return data.filter((track): track is string => typeof track === "string");
 }
 
-function buildMusicBrainzQuery(normalizedQuery: string, params?: MusicBrainzSearchParams): string {
-  if (params) {
-    const clauses: string[] = [];
-    const artist = params.artist?.trim() ?? "";
-    const title = params.title?.trim() ?? "";
-    const year = params.year?.trim() ?? "";
-    const type = params.type?.trim() ?? "";
-
-    if (artist) clauses.push(`artist:"${artist}"`);
-    if (title) clauses.push(`releasegroup:"${title}"`);
-    if (year) clauses.push(`date:${year}`);
-    if (type) clauses.push(`primarytype:${type.charAt(0).toUpperCase() + type.slice(1)}`);
-
-    return clauses.join(" AND ");
-  }
-
-  // Legacy string query: detect "artist - album" shorthand
+function stringQueryToSearchParams(normalizedQuery: string): MusicBrainzSearchParams {
   const dashSplit = normalizedQuery.split(/\s+-\s+/);
   if (dashSplit.length === 2 && dashSplit[0].length > 0 && dashSplit[1].length > 0) {
-    return `artist:"${dashSplit[0]}" AND releasegroup:"${dashSplit[1]}"`;
+    return { artist: dashSplit[0], title: dashSplit[1] };
   }
-  return normalizedQuery;
+  return { title: normalizedQuery };
 }
 
 async function fetchMusicBrainzAlbums(
-  normalizedQuery: string,
   fetcher: Fetcher,
-  params?: MusicBrainzSearchParams,
+  params: MusicBrainzSearchParams,
 ): Promise<AlbumDraftInput[]> {
-  const url = `${musicBrainzBaseUrl}?query=${encodeURIComponent(buildMusicBrainzQuery(normalizedQuery, params))}&fmt=json&limit=${searchLimit}`;
+  const searchParams = new URLSearchParams();
+  const artist = params.artist?.trim() ?? "";
+  const title = params.title?.trim() ?? "";
+  const year = params.year?.trim() ?? "";
+  const type = params.type?.trim() ?? "";
 
-  const response = await fetcher(url, {
-    headers: {
-      Accept: "application/json",
-    },
-  });
+  if (artist) searchParams.set("artist", artist);
+  if (title) searchParams.set("album", title);
+  if (year) searchParams.set("year", year);
+  if (type) searchParams.set("type", type);
+
+  const response = await fetcher(proxyUrl(`search?${searchParams.toString()}`), acceptJsonInit);
 
   if (!response.ok) {
     throw new Error(`MusicBrainz search failed with status ${response.status}`);
   }
 
-  const data = (await response.json()) as MusicBrainzReleaseGroupResponse;
-  return (data["release-groups"] ?? []).flatMap(normalizeReleaseGroup);
+  const data = (await response.json()) as unknown;
+  if (!Array.isArray(data)) return [];
+  return data.flatMap(normalizeProxySearchResult);
 }
 
 async function enrichAlbumsWithCoverArt(
@@ -290,21 +212,24 @@ async function enrichAlbumsWithCoverArt(
 ): Promise<AlbumDraftInput[]> {
   return Promise.all(
     albums.map(async (album) => {
-      if (!album.sourceId) {
+      if (!album.sourceId || album.artworkUrl) {
         return album;
       }
 
       try {
-        const coverArt = await findCoverArt(album.sourceId, fetcher);
+        const artworkUrl = await fetchCoverArt(
+          `release-group/${encodeURIComponent(album.sourceId)}/cover`,
+          fetcher,
+        );
 
-        if (!coverArt.artworkUrl) {
+        if (!artworkUrl) {
           return album;
         }
 
         return {
           ...album,
-          artworkUrl: coverArt.artworkUrl,
-          artworkSource: coverArt.artworkSource,
+          artworkUrl,
+          artworkSource: "cover-art-archive",
         };
       } catch {
         return album;
@@ -313,73 +238,86 @@ async function enrichAlbumsWithCoverArt(
   );
 }
 
-async function fetchReleaseCoverArt(releaseId: string, fetcher: Fetcher): Promise<string> {
+async function fetchMusicBrainzEditionsRaw(
+  releaseGroupId: string,
+  fetcher: Fetcher,
+): Promise<MusicBrainzEdition[]> {
   const response = await fetcher(
-    `https://coverartarchive.org/release/${encodeURIComponent(releaseId)}`,
-    {
-      headers: { Accept: "application/json" },
-    },
+    proxyUrl(`release-group/${encodeURIComponent(releaseGroupId)}/editions`),
+    acceptJsonInit,
   );
 
-  if (response.status === 404 || !response.ok) {
-    return "";
-  }
-
-  const data = (await response.json()) as CoverArtResponse;
-  const images = data.images ?? [];
-  const selected = images.find((image) => image.front) ?? images[0];
-  return selected?.image ?? selected?.thumbnails?.large ?? "";
-}
-
-function normalizeEdition(release: MusicBrainzReleaseListItem): MusicBrainzEdition[] {
-  if (!release.id || !release.title) {
+  if (!response.ok) {
     return [];
   }
 
-  const formats = Array.from(
-    new Set(
-      (release.media ?? [])
-        .map((medium) => medium.format?.trim())
-        .filter((format): format is string => Boolean(format)),
-    ),
-  );
-  const trackCount = (release.media ?? []).reduce(
-    (total, medium) => total + (medium.tracks?.length ?? 0),
-    0,
-  );
-
-  return [
-    {
-      id: release.id,
-      title: release.title,
-      releaseDate: release.date ?? "",
-      country: release.country ?? "",
-      formats,
-      trackCount,
-    },
-  ];
+  const data = (await response.json()) as unknown;
+  if (!Array.isArray(data)) return [];
+  return data.flatMap(normalizeProxyEdition);
 }
 
-function normalizeReleaseGroup(group: MusicBrainzReleaseGroup): AlbumDraftInput[] {
-  if (!group.id || !group.title) {
-    return [];
-  }
+async function fetchFirstReleaseId(releaseGroupId: string, fetcher: Fetcher): Promise<string> {
+  const id = releaseGroupId.trim();
+  if (!id) return "";
+
+  const editions = await fetchMusicBrainzEditionsRaw(id, fetcher);
+  return editions.find((edition) => edition.id)?.id ?? "";
+}
+
+async function fetchCoverArt(path: string, fetcher: Fetcher): Promise<string> {
+  const response = await fetcher(proxyUrl(path), acceptJsonInit);
+  if (response.status === 404 || !response.ok) return "";
+
+  const data = (await response.json()) as ProxyCoverArtResponse;
+  return data.artworkUrl ?? data.thumbnails?.large ?? "";
+}
+
+function normalizeProxySearchResult(result: unknown): AlbumDraftInput[] {
+  if (!result || typeof result !== "object") return [];
+  const album = result as ProxyAlbumSearchResult;
+  if (!album.id || !album.title) return [];
 
   return [
     {
-      id: group.id,
-      title: group.title,
-      artist: normalizeArtistCredit(group["artist-credit"] ?? []),
-      releaseDate: group["first-release-date"] ?? "",
+      id: album.id,
+      title: album.title,
+      artist: album.artist ?? "",
+      releaseDate: album.releaseDate ?? "",
       source: "musicbrainz",
-      sourceId: group.id,
+      sourceId: album.id,
+      ...(album.artworkUrl
+        ? {
+            artworkUrl: album.artworkUrl,
+            artworkSource:
+              album.artworkSource === "cover-art-archive" ? "cover-art-archive" : "remote",
+          }
+        : {}),
     },
   ];
 }
 
-function normalizeArtistCredit(credits: MusicBrainzArtistCredit[]): string {
-  const names = credits
-    .map((credit) => credit.name?.trim())
-    .filter((name): name is string => Boolean(name));
-  return names.join(" & ");
+function normalizeProxyEdition(edition: unknown): MusicBrainzEdition[] {
+  if (!edition || typeof edition !== "object") return [];
+  const item = edition as Partial<MusicBrainzEdition>;
+  if (!item.id || !item.title) return [];
+
+  return [
+    {
+      id: item.id,
+      title: item.title,
+      releaseDate: item.releaseDate ?? "",
+      country: item.country ?? "",
+      formats: Array.isArray(item.formats) ? item.formats : [],
+      trackCount: typeof item.trackCount === "number" ? item.trackCount : 0,
+      ...(item.artworkUrl ? { artworkUrl: item.artworkUrl } : {}),
+    },
+  ];
+}
+
+function proxyUrl(path: string): string {
+  return `${musicBrainzProxyBaseUrl()}/${path}`;
+}
+
+function musicBrainzProxyBaseUrl(): string {
+  return (import.meta.env.VITE_MB_PROXY_URL || defaultProxyBaseUrl).replace(/\/+$/, "");
 }

@@ -2,18 +2,16 @@ import type { AlbumDraftInput } from "../domain/album";
 
 type Fetcher = typeof fetch;
 
-interface CoverArtImage {
-  front?: boolean;
-  image?: string;
+interface CoverArtResponse {
+  artworkUrl?: string;
   thumbnails?: {
     large?: string;
     small?: string;
   };
 }
 
-interface CoverArtResponse {
-  images?: CoverArtImage[];
-}
+const defaultProxyBaseUrl = "https://mb-proxy.ybaspinar.dev";
+const acceptJsonInit = { headers: { Accept: "application/json" } } as const;
 
 export async function findCoverArt(
   releaseGroupId: string,
@@ -26,10 +24,8 @@ export async function findCoverArt(
   }
 
   const response = await fetcher(
-    `https://coverartarchive.org/release-group/${encodeURIComponent(id)}`,
-    {
-      headers: { Accept: "application/json" },
-    },
+    `${musicBrainzProxyBaseUrl()}/release-group/${encodeURIComponent(id)}/cover`,
+    acceptJsonInit,
   );
 
   if (response.status === 404) {
@@ -41,13 +37,14 @@ export async function findCoverArt(
   }
 
   const data = (await response.json()) as CoverArtResponse;
-  const images = data.images ?? [];
-  const selected = images.find((image) => image.front) ?? images[0];
-  // Prefer full-size image over large thumbnail for highest quality
-  const artworkUrl = selected?.image ?? selected?.thumbnails?.large ?? "";
+  const artworkUrl = data.artworkUrl ?? data.thumbnails?.large ?? "";
 
   return {
     artworkUrl,
     artworkSource: artworkUrl ? "cover-art-archive" : "remote",
   };
+}
+
+function musicBrainzProxyBaseUrl(): string {
+  return (import.meta.env.VITE_MB_PROXY_URL || defaultProxyBaseUrl).replace(/\/+$/, "");
 }

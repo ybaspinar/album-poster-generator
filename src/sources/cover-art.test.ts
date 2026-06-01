@@ -2,35 +2,28 @@ import { describe, expect, it, vi } from "vitest";
 import { findCoverArt } from "./cover-art";
 
 describe("findCoverArt", () => {
-  it("selects front artwork from Cover Art Archive images", async () => {
+  it("fetches release group artwork through the mb-proxy", async () => {
     const fetcher = vi.fn().mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          images: [
-            {
-              front: false,
-              image: "https://example.com/back.jpg",
-              thumbnails: { large: "https://example.com/back-large.jpg" },
-            },
-            {
-              front: true,
-              image: "https://example.com/front.jpg",
-              thumbnails: { large: "https://example.com/front-large.jpg" },
-            },
-          ],
-        }),
-        { status: 200 },
-      ),
+      Response.json({
+        artworkUrl: "https://example.com/front.jpg",
+        thumbnails: { large: "https://example.com/front-large.jpg" },
+      }),
     );
 
     await expect(findCoverArt("rg-1", fetcher)).resolves.toEqual({
       artworkUrl: "https://example.com/front.jpg",
       artworkSource: "cover-art-archive",
     });
+    expect(fetcher).toHaveBeenCalledWith(
+      "https://mb-proxy.ybaspinar.dev/release-group/rg-1/cover",
+      {
+        headers: { Accept: "application/json" },
+      },
+    );
   });
 
-  it("returns an empty result when the archive has no art", async () => {
-    const fetcher = vi.fn().mockResolvedValue(new Response("", { status: 404 }));
+  it("returns an empty result when the proxy has no art", async () => {
+    const fetcher = vi.fn().mockResolvedValue(Response.json({ artworkUrl: "", thumbnails: {} }));
 
     await expect(findCoverArt("missing", fetcher)).resolves.toEqual({
       artworkUrl: "",
