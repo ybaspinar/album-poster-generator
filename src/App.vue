@@ -263,7 +263,7 @@ async function exportPoster(): Promise<void> {
       <section
         v-else-if="creatorStep === 'models'"
         data-test="creator-models-step"
-        class="grid gap-5"
+        class="grid w-full gap-5"
       >
         <PosterModelPicker
           :draft="draft"
