@@ -47,7 +47,7 @@ const modelPreviews = computed(() =>
       </div>
     </CardHeader>
 
-    <CardContent class="grid gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+    <CardContent class="grid gap-4 sm:grid-cols-2">
       <button
         v-for="model in modelPreviews"
         :key="model.id"
