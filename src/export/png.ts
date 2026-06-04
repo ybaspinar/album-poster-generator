@@ -7,8 +7,8 @@ export async function exportElementAsPng(
   filename: string,
 ): Promise<void> {
   const sourceRect = element.getBoundingClientRect();
-  const sourceWidth = sourceRect.width || preset.widthPx;
-  const sourceHeight = sourceRect.height || preset.heightPx;
+  const sourceWidth = element.offsetWidth || sourceRect.width || preset.widthPx;
+  const sourceHeight = element.offsetHeight || sourceRect.height || preset.heightPx;
   const dataUrl = await toPng(element, {
     cacheBust: false,
     pixelRatio: 1,

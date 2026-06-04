@@ -32,15 +32,19 @@ describe("exportElementAsPng", () => {
     });
 
     const element = document.createElement("article");
+    Object.defineProperties(element, {
+      offsetWidth: { value: 720 },
+      offsetHeight: { value: 1018 },
+    });
     vi.spyOn(element, "getBoundingClientRect").mockReturnValue({
       x: 0,
       y: 0,
       top: 0,
-      right: 720,
-      bottom: 1018.4516,
+      right: 180,
+      bottom: 254.5,
       left: 0,
-      width: 720,
-      height: 1018.4516,
+      width: 180,
+      height: 254.5,
       toJSON: () => ({}),
     });
     const preset = getExportPreset("a4-portrait");
@@ -52,7 +56,7 @@ describe("exportElementAsPng", () => {
       cacheBust: false,
       pixelRatio: 1,
       width: 720,
-      height: 1018.4516,
+      height: 1018,
       canvasWidth: 2480,
       canvasHeight: 3508,
     });

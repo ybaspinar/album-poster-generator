@@ -26,6 +26,25 @@ describe("PosterPreview", () => {
     expect(wrapper.find(".poster-swatches").classes()).toContain("poster-swatches-square");
   });
 
+  it("renders through a fixed canonical poster canvas that can be visually scaled", () => {
+    const wrapper = mount(PosterPreview, {
+      props: {
+        draft: createAlbumDraft({
+          title: "Kids See Ghosts",
+          artist: "Kanye West & Kid Cudi",
+        }),
+      },
+    });
+
+    const frame = wrapper.find('[data-test="poster-preview-frame"]');
+    const scaler = wrapper.find('[data-test="poster-preview-scale"]');
+    const page = wrapper.find(".poster-page");
+
+    expect(frame.exists()).toBe(true);
+    expect(scaler.attributes("style")).toContain("--poster-preview-scale:");
+    expect(page.attributes("style")).toContain("width: 720px");
+  });
+
   it("places artist name under release in the meta row", () => {
     const wrapper = mount(PosterPreview, {
       props: {
@@ -121,7 +140,7 @@ describe("PosterPreview", () => {
     expect(wrapper.find(".poster-tracklist").classes()).toContain("poster-tracklist-columns-2");
     expect(wrapper.find(".poster-tracklist").classes()).toContain("poster-tracklist-size-small");
     expect(twoColumnRule).toContain("grid-template-columns: repeat(2, minmax(0, 1fr))");
-    expect(smallRule).toContain("font-size: clamp(0.5rem, 0.95cqw, 0.66rem)");
+    expect(smallRule).toContain("font-size: calc(9.5 * 100cqw / 720)");
   });
 
   it("hides swatches and supports circular swatches", () => {
@@ -211,12 +230,27 @@ describe("PosterPreview", () => {
     const style = wrapper.find(".poster-page").attributes("style");
 
     expect(style).toContain("--poster-title-color: #ff0000");
-    expect(style).toContain("--poster-title-size: 64px");
+    expect(style).toContain("--poster-title-size: 64;");
     expect(style).toContain("--poster-title-weight: 900");
     expect(style).toContain("--poster-title-style: italic");
     expect(style).toContain("--poster-title-transform: none");
     expect(style).toContain("--poster-artist-color: #00ff00");
     expect(style).toContain("--poster-tracklist-color: #123456");
+  });
+
+  it("scales poster typography relative to poster width instead of viewport pixels", () => {
+    const css = readFileSync("src/styles/globals.css", "utf8");
+    const titleRule = css.match(/\.poster-caption h2 \{(?<body>[^}]+)\}/)?.groups?.body;
+    const artistRule = css.match(/\.poster-artist \{(?<body>[^}]+)\}/)?.groups?.body;
+    const metadataRule = css.match(/\.poster-release \{(?<body>[^}]+)\}/)?.groups?.body;
+    const tracklistRule = css.match(/\.poster-tracklist \{(?<body>[^}]+)\}/)?.groups?.body;
+    const ruleRule = css.match(/\.poster-rule \{(?<body>[^}]+)\}/)?.groups?.body;
+
+    expect(titleRule).toContain("font-size: calc(var(--poster-title-size) * 100cqw / 720)");
+    expect(artistRule).toContain("font-size: calc(var(--poster-artist-size) * 100cqw / 720)");
+    expect(metadataRule).toContain("font-size: calc(var(--poster-metadata-size) * 100cqw / 720)");
+    expect(tracklistRule).toContain("font-size: calc(var(--poster-tracklist-size) * 100cqw / 720)");
+    expect(ruleRule).toContain("border-top: calc(3 * 100cqw / 720) solid var(--ink)");
   });
 
   it("loads remote artwork with anonymous CORS for PNG export", () => {

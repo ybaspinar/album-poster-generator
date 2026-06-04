@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, shallowRef, useTemplateRef, watch } from "vue";
 import type { AlbumDraft, PosterFont, PosterLayout } from "../domain/album";
 import { loadGoogleFont, getFontFamilyString } from "../services/google-fonts";
 
 const props = defineProps<{
   draft: AlbumDraft;
 }>();
+
+const POSTER_CANONICAL_WIDTH_PX = 720;
 
 // Built-in fonts that have CSS classes defined
 const BUILTIN_FONTS = ["gotham", "inter", "system"] as const;
@@ -25,7 +27,13 @@ const layoutClass = computed(() => {
   return `poster-layout-${layout}`;
 });
 
+const previewScale = shallowRef(1);
+const previewScaleStyle = computed(() => ({
+  "--poster-preview-scale": String(previewScale.value),
+}));
+
 const posterStyle = computed(() => ({
+  width: `${POSTER_CANONICAL_WIDTH_PX}px`,
   fontFamily: getFontFamily(props.draft.font),
   "--poster-bg-blur": `${props.draft.backgroundBlurAmount}px`,
   ...typographyVariables("title", props.draft.typography.title),
@@ -33,6 +41,29 @@ const posterStyle = computed(() => ({
   ...typographyVariables("metadata", props.draft.typography.metadata),
   ...typographyVariables("tracklist", props.draft.typography.tracklist),
 }));
+
+const previewFrameRef = useTemplateRef<HTMLElement>("previewFrame");
+let previewFrameObserver: ResizeObserver | undefined;
+
+function updatePreviewScale(): void {
+  const frameWidth = previewFrameRef.value?.clientWidth ?? POSTER_CANONICAL_WIDTH_PX;
+  previewScale.value = frameWidth > 0 ? frameWidth / POSTER_CANONICAL_WIDTH_PX : 1;
+}
+
+onMounted(() => {
+  updatePreviewScale();
+
+  if (typeof ResizeObserver === "undefined" || !previewFrameRef.value) {
+    return;
+  }
+
+  previewFrameObserver = new ResizeObserver(updatePreviewScale);
+  previewFrameObserver.observe(previewFrameRef.value);
+});
+
+onBeforeUnmount(() => {
+  previewFrameObserver?.disconnect();
+});
 
 const backgroundStyle = computed(() => {
   const mode = props.draft.backgroundMode;
@@ -76,7 +107,7 @@ function typographyVariables(
 ): Record<string, string> {
   return {
     [`--poster-${section}-color`]: style.color,
-    [`--poster-${section}-size`]: `${style.size}px`,
+    [`--poster-${section}-size`]: String(style.size),
     [`--poster-${section}-weight`]: String(style.weight),
     [`--poster-${section}-style`]: style.italic ? "italic" : "normal",
     [`--poster-${section}-transform`]: style.uppercase ? "uppercase" : "none",
@@ -116,65 +147,69 @@ watch(
 </script>
 
 <template>
-  <article
-    data-export-poster
-    class="poster-page"
-    :class="[fontClass, layoutClass, backgroundClasses]"
-    aria-label="Album poster preview"
-    :style="[posterStyle, backgroundStyle]"
-  >
-    <div class="poster-art-frame">
-      <img
-        v-if="draft.artworkUrl"
-        :src="draft.artworkUrl"
-        crossorigin="anonymous"
-        :alt="`${draft.title || 'Album'} artwork`"
-        class="poster-art"
-      />
-      <div v-else class="poster-art poster-art-empty">
-        <span>Add artwork</span>
-      </div>
-    </div>
-
-    <section class="poster-caption">
-      <h2>{{ draft.title || "Untitled Album" }}</h2>
-      <div class="poster-rule" />
-      <div class="poster-meta-row">
-        <div class="poster-meta-left">
-          <p class="poster-release">
-            {{ draft.metadataLine || draft.releaseDate || "Release date" }}
-          </p>
-          <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
-        </div>
-        <div
-          v-if="draft.showSwatches"
-          class="poster-swatches"
-          :class="`poster-swatches-${draft.swatchShape}`"
-          aria-label="Poster palette"
-        >
-          <span
-            v-for="color in draft.palette"
-            :key="color"
-            class="poster-swatch"
-            :style="{ backgroundColor: color }"
-          />
-        </div>
-      </div>
-
-      <ol
-        v-if="draft.showTracklist && draft.tracklist.length"
-        class="poster-tracklist"
-        :class="[
-          `poster-tracklist-columns-${draft.tracklistColumns}`,
-          `poster-tracklist-size-${draft.tracklistSize}`,
-        ]"
-        aria-label="Tracklist"
+  <div ref="previewFrame" data-test="poster-preview-frame" class="poster-preview-frame">
+    <div data-test="poster-preview-scale" class="poster-preview-scale" :style="previewScaleStyle">
+      <article
+        data-export-poster
+        class="poster-page"
+        :class="[fontClass, layoutClass, backgroundClasses]"
+        aria-label="Album poster preview"
+        :style="[posterStyle, backgroundStyle]"
       >
-        <li v-for="(track, index) in draft.tracklist" :key="`${track}-${index}`">
-          <span>{{ index + 1 }}) </span>
-          <span>{{ track }}</span>
-        </li>
-      </ol>
-    </section>
-  </article>
+        <div class="poster-art-frame">
+          <img
+            v-if="draft.artworkUrl"
+            :src="draft.artworkUrl"
+            crossorigin="anonymous"
+            :alt="`${draft.title || 'Album'} artwork`"
+            class="poster-art"
+          />
+          <div v-else class="poster-art poster-art-empty">
+            <span>Add artwork</span>
+          </div>
+        </div>
+
+        <section class="poster-caption">
+          <h2>{{ draft.title || "Untitled Album" }}</h2>
+          <div class="poster-rule" />
+          <div class="poster-meta-row">
+            <div class="poster-meta-left">
+              <p class="poster-release">
+                {{ draft.metadataLine || draft.releaseDate || "Release date" }}
+              </p>
+              <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
+            </div>
+            <div
+              v-if="draft.showSwatches"
+              class="poster-swatches"
+              :class="`poster-swatches-${draft.swatchShape}`"
+              aria-label="Poster palette"
+            >
+              <span
+                v-for="color in draft.palette"
+                :key="color"
+                class="poster-swatch"
+                :style="{ backgroundColor: color }"
+              />
+            </div>
+          </div>
+
+          <ol
+            v-if="draft.showTracklist && draft.tracklist.length"
+            class="poster-tracklist"
+            :class="[
+              `poster-tracklist-columns-${draft.tracklistColumns}`,
+              `poster-tracklist-size-${draft.tracklistSize}`,
+            ]"
+            aria-label="Tracklist"
+          >
+            <li v-for="(track, index) in draft.tracklist" :key="`${track}-${index}`">
+              <span>{{ index + 1 }}) </span>
+              <span>{{ track }}</span>
+            </li>
+          </ol>
+        </section>
+      </article>
+    </div>
+  </div>
 </template>
