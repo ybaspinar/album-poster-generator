@@ -19,6 +19,8 @@ export type ExportableArtworkUrlResult = ExportableArtworkUrlSuccess | Exportabl
 export const blockedArtworkDownloadMessage =
   "Artwork preview loaded, but the image server blocks browser download. Upload the artwork manually for PNG export.";
 
+const cache = new Map<string, ExportableArtworkUrlResult>();
+
 export async function createExportableArtworkUrl(
   artworkUrl: string,
   options: CreateExportableArtworkUrlOptions = {},
@@ -28,6 +30,12 @@ export async function createExportableArtworkUrl(
   }
 
   const normalizedArtworkUrl = normalizeArtworkUrl(artworkUrl);
+
+  const cached = cache.get(normalizedArtworkUrl);
+  if (cached) {
+    return cached;
+  }
+
   const fetcher = options.fetcher ?? fetch;
   const createObjectUrl = options.createObjectUrl ?? URL.createObjectURL.bind(URL);
 
@@ -38,16 +46,29 @@ export async function createExportableArtworkUrl(
     });
 
     if (!response.ok) {
-      return {
+      const result: ExportableArtworkUrlResult = {
         ok: false,
         artworkUrl: normalizedArtworkUrl,
         message: blockedArtworkDownloadMessage,
       };
+      cache.set(normalizedArtworkUrl, result);
+      return result;
     }
 
-    return { ok: true, artworkUrl: createObjectUrl(await response.blob()) };
+    const result: ExportableArtworkUrlResult = {
+      ok: true,
+      artworkUrl: createObjectUrl(await response.blob()),
+    };
+    cache.set(normalizedArtworkUrl, result);
+    return result;
   } catch {
-    return { ok: false, artworkUrl: normalizedArtworkUrl, message: blockedArtworkDownloadMessage };
+    const result: ExportableArtworkUrlResult = {
+      ok: false,
+      artworkUrl: normalizedArtworkUrl,
+      message: blockedArtworkDownloadMessage,
+    };
+    cache.set(normalizedArtworkUrl, result);
+    return result;
   }
 }
 

@@ -58,6 +58,27 @@ describe("createExportableArtworkUrl", () => {
     });
   });
 
+  it("caches successful downloads and skips re-fetching the same URL", async () => {
+    const blob = new Blob(["image"], { type: "image/jpeg" });
+    const fetcher = vi.fn().mockResolvedValue(new Response(blob, { status: 200 }));
+    const createObjectUrl = vi.fn().mockReturnValue("blob:cached-artwork");
+
+    const first = await createExportableArtworkUrl("https://example.com/cache.jpg", {
+      fetcher,
+      createObjectUrl,
+    });
+    expect(first.ok).toBe(true);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+
+    const second = await createExportableArtworkUrl("https://example.com/cache.jpg", {
+      fetcher,
+      createObjectUrl,
+    });
+    expect(second).toEqual(first);
+    expect(fetcher).toHaveBeenCalledTimes(1); // not called again
+    expect(createObjectUrl).toHaveBeenCalledTimes(1); // not called again
+  });
+
   it("leaves non-HTTP URLs unchanged", async () => {
     await expect(createExportableArtworkUrl("blob:manual-artwork")).resolves.toEqual({
       ok: true,

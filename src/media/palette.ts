@@ -1,7 +1,14 @@
 import { extractColors } from "extract-colors";
 import { defaultPalette } from "../domain/album";
 
+const cache = new Map<string, string[]>();
+
 export async function extractPaletteFromImage(url: string, maxColors = 6): Promise<string[]> {
+  const cached = cache.get(url);
+  if (cached) {
+    return cached;
+  }
+
   try {
     const colors = await extractColors(url, {
       pixels: 96 * 96,
@@ -19,7 +26,9 @@ export async function extractPaletteFromImage(url: string, maxColors = 6): Promi
       }
     }
 
-    return hexColors.slice(0, maxColors);
+    const result = hexColors.slice(0, maxColors);
+    cache.set(url, result);
+    return result;
   } catch {
     // Fall back to default palette on error
     return [...defaultPalette];

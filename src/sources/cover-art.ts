@@ -13,6 +13,8 @@ interface CoverArtResponse {
 const defaultProxyBaseUrl = "https://mb-proxy.ybaspinar.dev";
 const acceptJsonInit = { headers: { Accept: "application/json" } } as const;
 
+const cache = new Map<string, AlbumDraftInput>();
+
 export async function findCoverArt(
   releaseGroupId: string,
   fetcher: Fetcher = fetch,
@@ -23,13 +25,20 @@ export async function findCoverArt(
     return { artworkUrl: "", artworkSource: "remote" };
   }
 
+  const cached = cache.get(id);
+  if (cached) {
+    return cached;
+  }
+
   const response = await fetcher(
     `${musicBrainzProxyBaseUrl()}/release-group/${encodeURIComponent(id)}/cover`,
     acceptJsonInit,
   );
 
   if (response.status === 404) {
-    return { artworkUrl: "", artworkSource: "remote" };
+    const result: AlbumDraftInput = { artworkUrl: "", artworkSource: "remote" };
+    cache.set(id, result);
+    return result;
   }
 
   if (!response.ok) {
@@ -39,10 +48,12 @@ export async function findCoverArt(
   const data = (await response.json()) as CoverArtResponse;
   const artworkUrl = data.thumbnails?.large ?? data.artworkUrl ?? "";
 
-  return {
+  const result: AlbumDraftInput = {
     artworkUrl,
     artworkSource: artworkUrl ? "cover-art-archive" : "remote",
   };
+  cache.set(id, result);
+  return result;
 }
 
 function musicBrainzProxyBaseUrl(): string {

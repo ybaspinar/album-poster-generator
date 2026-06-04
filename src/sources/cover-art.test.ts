@@ -38,4 +38,19 @@ describe("findCoverArt", () => {
       "Cover art lookup failed with status 500",
     );
   });
+
+  it("caches successful lookups and skips re-fetching the same ID", async () => {
+    const fetcher = vi.fn().mockResolvedValue(
+      Response.json({
+        artworkUrl: "https://example.com/front.jpg",
+        thumbnails: { large: "https://example.com/front-large.jpg" },
+      }),
+    );
+    const first = await findCoverArt("rg-cache", fetcher);
+    expect(first.artworkUrl).toBe("https://example.com/front-large.jpg");
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    const second = await findCoverArt("rg-cache", fetcher);
+    expect(second).toEqual(first);
+    expect(fetcher).toHaveBeenCalledTimes(1); // not called again
+  });
 });
