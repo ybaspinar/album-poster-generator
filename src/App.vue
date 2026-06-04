@@ -43,15 +43,11 @@ const editionDialogOpen = computed(() => store.editionDialogOpen);
 
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
 type CreatorStep = "search" | "models" | "editor";
-type EditorTab = "information" | "tracklist" | "style" | "export";
-type AlbumEditorTab = Exclude<EditorTab, "export">;
+type EditorTab = "information" | "tracklist" | "style";
 
 const creatorStep = shallowRef<CreatorStep>("search");
 const activeEditorTab = shallowRef<EditorTab>("information");
 const selectedModelId = shallowRef<PosterModelId>("clean");
-const activeAlbumEditorTab = computed<AlbumEditorTab>(() =>
-  activeEditorTab.value === "export" ? "information" : activeEditorTab.value,
-);
 
 const { theme, toggleTheme } = useTheme();
 let paletteRequestId = 0;
@@ -374,34 +370,15 @@ async function exportPoster(): Promise<void> {
             >
               Style
             </button>
-            <button
-              data-test="creator-tab-export"
-              type="button"
-              :class="
-                activeEditorTab === 'export'
-                  ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm'
-                  : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'
-              "
-              @click="selectEditorTab('export')"
-            >
-              Export
-            </button>
           </div>
 
-          <AlbumEditor
-            v-show="activeEditorTab !== 'export'"
-            :active-tab="activeAlbumEditorTab"
-            :draft="draft"
-            @patch="patchDraft"
-          />
+          <AlbumEditor :active-tab="activeEditorTab" :draft="draft" @patch="patchDraft" />
           <ExportPanel
-            v-show="activeEditorTab === 'export'"
             :selected-preset-id="selectedPresetId"
             :exporting="exporting"
             @select-preset="selectedPresetId = $event"
             @export-poster="exportPoster"
           />
-
           <Alert v-if="status">
             <AlertDescription>{{ status }}</AlertDescription>
           </Alert>
