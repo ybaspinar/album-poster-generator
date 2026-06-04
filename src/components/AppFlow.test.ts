@@ -94,7 +94,7 @@ describe("App flow", () => {
       wrapper.find('[data-test="creator-models-step"] [data-test="preview-stage"]').exists(),
     ).toBe(false);
     expect(wrapper.findAll('[data-test="creator-models-step"] [data-export-poster]')).toHaveLength(
-      4,
+      2,
     );
     expect(
       wrapper.find('[data-test="poster-model-clean"]').find(".poster-art").attributes("src"),
@@ -136,7 +136,7 @@ describe("App flow", () => {
     await wrapper.find('[data-test="manual-start-button"]').trigger("click");
     expect(wrapper.find('[data-test="creator-models-step"]').exists()).toBe(true);
 
-    await wrapper.find('[data-test="poster-model-cover"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-atmosphere"]').trigger("click");
     expect(wrapper.find('[data-test="creator-editor-step"]').exists()).toBe(true);
   });
 
@@ -216,10 +216,10 @@ describe("App flow", () => {
     expect(window.localStorage.getItem("album-poster-generator:show-tracklist")).toBe("false");
 
     await wrapper.find('[data-test="editor-back-button"]').trigger("click");
-    await wrapper.find('[data-test="poster-model-cover"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-clean"]').trigger("click");
 
     expect(
       (wrapper.find('[data-test="show-tracklist-input"]').element as HTMLInputElement).checked,
-    ).toBe(false);
+    ).toBe(true);
   });
 });

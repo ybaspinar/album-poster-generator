@@ -3,12 +3,10 @@ import { createAlbumDraft } from "./album";
 import { applyPosterModel, posterModels } from "./poster-models";
 
 describe("poster models", () => {
-  it("defines four selectable creator models with stable labels", () => {
+  it("defines two selectable creator models with stable labels", () => {
     expect(posterModels.map((model) => [model.id, model.label])).toEqual([
       ["clean", "Clean"],
-      ["cover", "Cover"],
       ["atmosphere", "Atmosphere"],
-      ["darkroom", "Darkroom"],
     ]);
   });
 
@@ -21,16 +19,16 @@ describe("poster models", () => {
       tracklist: ["Starboy"],
     });
 
-    const modelled = applyPosterModel(draft, "cover");
+    const modelled = applyPosterModel(draft, "atmosphere");
 
     expect(modelled.id).toBe("draft-1");
     expect(modelled.title).toBe("Starboy");
     expect(modelled.artist).toBe("The Weeknd");
     expect(modelled.backgroundMode).toBe("artwork");
-    expect(modelled.layout).toBe("edge-to-edge");
+    expect(modelled.layout).toBe("large");
   });
 
-  it("falls back to the standard model for unknown ids", () => {
+  it("falls back to the clean model for unknown ids", () => {
     const draft = createAlbumDraft({ id: "draft-2", layout: "large" });
 
     const modelled = applyPosterModel(draft, "missing");

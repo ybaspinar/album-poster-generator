@@ -1,7 +1,7 @@
 import { applyDraftPatch } from "../editor/draft";
 import type { AlbumDraft, AlbumDraftInput, PosterLayout } from "./album";
 
-export type PosterModelId = "clean" | "cover" | "atmosphere" | "darkroom";
+export type PosterModelId = "clean" | "atmosphere";
 
 export interface PosterModel {
   id: PosterModelId;
@@ -33,27 +33,6 @@ export const posterModels: PosterModel[] = [
     },
   },
   {
-    id: "cover",
-    label: "Cover",
-    description: "The artwork is the poster. Light text sits over expansive cover art.",
-    layout: "edge-to-edge",
-    patch: {
-      layout: "edge-to-edge",
-      backgroundMode: "artwork",
-      backgroundBlur: true,
-      backgroundBlurAmount: 8,
-      font: "Oswald",
-      showTracklist: false,
-      showSwatches: false,
-      typography: {
-        title: { color: "#ffffff", size: 40, weight: 700, uppercase: true },
-        artist: { color: "#f0f0f0", size: 14, weight: 500, uppercase: true },
-        metadata: { color: "#cccccc", size: 11, weight: 400, uppercase: true },
-        tracklist: { color: "#dddddd", size: 10, weight: 400, uppercase: true },
-      },
-    },
-  },
-  {
     id: "atmosphere",
     label: "Atmosphere",
     description: "Artwork fills the background behind generous spacing and elegant serif type.",
@@ -72,27 +51,6 @@ export const posterModels: PosterModel[] = [
         artist: { color: "#1a1a1a", size: 18, weight: 700, uppercase: true },
         metadata: { color: "#333333", size: 13, weight: 400, uppercase: true },
         tracklist: { color: "#2a2a2a", size: 11, weight: 400, uppercase: true },
-      },
-    },
-  },
-  {
-    id: "darkroom",
-    label: "Darkroom",
-    description: "High-contrast gallery look. Dark backdrop, white type, bold energy.",
-    layout: "medium",
-    patch: {
-      layout: "medium",
-      backgroundMode: "solid",
-      backgroundSolidColor: "#0d0d0d",
-      font: "Space Grotesk",
-      showTracklist: true,
-      showSwatches: true,
-      swatchShape: "circle",
-      typography: {
-        title: { color: "#ffffff", size: 50, weight: 900, uppercase: true },
-        artist: { color: "#d4d4d4", size: 16, weight: 600, uppercase: true },
-        metadata: { color: "#a0a0a0", size: 12, weight: 400, uppercase: true },
-        tracklist: { color: "#c0c0c0", size: 10, weight: 400, uppercase: true },
       },
     },
   },

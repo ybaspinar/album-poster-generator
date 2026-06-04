@@ -155,6 +155,8 @@ export interface AlbumDraft {
   tracklistSize: TracklistSize;
   showSwatches: boolean;
   swatchShape: SwatchShape;
+  showTitle: boolean;
+  showArtist: boolean;
   source: AlbumSource;
   sourceId: string;
   font: PosterFont;
@@ -181,6 +183,8 @@ export interface AlbumDraftInput {
   tracklist?: string[];
   showTracklist?: boolean;
   tracklistColumns?: TracklistColumns;
+  showTitle?: boolean;
+  showArtist?: boolean;
   tracklistSize?: TracklistSize;
   showSwatches?: boolean;
   swatchShape?: SwatchShape;
@@ -221,6 +225,8 @@ export function createAlbumDraft(input: AlbumDraftInput = {}): AlbumDraft {
     tracklist: normalizeTracklist(input.tracklist),
     showTracklist: input.showTracklist ?? true,
     tracklistColumns: input.tracklistColumns ?? "3",
+    showTitle: input.showTitle ?? true,
+    showArtist: input.showArtist ?? true,
     tracklistSize: input.tracklistSize ?? "medium",
     showSwatches: input.showSwatches ?? true,
     swatchShape: input.swatchShape ?? "square",

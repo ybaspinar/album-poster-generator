@@ -17,13 +17,13 @@ describe("PosterModelPicker", () => {
     });
 
     expect(wrapper.text()).toContain("Choose a poster model");
-    expect(wrapper.findAll('[data-test^="poster-model-"]')).toHaveLength(4);
-    expect(wrapper.find('[data-test="poster-model-clean"]').text()).toContain("Clean");
-    expect(wrapper.find('[data-test="poster-model-darkroom"]').text()).toContain("Darkroom");
+    expect(wrapper.findAll('[data-test^="poster-model-"]')).toHaveLength(2);
+
     const cleanCard = wrapper.find('[data-test="poster-model-clean"]');
     expect(cleanCard.find(".poster-art").attributes("src")).toBe("https://example.com/starboy.jpg");
-    const coverCard = wrapper.find('[data-test="poster-model-cover"]');
-    expect(coverCard.find(".poster-page").classes()).toContain("poster-layout-edge-to-edge");
+
+    const atmosphereCard = wrapper.find('[data-test="poster-model-atmosphere"]');
+    expect(atmosphereCard.find(".poster-page").classes()).toContain("poster-layout-large");
   });
 
   it("emits model selection and back navigation", async () => {
@@ -31,10 +31,10 @@ describe("PosterModelPicker", () => {
       props: { draft, selectedModelId: "clean" },
     });
 
-    await wrapper.find('[data-test="poster-model-cover"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-atmosphere"]').trigger("click");
     await wrapper.find('[data-test="model-back-button"]').trigger("click");
 
-    expect(wrapper.emitted("selectModel")?.[0]).toEqual(["cover"]);
+    expect(wrapper.emitted("selectModel")?.[0]).toEqual(["atmosphere"]);
     expect(wrapper.emitted("back")).toHaveLength(1);
   });
 });

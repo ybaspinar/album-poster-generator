@@ -170,14 +170,16 @@ watch(
         </div>
 
         <section class="poster-caption">
-          <h2>{{ draft.title || "Untitled Album" }}</h2>
-          <div class="poster-rule" />
+          <h2 v-if="draft.showTitle">{{ draft.title || "Untitled Album" }}</h2>
+          <div v-if="draft.showTitle" class="poster-rule" />
           <div class="poster-meta-row">
             <div class="poster-meta-left">
-              <p class="poster-release">
+              <p v-if="draft.showArtist" class="poster-release">
                 {{ draft.metadataLine || draft.releaseDate || "Release date" }}
               </p>
-              <p class="poster-artist">{{ draft.artist || "Unknown Artist" }}</p>
+              <p v-if="draft.showArtist" class="poster-artist">
+                {{ draft.artist || "Unknown Artist" }}
+              </p>
             </div>
             <div
               v-if="draft.showSwatches"
