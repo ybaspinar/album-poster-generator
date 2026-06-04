@@ -90,6 +90,15 @@ describe("App flow", () => {
 
     expect(wrapper.find('[data-test="creator-models-step"]').exists()).toBe(true);
     expect(wrapper.text()).toContain("Choose a poster model");
+    expect(
+      wrapper.find('[data-test="creator-models-step"] [data-test="preview-stage"]').exists(),
+    ).toBe(false);
+    expect(wrapper.findAll('[data-test="creator-models-step"] [data-export-poster]')).toHaveLength(
+      4,
+    );
+    expect(
+      wrapper.find('[data-test="poster-model-standard"]').find(".poster-art").attributes("src"),
+    ).toBe("blob:search-front-exportable");
     expect(fetchMusicBrainzTracklist).toHaveBeenCalledWith("rg-1");
     expect(createExportableArtworkUrl).toHaveBeenCalledWith("https://example.com/search-front.jpg");
     expect(findCoverArt).not.toHaveBeenCalled();

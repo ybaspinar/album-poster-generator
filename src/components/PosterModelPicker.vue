@@ -3,9 +3,12 @@ import { computed } from "vue";
 import { ArrowLeft } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { posterModels, type PosterModelId } from "../domain/poster-models";
+import type { AlbumDraft } from "../domain/album";
+import { applyPosterModel, posterModels, type PosterModelId } from "../domain/poster-models";
+import PosterPreview from "./PosterPreview.vue";
 
 const props = defineProps<{
+  draft: AlbumDraft;
   selectedModelId: PosterModelId;
 }>();
 
@@ -15,6 +18,12 @@ const emit = defineEmits<{
 }>();
 
 const selectedModel = computed(() => props.selectedModelId);
+const modelPreviews = computed(() =>
+  posterModels.map((model) => ({
+    ...model,
+    draft: applyPosterModel(props.draft, model.id),
+  })),
+);
 </script>
 
 <template>
@@ -40,7 +49,7 @@ const selectedModel = computed(() => props.selectedModelId);
 
     <CardContent class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <button
-        v-for="model in posterModels"
+        v-for="model in modelPreviews"
         :key="model.id"
         :data-test="`poster-model-${model.id}`"
         type="button"
@@ -51,22 +60,10 @@ const selectedModel = computed(() => props.selectedModelId);
         @click="emit('selectModel', model.id)"
       >
         <span
-          class="grid aspect-[3/4] place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-4 shadow-inner"
+          class="grid aspect-[3/4] place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-3 shadow-inner"
         >
-          <span
-            class="grid h-full w-full content-between rounded-lg border border-white/15 bg-gradient-to-b from-zinc-800 to-zinc-950 p-3"
-          >
-            <span class="mx-auto size-16 rounded-2xl bg-white/80" />
-            <span class="grid gap-1">
-              <span class="h-3 w-4/5 rounded-full bg-white/80" />
-              <span class="h-2 w-3/5 rounded-full bg-white/50" />
-              <span class="mt-2 grid grid-cols-2 gap-1">
-                <span class="h-1.5 rounded-full bg-white/35" />
-                <span class="h-1.5 rounded-full bg-white/35" />
-                <span class="h-1.5 rounded-full bg-white/25" />
-                <span class="h-1.5 rounded-full bg-white/25" />
-              </span>
-            </span>
+          <span class="w-full max-w-[13rem] overflow-hidden rounded-lg shadow-2xl shadow-black/30">
+            <PosterPreview :draft="model.draft" />
           </span>
         </span>
         <span class="grid gap-1">

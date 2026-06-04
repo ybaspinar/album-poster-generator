@@ -266,22 +266,11 @@ async function exportPoster(): Promise<void> {
         class="grid gap-5"
       >
         <PosterModelPicker
+          :draft="draft"
           :selected-model-id="selectedModelId"
           @back="backToSearch"
           @select-model="selectPosterModel"
         />
-
-        <section data-test="preview-stage" class="mx-auto w-full max-w-3xl">
-          <Card class="border-border/80 bg-card/80 shadow-2xl shadow-black/20 backdrop-blur">
-            <CardHeader class="border-b border-border/70">
-              <CardTitle>Preview</CardTitle>
-              <CardDescription>The selected model will use this poster data.</CardDescription>
-            </CardHeader>
-            <CardContent class="grid place-items-center overflow-auto p-6 xl:p-10">
-              <PosterPreview :draft="draft" />
-            </CardContent>
-          </Card>
-        </section>
       </section>
 
       <section
