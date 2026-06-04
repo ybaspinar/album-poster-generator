@@ -1,21 +1,15 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
-import posthog from "posthog-js";
+import { capturePostHogException, initPostHog } from "./analytics/posthog";
 import App from "./App.vue";
 import "./styles/globals.css";
 
-posthog.init(import.meta.env.VITE_POSTHOG_PROJECT_TOKEN || "", {
-  api_host: import.meta.env.VITE_POSTHOG_HOST || "https://eu.i.posthog.com",
-  defaults: "2026-01-30",
-  logs: {
-    serviceName: "album-poster-generator-web",
-    environment: import.meta.env.MODE,
-    serviceVersion: import.meta.env.VITE_APP_VERSION || "dev",
-  },
-});
-
-posthog.logger.info("app initialized", {
-  service: "album-poster-generator",
+initPostHog({
+  appVersion: import.meta.env.VITE_APP_VERSION || "dev",
+  host: import.meta.env.VITE_POSTHOG_HOST || "https://eu.i.posthog.com",
+  hostname: window.location.hostname,
+  mode: import.meta.env.MODE,
+  projectToken: import.meta.env.VITE_POSTHOG_PROJECT_TOKEN || "",
 });
 
 const app = createApp(App);
@@ -24,7 +18,7 @@ const pinia = createPinia();
 app.use(pinia);
 
 app.config.errorHandler = (err) => {
-  posthog.captureException(err);
+  capturePostHogException(err);
 };
 
 app.mount("#app");

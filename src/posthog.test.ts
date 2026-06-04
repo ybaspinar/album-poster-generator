@@ -10,13 +10,16 @@ describe("PostHog production debugging", () => {
   });
 
   it("configures explicit structured logs without console autocapture", () => {
+    const analytics = readFileSync("src/analytics/posthog.ts", "utf8");
     const main = readFileSync("src/main.ts", "utf8");
 
-    expect(main).toContain("logs:");
-    expect(main).toContain('serviceName: "album-poster-generator-web"');
-    expect(main).toContain("environment: import.meta.env.MODE");
-    expect(main).toContain('serviceVersion: import.meta.env.VITE_APP_VERSION || "dev"');
-    expect(main).toContain('posthog.logger.info("app initialized"');
-    expect(main).not.toContain("captureConsoleLogs: true");
+    expect(analytics).toContain("logs:");
+    expect(analytics).toContain('serviceName: "album-poster-generator-web"');
+    expect(analytics).toContain("environment: runtime.mode");
+    expect(analytics).toContain('serviceVersion: runtime.appVersion || "dev"');
+    expect(analytics).toContain('posthog.logger.info("app initialized"');
+    expect(analytics).not.toContain("captureConsoleLogs: true");
+    expect(main).toContain("hostname: window.location.hostname");
+    expect(main).toContain("initPostHog({");
   });
 });

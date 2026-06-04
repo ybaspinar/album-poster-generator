@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from "vue";
 import { storeToRefs } from "pinia";
-import posthog from "posthog-js";
+import { capturePostHogEvent, capturePostHogException } from "./analytics/posthog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -210,7 +210,7 @@ async function exportPoster(): Promise<void> {
       createExportFilename(draft.value.artist, draft.value.title, selectedPreset.value),
     );
     status.value = `Exported ${selectedPreset.value.label} PNG.`;
-    posthog.capture("poster_exported", {
+    capturePostHogEvent("poster_exported", {
       preset_id: selectedPreset.value.id,
       preset_label: selectedPreset.value.label,
       width_px: selectedPreset.value.widthPx,
@@ -222,7 +222,7 @@ async function exportPoster(): Promise<void> {
     const message =
       error instanceof Error ? error.message : "PNG export failed. Try another preset.";
     status.value = message;
-    posthog.captureException(error instanceof Error ? error : new Error(message), {
+    capturePostHogException(error instanceof Error ? error : new Error(message), {
       preset_id: selectedPreset.value.id,
     });
   } finally {

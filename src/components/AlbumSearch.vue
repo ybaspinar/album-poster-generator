@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
-import posthog from "posthog-js";
+import { capturePostHogEvent, capturePostHogException } from "../analytics/posthog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -120,7 +120,7 @@ async function performSearch(): Promise<void> {
     status.value = results.value.length
       ? `${results.value.length} result${results.value.length === 1 ? "" : "s"} found.`
       : "No results found. Adjust the query or fill in details manually.";
-    posthog.capture("album_searched", {
+    capturePostHogEvent("album_searched", {
       result_count: results.value.length,
       has_artist: Boolean(params.artist),
       has_title: Boolean(params.title),
@@ -132,7 +132,7 @@ async function performSearch(): Promise<void> {
       if (label) addRecentSearch(label);
     }
   } catch (error) {
-    posthog.captureException(
+    capturePostHogException(
       error instanceof Error ? error : new Error("MusicBrainz search failed."),
     );
     status.value = error instanceof Error ? error.message : "MusicBrainz search failed.";
@@ -181,7 +181,7 @@ function onKeyDown(event: KeyboardEvent): void {
 }
 
 function selectResult(album: AlbumDraftInput): void {
-  posthog.capture("album_selected", {
+  capturePostHogEvent("album_selected", {
     album_title: album.title,
     album_artist: album.artist,
     has_artwork: Boolean(album.artworkUrl),

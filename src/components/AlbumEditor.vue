@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import posthog from "posthog-js";
+import { capturePostHogEvent } from "../analytics/posthog";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -120,7 +120,7 @@ function uploadArtwork(event: Event): void {
     return;
   }
 
-  posthog.capture("artwork_uploaded", { file_type: file.type, file_size_bytes: file.size });
+  capturePostHogEvent("artwork_uploaded", { file_type: file.type, file_size_bytes: file.size });
   emit("patch", { artworkUrl: createArtworkObjectUrl(file), artworkSource: "manual" });
 }
 
