@@ -48,21 +48,24 @@ const modelPreviews = computed(() =>
     </CardHeader>
 
     <CardContent class="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2">
-      <button
+      <div
         v-for="model in modelPreviews"
         :key="model.id"
         :data-test="`poster-model-${model.id}`"
-        type="button"
+        role="button"
+        tabindex="0"
         :class="[
-          'group grid grid-rows-[1fr_auto] gap-3 rounded-2xl border bg-background/70 p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-primary/70 hover:shadow-lg',
+          'group grid w-full grid-rows-[1fr_auto] gap-3 rounded-2xl border bg-background/70 p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-primary/70 hover:shadow-lg',
           selectedModel === model.id ? 'border-primary ring-2 ring-primary/25' : 'border-border/70',
         ]"
         @click="emit('selectModel', model.id)"
+        @keydown.enter="emit('selectModel', model.id)"
+        @keydown.space.prevent="emit('selectModel', model.id)"
       >
         <span
-          class="grid h-full place-items-center overflow-hidden rounded-xl border border-border/70 bg-background p-1 shadow-sm"
+          class="grid w-full place-items-center overflow-hidden rounded-xl border border-border/70 bg-background p-1 shadow-sm"
         >
-          <span class="overflow-hidden rounded-lg">
+          <span class="w-full overflow-hidden rounded-lg">
             <PosterPreview :draft="model.draft" />
           </span>
         </span>
@@ -70,7 +73,7 @@ const modelPreviews = computed(() =>
           <strong class="text-base text-foreground">{{ model.label }}</strong>
           <span class="text-sm text-muted-foreground">{{ model.description }}</span>
         </span>
-      </button>
+      </div>
     </CardContent>
   </Card>
 </template>
