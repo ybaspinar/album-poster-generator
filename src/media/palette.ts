@@ -5,9 +5,7 @@ export async function extractPaletteFromImage(url: string, maxColors = 6): Promi
   try {
     const colors = await extractColors(url, {
       pixels: 96 * 96,
-      hueDistance: 12,
-      saturationDistance: 12,
-      lightnessDistance: 10,
+      distance: 0.2,
     });
 
     // Extract hex values and ensure we have up to maxColors

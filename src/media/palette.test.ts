@@ -14,6 +14,8 @@ describe("palette helpers", () => {
     expect(palette).toContain("#ff0000");
     expect(palette).toContain("#00ff00");
     expect(palette).toContain("#0000ff");
+    // All colors should be distinct
+    expect(new Set(palette).size).toBe(palette.length);
   });
 
   it("returns a cloned default palette on extract-colors failure", async () => {
