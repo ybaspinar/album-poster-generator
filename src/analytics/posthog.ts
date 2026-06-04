@@ -65,25 +65,13 @@ export function capturePostHogException(error: unknown, properties?: PostHogProp
 function isLocalHostname(hostname: string): boolean {
   const normalizedHostname = hostname.toLowerCase();
 
-  if (
+  return (
     !normalizedHostname ||
     normalizedHostname === "localhost" ||
     normalizedHostname.endsWith(".localhost") ||
     normalizedHostname === "::1" ||
     normalizedHostname === "0.0.0.0" ||
     normalizedHostname.endsWith(".local") ||
-    normalizedHostname.startsWith("127.") ||
-    normalizedHostname.startsWith("10.") ||
-    normalizedHostname.startsWith("192.168.")
-  ) {
-    return true;
-  }
-
-  const private172Match = /^172\.(\d{1,2})\./.exec(normalizedHostname);
-  if (!private172Match) {
-    return false;
-  }
-
-  const secondOctet = Number(private172Match[1]);
-  return secondOctet >= 16 && secondOctet <= 31;
+    normalizedHostname.startsWith("127.")
+  );
 }

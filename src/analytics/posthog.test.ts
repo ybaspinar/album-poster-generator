@@ -53,9 +53,6 @@ describe("PostHog local suppression", () => {
       "127.12.0.3",
       "::1",
       "0.0.0.0",
-      "192.168.1.20",
-      "10.0.0.4",
-      "172.20.1.5",
       "album.local",
     ]) {
       expect(
@@ -65,6 +62,18 @@ describe("PostHog local suppression", () => {
           projectToken: "phc_test",
         }),
       ).toBe(false);
+    }
+  });
+
+  it("allows PostHog for private network IPs when token and mode are production", () => {
+    for (const hostname of ["192.168.1.20", "10.0.0.4", "172.20.1.5"]) {
+      expect(
+        shouldEnablePostHog({
+          hostname,
+          mode: "production",
+          projectToken: "phc_test",
+        }),
+      ).toBe(true);
     }
   });
 
