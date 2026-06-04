@@ -222,4 +222,15 @@ describe("App flow", () => {
       (wrapper.find('[data-test="show-tracklist-input"]').element as HTMLInputElement).checked,
     ).toBe(true);
   });
+
+  it("shows a quick export button in the preview header", async () => {
+    const wrapper = mount(App);
+
+    await wrapper.find('[data-test="manual-start-button"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-clean"]').trigger("click");
+
+    const exportBtn = wrapper.find('[data-test="quick-export-button"]');
+    expect(exportBtn.exists()).toBe(true);
+    expect(exportBtn.text()).toContain("Export PNG");
+  });
 });

@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { capturePostHogEvent, capturePostHogException } from "./analytics/posthog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "@lucide/vue";
+import { Download, Moon, Sun } from "@lucide/vue";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -308,14 +308,25 @@ async function exportPoster(): Promise<void> {
                   >Only the poster surface is captured during PNG export.</CardDescription
                 >
               </div>
-              <Button
-                data-test="editor-back-button"
-                type="button"
-                variant="ghost"
-                @click="backToModels"
-              >
-                Back
-              </Button>
+              <div class="flex items-center gap-2">
+                <Button
+                  data-test="quick-export-button"
+                  type="button"
+                  :disabled="exporting"
+                  @click="exportPoster"
+                >
+                  <Download class="size-4 mr-1.5" />
+                  {{ exporting ? "Exporting…" : "Export PNG" }}
+                </Button>
+                <Button
+                  data-test="editor-back-button"
+                  type="button"
+                  variant="ghost"
+                  @click="backToModels"
+                >
+                  Back
+                </Button>
+              </div>
             </CardHeader>
             <CardContent
               class="grid min-h-[calc(100vh-14rem)] place-items-center overflow-auto p-6 xl:p-10 2xl:p-12"
