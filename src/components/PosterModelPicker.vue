@@ -47,7 +47,7 @@ const modelPreviews = computed(() =>
       </div>
     </CardHeader>
 
-    <CardContent class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+    <CardContent class="grid gap-3 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
       <button
         v-for="model in modelPreviews"
         :key="model.id"
@@ -60,9 +60,9 @@ const modelPreviews = computed(() =>
         @click="emit('selectModel', model.id)"
       >
         <span
-          class="grid aspect-[3/4] place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-3 shadow-inner"
+          class="grid place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-2 shadow-inner"
         >
-          <span class="w-full max-w-[13rem] overflow-hidden rounded-lg shadow-2xl shadow-black/30">
+          <span class="w-full overflow-hidden rounded-lg shadow-2xl shadow-black/30">
             <PosterPreview :draft="model.draft" />
           </span>
         </span>
