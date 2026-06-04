@@ -91,6 +91,13 @@ async function selectEdition(edition: MusicBrainzEdition): Promise<void> {
     return;
   }
 
+  capturePostHogEvent("edition_selected", {
+    edition_id: edition.id,
+    has_artwork: Boolean(edition.artworkUrl),
+    country: edition.country ?? null,
+    track_count: edition.trackCount ?? null,
+  });
+
   const album = pendingAlbum.value;
   store.clearPendingAlbum();
   const tracklist = await fetchMusicBrainzTracklistForRelease(edition.id);
@@ -107,6 +114,7 @@ async function selectEdition(edition: MusicBrainzEdition): Promise<void> {
 }
 
 function cancelEditionSelection(): void {
+  capturePostHogEvent("edition_selection_cancelled");
   store.clearPendingAlbum();
   store.setStatus("Album selection cancelled.");
 }
@@ -157,6 +165,7 @@ function patchDraft(patch: Partial<AlbumDraft>): void {
 }
 
 function startManualDraft(): void {
+  capturePostHogEvent("manual_start_clicked");
   creatorStep.value = "models";
   status.value = "Choose a poster model, then edit any details manually.";
 }
@@ -172,6 +181,7 @@ function backToModels(): void {
 }
 
 function selectPosterModel(modelId: PosterModelId): void {
+  capturePostHogEvent("poster_model_selected", { model_id: modelId });
   selectedModelId.value = modelId;
   draft.value = applyPosterModel(draft.value, modelId);
   creatorStep.value = "editor";
