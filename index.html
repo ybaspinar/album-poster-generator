@@ -1,9 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Album Poster Generator</title>
+    <script>
+      (function () {
+        var t = localStorage.getItem("album-poster-generator:theme");
+        if (t === "dark") document.documentElement.classList.add("dark");
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

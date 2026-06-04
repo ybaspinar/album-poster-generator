@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { capturePostHogEvent, capturePostHogException } from "./analytics/posthog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { Moon, Sun } from "@lucide/vue";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
@@ -15,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import AlbumEditor from "./components/AlbumEditor.vue";
 import AlbumSearch from "./components/AlbumSearch.vue";
+import { useTheme } from "./composables/useTheme";
 import ExportPanel from "./components/ExportPanel.vue";
 import PosterModelPicker from "./components/PosterModelPicker.vue";
 import PosterPreview from "./components/PosterPreview.vue";
@@ -51,6 +53,7 @@ const activeAlbumEditorTab = computed<AlbumEditorTab>(() =>
   activeEditorTab.value === "export" ? "information" : activeEditorTab.value,
 );
 
+const { theme, toggleTheme } = useTheme();
 let paletteRequestId = 0;
 
 watch(
@@ -244,7 +247,18 @@ async function exportPoster(): Promise<void> {
         class="mx-auto grid w-full max-w-5xl gap-5"
       >
         <Card class="border-border/80 bg-card/92 shadow-2xl shadow-black/10 backdrop-blur">
-          <CardHeader class="gap-3 pb-5">
+          <CardHeader class="relative gap-3 pb-5">
+            <Button
+              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
+              type="button"
+              variant="ghost"
+              size="icon"
+              class="absolute right-4 top-4"
+              @click="toggleTheme"
+            >
+              <Sun v-if="theme === 'dark'" class="size-5" />
+              <Moon v-else class="size-5" />
+            </Button>
             <p class="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-primary">
               Album Poster Generator
             </p>
