@@ -10,10 +10,8 @@ describe("App layout and brand", () => {
 
     expect(wrapper.find('[data-test="app-shell"]').attributes("data-brand")).toBe("ink-slate");
     expect(wrapper.find('[data-test="app-workspace"]').classes().join(" ")).toContain(
-      "2xl:grid-cols-[460px_minmax(0,1fr)]",
+      "max-w-[112rem]",
     );
-    expect(wrapper.find('[data-test="preview-stage"]').classes().join(" ")).toContain(
-      "min-h-[calc(100vh-6rem)]",
-    );
+    expect(wrapper.find('[data-test="creator-search-step"]').exists()).toBe(true);
   });
 });

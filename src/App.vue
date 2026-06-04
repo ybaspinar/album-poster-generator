@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, shallowRef, watch } from "vue";
 import { storeToRefs } from "pinia";
 import posthog from "posthog-js";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -16,8 +16,10 @@ import {
 import AlbumEditor from "./components/AlbumEditor.vue";
 import AlbumSearch from "./components/AlbumSearch.vue";
 import ExportPanel from "./components/ExportPanel.vue";
+import PosterModelPicker from "./components/PosterModelPicker.vue";
 import PosterPreview from "./components/PosterPreview.vue";
-import { createAlbumDraft, type AlbumDraft, type AlbumDraftInput } from "./domain/album";
+import { type AlbumDraft, type AlbumDraftInput } from "./domain/album";
+import { applyPosterModel, type PosterModelId } from "./domain/poster-models";
 import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
 import { createExportFilename, getExportPreset } from "./export/presets";
 import { exportElementAsPng } from "./export/png";
@@ -38,6 +40,16 @@ const { draft, selectedPresetId, exporting, status, pendingAlbum, pendingEdition
 const editionDialogOpen = computed(() => store.editionDialogOpen);
 
 const selectedPreset = computed(() => getExportPreset(selectedPresetId.value));
+type CreatorStep = "search" | "models" | "editor";
+type EditorTab = "information" | "tracklist" | "style" | "export";
+type AlbumEditorTab = Exclude<EditorTab, "export">;
+
+const creatorStep = shallowRef<CreatorStep>("search");
+const activeEditorTab = shallowRef<EditorTab>("information");
+const selectedModelId = shallowRef<PosterModelId>("standard");
+const activeAlbumEditorTab = computed<AlbumEditorTab>(() =>
+  activeEditorTab.value === "export" ? "information" : activeEditorTab.value,
+);
 
 let paletteRequestId = 0;
 
@@ -134,6 +146,7 @@ async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Prom
         error instanceof Error ? error.message : "Artwork lookup failed. Add artwork manually.";
     }
   }
+  creatorStep.value = "models";
 }
 
 function patchDraft(patch: Partial<AlbumDraft>): void {
@@ -142,6 +155,33 @@ function patchDraft(patch: Partial<AlbumDraft>): void {
   }
 
   draft.value = applyDraftPatch(draft.value, patch);
+}
+
+function startManualDraft(): void {
+  creatorStep.value = "models";
+  status.value = "Choose a poster model, then edit any details manually.";
+}
+
+function backToSearch(): void {
+  creatorStep.value = "search";
+  activeEditorTab.value = "information";
+}
+
+function backToModels(): void {
+  creatorStep.value = "models";
+  activeEditorTab.value = "information";
+}
+
+function selectPosterModel(modelId: PosterModelId): void {
+  selectedModelId.value = modelId;
+  draft.value = applyPosterModel(draft.value, modelId);
+  creatorStep.value = "editor";
+  activeEditorTab.value = "information";
+  status.value = "Poster model applied. Fine-tune the details or export when ready.";
+}
+
+function selectEditorTab(tab: EditorTab): void {
+  activeEditorTab.value = tab;
 }
 
 async function makeArtworkExportable(artworkUrl: string): Promise<ExportableArtworkUrlResult> {
@@ -197,60 +237,130 @@ async function exportPoster(): Promise<void> {
     data-brand="ink-slate"
     class="min-h-screen bg-transparent px-5 py-6 text-foreground md:px-8 md:py-10 xl:px-12"
   >
-    <div
-      data-test="app-workspace"
-      class="mx-auto grid max-w-[112rem] gap-6 lg:grid-cols-[420px_minmax(0,1fr)] lg:items-start xl:grid-cols-[440px_minmax(0,1fr)] 2xl:grid-cols-[460px_minmax(0,1fr)]"
-    >
-      <section class="grid min-w-0 gap-4 xl:gap-5">
+    <div data-test="app-workspace" class="mx-auto grid max-w-[112rem] gap-6">
+      <section
+        v-if="creatorStep === 'search'"
+        data-test="creator-search-step"
+        class="mx-auto grid w-full max-w-5xl gap-5"
+      >
         <Card class="border-border/80 bg-card/92 shadow-2xl shadow-black/10 backdrop-blur">
-          <CardHeader class="gap-5 pb-5">
+          <CardHeader class="gap-3 pb-5">
             <p class="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-primary">
               Album Poster Generator
             </p>
-            <CardTitle
-              class="max-w-[12ch] text-4xl leading-[0.95] tracking-tight md:text-5xl xl:text-6xl"
-            >
-              Make print-ready album posters.
+            <CardTitle class="max-w-2xl text-4xl leading-[0.95] tracking-tight md:text-5xl">
+              Make a print-ready album poster.
             </CardTitle>
             <CardDescription>
-              Fetch metadata, override anything, and keep the poster browser-only.
+              Search an album, choose a model, tweak the poster, and export a PNG.
             </CardDescription>
           </CardHeader>
         </Card>
 
-        <AlbumSearch @select="selectAlbum" />
-        <AlbumEditor :draft="draft" @patch="patchDraft" />
-        <ExportPanel
-          :selected-preset-id="selectedPresetId"
-          :exporting="exporting"
-          @select-preset="selectedPresetId = $event"
-          @export-poster="exportPoster"
+        <AlbumSearch @manual-start="startManualDraft" @select="selectAlbum" />
+      </section>
+
+      <section v-else-if="creatorStep === 'models'" data-test="creator-models-step" class="grid gap-5">
+        <PosterModelPicker
+          :selected-model-id="selectedModelId"
+          @back="backToSearch"
+          @select-model="selectPosterModel"
         />
 
-        <Alert v-if="status">
-          <AlertDescription>{{ status }}</AlertDescription>
-        </Alert>
+        <section data-test="preview-stage" class="mx-auto w-full max-w-3xl">
+          <Card class="border-border/80 bg-card/80 shadow-2xl shadow-black/20 backdrop-blur">
+            <CardHeader class="border-b border-border/70">
+              <CardTitle>Preview</CardTitle>
+              <CardDescription>The selected model will use this poster data.</CardDescription>
+            </CardHeader>
+            <CardContent class="grid place-items-center overflow-auto p-6 xl:p-10">
+              <PosterPreview :draft="draft" />
+            </CardContent>
+          </Card>
+        </section>
       </section>
 
       <section
-        data-test="preview-stage"
-        class="min-w-0 lg:sticky lg:top-10 lg:min-h-[calc(100vh-6rem)]"
+        v-else
+        data-test="creator-editor-step"
+        class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_440px] lg:items-start xl:grid-cols-[minmax(0,1fr)_480px]"
       >
-        <Card
-          class="min-h-full border-border/80 bg-card/80 shadow-2xl shadow-black/20 backdrop-blur"
-        >
-          <CardHeader class="border-b border-border/70">
-            <CardTitle>Preview</CardTitle>
-            <CardDescription>
-              Only the poster surface is captured during PNG export.
-            </CardDescription>
-          </CardHeader>
-          <CardContent
-            class="grid min-h-[calc(100vh-14rem)] place-items-center overflow-auto p-6 xl:p-10 2xl:p-12"
-          >
-            <PosterPreview :draft="draft" />
-          </CardContent>
-        </Card>
+        <section data-test="preview-stage" class="min-w-0 lg:sticky lg:top-10 lg:min-h-[calc(100vh-6rem)]">
+          <Card class="min-h-full border-border/80 bg-card/80 shadow-2xl shadow-black/20 backdrop-blur">
+            <CardHeader class="flex flex-row items-center justify-between gap-3 border-b border-border/70">
+              <div>
+                <CardTitle>Preview</CardTitle>
+                <CardDescription>Only the poster surface is captured during PNG export.</CardDescription>
+              </div>
+              <Button
+                data-test="editor-back-button"
+                type="button"
+                variant="ghost"
+                @click="backToModels"
+              >
+                Back
+              </Button>
+            </CardHeader>
+            <CardContent class="grid min-h-[calc(100vh-14rem)] place-items-center overflow-auto p-6 xl:p-10 2xl:p-12">
+              <PosterPreview :draft="draft" />
+            </CardContent>
+          </Card>
+        </section>
+
+        <section class="grid min-w-0 gap-4 xl:gap-5">
+          <div class="flex flex-wrap gap-2 rounded-2xl border border-border/70 bg-muted/40 p-1">
+            <button
+              data-test="creator-tab-information"
+              type="button"
+              :class="activeEditorTab === 'information' ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm' : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'"
+              @click="selectEditorTab('information')"
+            >
+              Information
+            </button>
+            <button
+              data-test="creator-tab-tracklist"
+              type="button"
+              :class="activeEditorTab === 'tracklist' ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm' : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'"
+              @click="selectEditorTab('tracklist')"
+            >
+              Tracklist
+            </button>
+            <button
+              data-test="creator-tab-style"
+              type="button"
+              :class="activeEditorTab === 'style' ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm' : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'"
+              @click="selectEditorTab('style')"
+            >
+              Style
+            </button>
+            <button
+              data-test="creator-tab-export"
+              type="button"
+              :class="activeEditorTab === 'export' ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm' : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'"
+              @click="selectEditorTab('export')"
+            >
+              Export
+            </button>
+          </div>
+
+          <AlbumEditor
+            v-show="activeEditorTab !== 'export'"
+            :active-tab="activeAlbumEditorTab"
+            :draft="draft"
+            @patch="patchDraft"
+          />
+          <ExportPanel
+            v-show="activeEditorTab === 'export'"
+            :selected-preset-id="selectedPresetId"
+            :exporting="exporting"
+            @select-preset="selectedPresetId = $event"
+            @export-poster="exportPoster"
+          />
+
+          <Alert v-if="status">
+            <AlertDescription>{{ status }}</AlertDescription>
+          </Alert>
+        </section>
       </section>
     </div>
 

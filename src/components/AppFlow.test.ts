@@ -2,7 +2,6 @@ import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App.vue";
 import { createExportableArtworkUrl } from "../media/artwork-url";
@@ -66,10 +65,12 @@ beforeEach(() => {
 });
 
 describe("App flow", () => {
-  it("searches, selects a result, uses search artwork, updates swatches, and allows manual title override", async () => {
+  it("searches, selects an album, chooses a model, edits details, and exports from the guided flow", async () => {
     const wrapper = mount(App);
 
-    expect(wrapper.findAllComponents(Card).length).toBeGreaterThanOrEqual(4);
+    expect(wrapper.find('[data-test="creator-search-step"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="creator-models-step"]').exists()).toBe(false);
+    expect(wrapper.find('[data-test="creator-editor-step"]').exists()).toBe(false);
     expect(wrapper.findComponent(Alert).exists()).toBe(false);
     expect(wrapper.findAllComponents(Button).length).toBeGreaterThanOrEqual(2);
 
@@ -87,29 +88,45 @@ describe("App flow", () => {
     await Promise.resolve();
     await Promise.resolve();
 
-    expect(wrapper.findComponent(Alert).exists()).toBe(true);
-    expect(wrapper.text()).toContain("Kids See Ghosts");
+    expect(wrapper.find('[data-test="creator-models-step"]').exists()).toBe(true);
+    expect(wrapper.text()).toContain("Choose a poster model");
     expect(fetchMusicBrainzTracklist).toHaveBeenCalledWith("rg-1");
+    expect(createExportableArtworkUrl).toHaveBeenCalledWith("https://example.com/search-front.jpg");
+    expect(findCoverArt).not.toHaveBeenCalled();
+
+    await wrapper.find('[data-test="poster-model-standard"]').trigger("click");
+    await Promise.resolve();
+
+    expect(wrapper.find('[data-test="creator-editor-step"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="preview-stage"]').exists()).toBe(true);
+    expect(wrapper.findComponent(Alert).exists()).toBe(true);
     expect(wrapper.find('[data-test="tracklist-input"]').element).toHaveProperty(
       "value",
       "Feel the Love\nFire",
     );
     expect(wrapper.text()).toContain("1) Feel the Love");
-    expect(createExportableArtworkUrl).toHaveBeenCalledWith("https://example.com/search-front.jpg");
     expect(wrapper.find(".poster-art").attributes("src")).toBe("blob:search-front-exportable");
-    expect(findCoverArt).not.toHaveBeenCalled();
     expect(
       wrapper
         .findAll<HTMLInputElement>('[data-test^="palette-input-"]')
         .map((input) => input.element.value),
     ).toEqual(["#112233", "#445566", "#778899", "#aabbcc", "#ddeeff", "#010203"]);
 
-    // The editor title input is the second [data-test="title-input"] after the search title.
-    const editorTitleInput = wrapper.findAll('[data-test="title-input"]')[1];
+    const editorTitleInput = wrapper.find('[data-test="creator-editor-step"] [data-test="title-input"]');
     expect(editorTitleInput.exists()).toBe(true);
     await editorTitleInput.setValue("My Custom Poster Title");
 
     expect(wrapper.text()).toContain("My Custom Poster Title");
+  });
+
+  it("lets users start manually and choose a model without search", async () => {
+    const wrapper = mount(App);
+
+    await wrapper.find('[data-test="manual-start-button"]').trigger("click");
+    expect(wrapper.find('[data-test="creator-models-step"]').exists()).toBe(true);
+
+    await wrapper.find('[data-test="poster-model-basic"]').trigger("click");
+    expect(wrapper.find('[data-test="creator-editor-step"]').exists()).toBe(true);
   });
 
   it("opens a shadcn edition picker when an album has multiple editions", async () => {
@@ -163,6 +180,11 @@ describe("App flow", () => {
 
     expect(mockedFetchMusicBrainzTracklistForRelease).toHaveBeenCalledWith("release-deluxe");
     expect(wrapper.find('[data-test="edition-dialog"]').exists()).toBe(false);
+    expect(wrapper.find('[data-test="creator-models-step"]').exists()).toBe(true);
+
+    await wrapper.find('[data-test="poster-model-standard"]').trigger("click");
+    await Promise.resolve();
+
     expect(wrapper.find('[data-test="tracklist-input"]').element).toHaveProperty(
       "value",
       "State of Grace\nThe Moment I Knew",
@@ -173,13 +195,18 @@ describe("App flow", () => {
   it("persists the tracklist visibility preference between drafts", async () => {
     const wrapper = mount(App);
 
+    await wrapper.find('[data-test="manual-start-button"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-standard"]').trigger("click");
+
     const showTracklistCheckbox = wrapper.find('[data-test="show-tracklist-input"]');
     expect((showTracklistCheckbox.element as HTMLInputElement).checked).toBe(true);
 
     await showTracklistCheckbox.setValue(false);
     expect(window.localStorage.getItem("album-poster-generator:show-tracklist")).toBe("false");
 
-    await wrapper.findComponent(Button).trigger("click");
+    await wrapper.find('[data-test="editor-back-button"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-basic"]').trigger("click");
+
     expect(
       (wrapper.find('[data-test="show-tracklist-input"]').element as HTMLInputElement).checked,
     ).toBe(false);
