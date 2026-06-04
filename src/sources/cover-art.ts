@@ -37,7 +37,7 @@ export async function findCoverArt(
   }
 
   const data = (await response.json()) as CoverArtResponse;
-  const artworkUrl = data.artworkUrl ?? data.thumbnails?.large ?? "";
+  const artworkUrl = data.thumbnails?.large ?? data.artworkUrl ?? "";
 
   return {
     artworkUrl,

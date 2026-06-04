@@ -163,6 +163,8 @@ watch(
             crossorigin="anonymous"
             :alt="`${draft.title || 'Album'} artwork`"
             class="poster-art"
+            loading="lazy"
+            decoding="async"
           />
           <div v-else class="poster-art poster-art-empty">
             <span>Add artwork</span>
