@@ -1,6 +1,5 @@
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { createAlbumDraft } from "../domain/album";
 import AlbumEditor from "./AlbumEditor.vue";
@@ -16,7 +15,7 @@ describe("AlbumEditor", () => {
       },
     });
 
-    expect(wrapper.findComponent(Card).exists()).toBe(true);
+    expect(wrapper.find('[data-test="album-editor-panels"]').exists()).toBe(true);
     expect(wrapper.findAllComponents(Input).length).toBeGreaterThanOrEqual(7);
 
     await wrapper.find('[data-test="title-input"]').setValue("Updated Title");
@@ -97,5 +96,24 @@ describe("AlbumEditor", () => {
         }),
       },
     ]);
+  });
+
+  it("renders controls for the active editor task", async () => {
+    const wrapper = mount(AlbumEditor, {
+      props: {
+        activeTab: "information",
+        draft: createAlbumDraft({ title: "Starboy", artist: "The Weeknd" }),
+      },
+    });
+
+    expect(wrapper.find('[data-test="editor-panel-information"]').text()).toContain("Title");
+    expect(wrapper.find('[data-test="editor-panel-tracklist"]').isVisible()).toBe(false);
+
+    await wrapper.setProps({ activeTab: "tracklist" });
+    expect(wrapper.find('[data-test="editor-panel-tracklist"]').text()).toContain("Tracklist");
+
+    await wrapper.setProps({ activeTab: "style" });
+    expect(wrapper.find('[data-test="editor-panel-style"]').text()).toContain("Font");
+    expect(wrapper.find('[data-test="editor-panel-style"]').text()).toContain("Background");
   });
 });
