@@ -47,22 +47,22 @@ const modelPreviews = computed(() =>
       </div>
     </CardHeader>
 
-    <CardContent class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+    <CardContent class="grid grid-cols-1 items-stretch gap-4 sm:grid-cols-2">
       <button
         v-for="model in modelPreviews"
         :key="model.id"
         :data-test="`poster-model-${model.id}`"
         type="button"
         :class="[
-          'group grid gap-3 rounded-2xl border bg-background/70 p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-primary/70 hover:shadow-lg',
+          'group grid grid-rows-[1fr_auto] gap-3 rounded-2xl border bg-background/70 p-3 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-primary/70 hover:shadow-lg',
           selectedModel === model.id ? 'border-primary ring-2 ring-primary/25' : 'border-border/70',
         ]"
         @click="emit('selectModel', model.id)"
       >
         <span
-          class="grid place-items-center overflow-hidden rounded-xl border border-border/70 bg-background p-1 shadow-sm"
+          class="grid h-full place-items-center overflow-hidden rounded-xl border border-border/70 bg-background p-1 shadow-sm"
         >
-          <span class="w-full max-w-[420px] overflow-hidden rounded-lg">
+          <span class="h-full w-full overflow-hidden rounded-lg">
             <PosterPreview :draft="model.draft" />
           </span>
         </span>
