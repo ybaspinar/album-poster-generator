@@ -1,6 +1,5 @@
 interface CreateExportableArtworkUrlOptions {
   fetcher?: typeof fetch;
-  createObjectUrl?: (blob: Blob) => string;
 }
 
 interface ExportableArtworkUrlSuccess {
@@ -19,7 +18,16 @@ export type ExportableArtworkUrlResult = ExportableArtworkUrlSuccess | Exportabl
 export const blockedArtworkDownloadMessage =
   "Artwork preview loaded, but the image server blocks browser download. Upload the artwork manually for PNG export.";
 
-const cache = new Map<string, ExportableArtworkUrlResult>();
+const imageCache = new Map<string, string>();
+
+function blobToDataUrl(blob: Blob): Promise<string> {
+  const { promise, resolve, reject } = Promise.withResolvers<string>();
+  const reader = new FileReader();
+  reader.onloadend = () => resolve(reader.result as string);
+  reader.onerror = reject;
+  reader.readAsDataURL(blob);
+  return promise;
+}
 
 export async function createExportableArtworkUrl(
   artworkUrl: string,
@@ -31,13 +39,12 @@ export async function createExportableArtworkUrl(
 
   const normalizedArtworkUrl = normalizeArtworkUrl(artworkUrl);
 
-  const cached = cache.get(normalizedArtworkUrl);
+  const cached = imageCache.get(normalizedArtworkUrl);
   if (cached) {
-    return cached;
+    return { ok: true, artworkUrl: cached };
   }
 
   const fetcher = options.fetcher ?? fetch;
-  const createObjectUrl = options.createObjectUrl ?? URL.createObjectURL.bind(URL);
 
   try {
     const response = await fetcher(normalizedArtworkUrl, {
@@ -46,29 +53,22 @@ export async function createExportableArtworkUrl(
     });
 
     if (!response.ok) {
-      const result: ExportableArtworkUrlResult = {
+      return {
         ok: false,
         artworkUrl: normalizedArtworkUrl,
         message: blockedArtworkDownloadMessage,
       };
-      cache.set(normalizedArtworkUrl, result);
-      return result;
     }
 
-    const result: ExportableArtworkUrlResult = {
-      ok: true,
-      artworkUrl: createObjectUrl(await response.blob()),
-    };
-    cache.set(normalizedArtworkUrl, result);
-    return result;
+    const dataUrl = await blobToDataUrl(await response.blob());
+    imageCache.set(normalizedArtworkUrl, dataUrl);
+    return { ok: true, artworkUrl: dataUrl };
   } catch {
-    const result: ExportableArtworkUrlResult = {
+    return {
       ok: false,
       artworkUrl: normalizedArtworkUrl,
       message: blockedArtworkDownloadMessage,
     };
-    cache.set(normalizedArtworkUrl, result);
-    return result;
   }
 }
 
