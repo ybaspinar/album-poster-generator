@@ -1,17 +1,17 @@
-# Posterfy-Inspired Creator Flow - Design
+# Guided Creator Flow - Design
 
 **Date:** 2026-06-04
 **Status:** Ready for review
 
 ## Goal
 
-Replace the current dense editor-first layout with a simpler creator journey inspired by Posterfy's album creation flow, while keeping this app personal-share friendly rather than marketing-site oriented.
+Replace the current dense editor-first layout with a simpler album creation journey, while keeping this app personal-share friendly rather than marketing-site oriented.
 
 The app should open directly into creation. No hero section, no community content, no signup affordances, and no promotional landing page. The first screen should help a friend make a poster quickly.
 
 ## Reference Behavior
 
-Posterfy's useful flow pattern is:
+The useful reference flow pattern is:
 
 1. Search for an album.
 2. Pick a visual album result.
@@ -19,7 +19,7 @@ Posterfy's useful flow pattern is:
 4. Edit the poster with the preview visible and controls grouped behind top tabs.
 5. Export.
 
-The design borrows that journey structure, not Posterfy's full landing page, community feed, account system, or Spotify-specific branding.
+The design borrows that journey structure, not the reference site's full landing page, community feed, account system, or Spotify-specific branding.
 
 ## Target Flow
 
@@ -51,7 +51,7 @@ Model cards map to existing capabilities:
 | Model | Initial settings | Purpose |
 | --- | --- | --- |
 | Standard | Current default poster layout | Safe first choice |
-| Frame | Current layout with framed artwork feel | Closer to Posterfy's frame option |
+| Frame | Current layout with framed artwork feel | Framed poster option |
 | Basic | Simplified text/artwork emphasis | Minimal poster |
 | Full Cover | Artwork-forward layout/background | Strong visual album-cover style |
 
@@ -59,7 +59,7 @@ Selecting a model applies a draft patch and advances to editing. The user can go
 
 ### 4. Editor Workspace
 
-The editor should feel like Posterfy's creation workspace, not the current full accordion stack.
+The editor should feel like a focused creation workspace, not the current full accordion stack.
 
 - Preview stays visible during editing.
 - Controls sit in a compact panel with top tabs.
