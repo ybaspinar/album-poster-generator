@@ -3,7 +3,7 @@
 
 @custom-variant dark (&:is(.dark *));
 
-::root {
+:root {
   color-scheme: light;
   --brand-bg: #fafaf7;
   --brand-panel: #f2f1ee;
@@ -61,6 +61,15 @@
 }
 
 .dark {
+  color-scheme: dark;
+  --brand-bg: #0f1419;
+  --brand-panel: #151b22;
+  --brand-text: #e6edf3;
+  --brand-muted: #9aa7b2;
+  --brand-soft: #687786;
+  --brand-line: #24303a;
+  --brand-accent: #8fb4d8;
+
   --background: var(--brand-bg);
   --foreground: var(--brand-text);
   --card: var(--brand-panel);
@@ -93,49 +102,7 @@
   --sidebar-accent-foreground: var(--brand-text);
   --sidebar-border: var(--brand-line);
   --sidebar-ring: var(--brand-accent);
-  .dark {
-    color-scheme: dark;
-    --brand-bg: #0f1419;
-    --brand-panel: #151b22;
-    --brand-text: #e6edf3;
-    --brand-muted: #9aa7b2;
-    --brand-soft: #687786;
-    --brand-line: #24303a;
-    --brand-accent: #8fb4d8;
 
-    --background: var(--brand-bg);
-    --foreground: var(--brand-text);
-    --card: var(--brand-panel);
-    --card-foreground: var(--brand-text);
-    --popover: var(--brand-panel);
-    --popover-foreground: var(--brand-text);
-    --primary: var(--brand-accent);
-    --primary-foreground: var(--brand-bg);
-    --secondary: #1b242d;
-    --secondary-foreground: var(--brand-text);
-    --muted: #1b242d;
-    --muted-foreground: var(--brand-muted);
-    --accent: #1f2a34;
-    --accent-foreground: var(--brand-text);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: var(--brand-text);
-    --border: var(--brand-line);
-    --input: var(--brand-line);
-    --ring: var(--brand-accent);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: var(--brand-panel);
-    --sidebar-foreground: var(--brand-text);
-    --sidebar-primary: var(--brand-accent);
-    --sidebar-primary-foreground: var(--brand-bg);
-    --sidebar-accent: #1f2a34;
-    --sidebar-accent-foreground: var(--brand-text);
-    --sidebar-border: var(--brand-line);
-    --sidebar-ring: var(--brand-accent);
-  }
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
@@ -144,16 +111,15 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
+    outline-color: var(--ring);
   }
 
   body {
     min-width: 320px;
     min-height: 100vh;
-    background:
-      radial-gradient(circle at 20% 0%, rgb(143 180 216 / 10%), transparent 34rem),
-      linear-gradient(180deg, #121a22 0%, var(--brand-bg) 22rem);
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
   }
 }
 

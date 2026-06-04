@@ -10,6 +10,6 @@ describe("brand tokens", () => {
     expect(css).toContain("--brand-bg: #0f1419");
     expect(css).toContain("--brand-panel: #151b22");
     expect(css).toContain("--brand-accent: #8fb4d8");
-    expect(css).toContain("radial-gradient(circle at 20% 0%, rgb(143 180 216 / 10%)");
+    expect(css).toContain("background-color: var(--background)");
   });
 });
