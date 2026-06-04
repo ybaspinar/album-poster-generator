@@ -98,22 +98,37 @@ describe("AlbumEditor", () => {
     ]);
   });
 
-  it("renders controls for the active editor task", async () => {
-    const wrapper = mount(AlbumEditor, {
+  it("renders controls for the active editor task", () => {
+    const draft = createAlbumDraft({ title: "Starboy", artist: "The Weeknd" });
+    const informationWrapper = mount(AlbumEditor, {
       props: {
         activeTab: "information",
-        draft: createAlbumDraft({ title: "Starboy", artist: "The Weeknd" }),
+        draft,
       },
     });
 
-    expect(wrapper.find('[data-test="editor-panel-information"]').text()).toContain("Title");
-    expect(wrapper.find('[data-test="editor-panel-tracklist"]').isVisible()).toBe(false);
+    expect(informationWrapper.find('[data-test="editor-panel-information"]').text()).toContain(
+      "Title",
+    );
+    expect(informationWrapper.find('[data-test="editor-panel-tracklist"]').isVisible()).toBe(false);
 
-    await wrapper.setProps({ activeTab: "tracklist" });
-    expect(wrapper.find('[data-test="editor-panel-tracklist"]').text()).toContain("Tracklist");
+    const tracklistWrapper = mount(AlbumEditor, {
+      props: {
+        activeTab: "tracklist",
+        draft,
+      },
+    });
+    expect(tracklistWrapper.find('[data-test="editor-panel-tracklist"]').text()).toContain(
+      "Tracklist",
+    );
 
-    await wrapper.setProps({ activeTab: "style" });
-    expect(wrapper.find('[data-test="editor-panel-style"]').text()).toContain("Font");
-    expect(wrapper.find('[data-test="editor-panel-style"]').text()).toContain("Background");
+    const styleWrapper = mount(AlbumEditor, {
+      props: {
+        activeTab: "style",
+        draft,
+      },
+    });
+    expect(styleWrapper.find('[data-test="editor-panel-style"]').text()).toContain("Font");
+    expect(styleWrapper.find('[data-test="editor-panel-style"]').text()).toContain("Background");
   });
 });

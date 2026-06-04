@@ -13,6 +13,7 @@
 ### Task 1: Add background types and defaults to domain model
 
 **Files:**
+
 - Modify: `src/domain/album.ts`
 
 - [ ] **Step 1: Add new types and default constants**
@@ -35,12 +36,12 @@ export const defaultBackgroundGradientDirection: GradientDirection = "vertical";
 In the `AlbumDraft` interface, after `layout`:
 
 ```ts
-  backgroundMode: PosterBackgroundMode;
-  backgroundSolidColor: string;
-  backgroundGradientFrom: string;
-  backgroundGradientTo: string;
-  backgroundGradientDirection: GradientDirection;
-  backgroundBlur: boolean;
+backgroundMode: PosterBackgroundMode;
+backgroundSolidColor: string;
+backgroundGradientFrom: string;
+backgroundGradientTo: string;
+backgroundGradientDirection: GradientDirection;
+backgroundBlur: boolean;
 ```
 
 - [ ] **Step 3: Add background fields to `AlbumDraftInput`**
@@ -87,6 +88,7 @@ git commit -m "feat(domain): add background mode types and defaults"
 ### Task 2: Add background localStorage persistence to Pinia store
 
 **Files:**
+
 - Modify: `src/stores/album.ts`
 
 - [ ] **Step 1: Add localStorage key and helper functions**
@@ -138,10 +140,7 @@ import type {
   PosterBackgroundMode,
   PosterLayout,
 } from "../domain/album";
-import {
-  createAlbumDraft,
-  defaultPosterLayout,
-} from "../domain/album";
+import { createAlbumDraft, defaultPosterLayout } from "../domain/album";
 ```
 
 - [ ] **Step 3: Apply saved background on draft creation**
@@ -180,17 +179,17 @@ const draft = ref<AlbumDraft>(
 After the `patch.layout` check block inside `patchDraft`, add:
 
 ```ts
-    if (typeof patch.backgroundMode === "string" || typeof patch.backgroundBlur === "boolean") {
-      const current = draft.value;
-      writeBackgroundPreference({
-        mode: patch.backgroundMode ?? current.backgroundMode,
-        solidColor: patch.backgroundSolidColor ?? current.backgroundSolidColor,
-        gradientFrom: patch.backgroundGradientFrom ?? current.backgroundGradientFrom,
-        gradientTo: patch.backgroundGradientTo ?? current.backgroundGradientTo,
-        gradientDirection: patch.backgroundGradientDirection ?? current.backgroundGradientDirection,
-        blur: patch.backgroundBlur ?? current.backgroundBlur,
-      });
-    }
+if (typeof patch.backgroundMode === "string" || typeof patch.backgroundBlur === "boolean") {
+  const current = draft.value;
+  writeBackgroundPreference({
+    mode: patch.backgroundMode ?? current.backgroundMode,
+    solidColor: patch.backgroundSolidColor ?? current.backgroundSolidColor,
+    gradientFrom: patch.backgroundGradientFrom ?? current.backgroundGradientFrom,
+    gradientTo: patch.backgroundGradientTo ?? current.backgroundGradientTo,
+    gradientDirection: patch.backgroundGradientDirection ?? current.backgroundGradientDirection,
+    blur: patch.backgroundBlur ?? current.backgroundBlur,
+  });
+}
 ```
 
 - [ ] **Step 5: Verify types compile**
@@ -210,6 +209,7 @@ git commit -m "feat(store): persist background settings to localStorage"
 ### Task 3: Add background CSS classes
 
 **Files:**
+
 - Modify: `src/styles/globals.css`
 
 - [ ] **Step 1: Remove hardcoded background from `.poster-page` and add CSS custom property defaults**
@@ -312,6 +312,7 @@ git commit -m "feat(styles): add background frosted and artwork mode CSS"
 ### Task 4: Render backgrounds in PosterPreview
 
 **Files:**
+
 - Modify: `src/components/PosterPreview.vue`
 
 - [ ] **Step 1: Add computed for background style and classes**
@@ -355,25 +356,25 @@ const backgroundClasses = computed(() => {
 Change the `<article>` opening tag from:
 
 ```html
-  <article
-    data-export-poster
-    class="poster-page"
-    :class="[fontClass, layoutClass]"
-    aria-label="Album poster preview"
-    :style="{ fontFamily: getFontFamily(draft.font) }"
-  >
+<article
+  data-export-poster
+  class="poster-page"
+  :class="[fontClass, layoutClass]"
+  aria-label="Album poster preview"
+  :style="{ fontFamily: getFontFamily(draft.font) }"
+></article>
 ```
 
 To:
 
 ```html
-  <article
-    data-export-poster
-    class="poster-page"
-    :class="[fontClass, layoutClass, backgroundClasses]"
-    aria-label="Album poster preview"
-    :style="[{ fontFamily: getFontFamily(draft.font) }, backgroundStyle]"
-  >
+<article
+  data-export-poster
+  class="poster-page"
+  :class="[fontClass, layoutClass, backgroundClasses]"
+  aria-label="Album poster preview"
+  :style="[{ fontFamily: getFontFamily(draft.font) }, backgroundStyle]"
+></article>
 ```
 
 - [ ] **Step 3: Hide artwork frame when mode is artwork**
@@ -397,6 +398,7 @@ git commit -m "feat(poster): render background modes and frosted blur"
 ### Task 5: Add Background card in AlbumEditor
 
 **Files:**
+
 - Modify: `src/components/AlbumEditor.vue`
 
 - [ ] **Step 1: Add new type imports**
@@ -451,106 +453,100 @@ function updateBackgroundBlur(event: Event): void {
 Insert a new `<AccordionItem>` between the Swatches card and the Layout card. The new card should have value `"background"`:
 
 ```html
-    <AccordionItem value="background">
-      <Card>
-        <AccordionTrigger header="Background" />
-        <AccordionContent>
-          <div class="grid gap-3 px-1">
-            <div class="grid gap-2">
-              <Label for="poster-background-mode">Mode</Label>
-              <Select
-                :model-value="draft.backgroundMode"
-                @update:model-value="updateBackgroundMode"
-              >
-                <SelectTrigger id="poster-background-mode" class="w-full">
-                  <SelectValue placeholder="Select background" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="default">Default</SelectItem>
-                    <SelectItem value="solid">Solid</SelectItem>
-                    <SelectItem value="gradient">Gradient</SelectItem>
-                    <SelectItem value="artwork">Artwork</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
+<AccordionItem value="background">
+  <Card>
+    <AccordionTrigger header="Background" />
+    <AccordionContent>
+      <div class="grid gap-3 px-1">
+        <div class="grid gap-2">
+          <label for="poster-background-mode">Mode</label>
+          <select :model-value="draft.backgroundMode" @update:model-value="updateBackgroundMode">
+            <SelectTrigger id="poster-background-mode" class="w-full">
+              <SelectValue placeholder="Select background" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="default">Default</SelectItem>
+                <SelectItem value="solid">Solid</SelectItem>
+                <SelectItem value="gradient">Gradient</SelectItem>
+                <SelectItem value="artwork">Artwork</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </select>
+        </div>
 
-            <div v-if="draft.backgroundMode === 'solid'" class="grid gap-2">
-              <Label for="poster-background-color">Background color</Label>
-              <Input
-                id="poster-background-color"
+        <div v-if="draft.backgroundMode === 'solid'" class="grid gap-2">
+          <label for="poster-background-color">Background color</label>
+          <input
+            id="poster-background-color"
+            type="color"
+            class="h-10 p-1"
+            :model-value="draft.backgroundSolidColor"
+            @update:model-value="updateBackgroundSolidColor"
+          />
+        </div>
+
+        <template v-if="draft.backgroundMode === 'gradient'">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="grid gap-2">
+              <label for="poster-bg-from">From</label>
+              <input
+                id="poster-bg-from"
                 type="color"
                 class="h-10 p-1"
-                :model-value="draft.backgroundSolidColor"
-                @update:model-value="updateBackgroundSolidColor"
+                :model-value="draft.backgroundGradientFrom"
+                @update:model-value="updateBackgroundGradientFrom"
               />
             </div>
-
-            <template v-if="draft.backgroundMode === 'gradient'">
-              <div class="grid grid-cols-2 gap-3">
-                <div class="grid gap-2">
-                  <Label for="poster-bg-from">From</Label>
-                  <Input
-                    id="poster-bg-from"
-                    type="color"
-                    class="h-10 p-1"
-                    :model-value="draft.backgroundGradientFrom"
-                    @update:model-value="updateBackgroundGradientFrom"
-                  />
-                </div>
-                <div class="grid gap-2">
-                  <Label for="poster-bg-to">To</Label>
-                  <Input
-                    id="poster-bg-to"
-                    type="color"
-                    class="h-10 p-1"
-                    :model-value="draft.backgroundGradientTo"
-                    @update:model-value="updateBackgroundGradientTo"
-                  />
-                </div>
-              </div>
-              <div class="grid gap-2">
-                <Label for="poster-bg-direction">Direction</Label>
-                <Select
-                  :model-value="draft.backgroundGradientDirection"
-                  @update:model-value="updateBackgroundGradientDirection"
-                >
-                  <SelectTrigger id="poster-bg-direction" class="w-full">
-                    <SelectValue placeholder="Direction" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectItem value="horizontal">Horizontal</SelectItem>
-                      <SelectItem value="vertical">Vertical</SelectItem>
-                      <SelectItem value="radial">Radial</SelectItem>
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-            </template>
-
-            <div
-              v-if="draft.backgroundMode === 'artwork'"
-              class="text-sm text-muted-foreground"
-            >
-              Album artwork will fill the poster background. Caption will remain on top.
-            </div>
-
-            <div class="flex items-center gap-2 pt-1">
+            <div class="grid gap-2">
+              <label for="poster-bg-to">To</label>
               <input
-                id="poster-bg-blur"
-                type="checkbox"
-                class="size-4 rounded border-input accent-primary"
-                :checked="draft.backgroundBlur"
-                @change="updateBackgroundBlur"
+                id="poster-bg-to"
+                type="color"
+                class="h-10 p-1"
+                :model-value="draft.backgroundGradientTo"
+                @update:model-value="updateBackgroundGradientTo"
               />
-              <Label for="poster-bg-blur" class="text-sm font-medium">Frosted overlay</Label>
             </div>
           </div>
-        </AccordionContent>
-      </Card>
-    </AccordionItem>
+          <div class="grid gap-2">
+            <label for="poster-bg-direction">Direction</label>
+            <select
+              :model-value="draft.backgroundGradientDirection"
+              @update:model-value="updateBackgroundGradientDirection"
+            >
+              <SelectTrigger id="poster-bg-direction" class="w-full">
+                <SelectValue placeholder="Direction" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="horizontal">Horizontal</SelectItem>
+                  <SelectItem value="vertical">Vertical</SelectItem>
+                  <SelectItem value="radial">Radial</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </select>
+          </div>
+        </template>
+
+        <div v-if="draft.backgroundMode === 'artwork'" class="text-sm text-muted-foreground">
+          Album artwork will fill the poster background. Caption will remain on top.
+        </div>
+
+        <div class="flex items-center gap-2 pt-1">
+          <input
+            id="poster-bg-blur"
+            type="checkbox"
+            class="size-4 rounded border-input accent-primary"
+            :checked="draft.backgroundBlur"
+            @change="updateBackgroundBlur"
+          />
+          <label for="poster-bg-blur" class="text-sm font-medium">Frosted overlay</label>
+        </div>
+      </div>
+    </AccordionContent>
+  </Card>
+</AccordionItem>
 ```
 
 - [ ] **Step 4: Update default-value to include background**

@@ -13,6 +13,7 @@
 ### Task 1: Add PosterLayout type and default to domain model
 
 **Files:**
+
 - Modify: `src/domain/album.ts`
 
 - [ ] **Step 1: Add the type and default constant**
@@ -38,7 +39,7 @@ In the `AlbumDraftInput` interface, add:
 In the `AlbumDraft` interface (after `font`):
 
 ```ts
-  layout: PosterLayout;
+layout: PosterLayout;
 ```
 
 - [ ] **Step 4: Add default in `createAlbumDraft`**
@@ -68,6 +69,7 @@ git commit -m "feat(domain): add PosterLayout type and default"
 ### Task 2: Persist layout preference in Pinia store
 
 **Files:**
+
 - Modify: `src/stores/album.ts`
 
 - [ ] **Step 1: Add localStorage key constant**
@@ -86,7 +88,12 @@ After the `writeShowTracklistPreference` function:
 function readLayoutPreference(): PosterLayout {
   try {
     const stored = window.localStorage.getItem(layoutPreferenceKey);
-    if (stored === "small" || stored === "medium" || stored === "large" || stored === "edge-to-edge") {
+    if (
+      stored === "small" ||
+      stored === "medium" ||
+      stored === "large" ||
+      stored === "edge-to-edge"
+    ) {
       return stored;
     }
   } catch {
@@ -131,9 +138,9 @@ const draft = ref<AlbumDraft>(
 In the `patchDraft` function, after the `showTracklist` check block, add:
 
 ```ts
-    if (typeof patch.layout === "string") {
-      writeLayoutPreference(patch.layout);
-    }
+if (typeof patch.layout === "string") {
+  writeLayoutPreference(patch.layout);
+}
 ```
 
 - [ ] **Step 6: Verify types compile**
@@ -153,6 +160,7 @@ git commit -m "feat(store): persist poster layout preference to localStorage"
 ### Task 3: Add layout CSS classes
 
 **Files:**
+
 - Modify: `src/styles/globals.css`
 
 - [ ] **Step 1: Add layout override classes after the `.poster-page` block**
@@ -196,6 +204,7 @@ git commit -m "feat(styles): add poster layout CSS classes"
 ### Task 4: Bind layout class in PosterPreview
 
 **Files:**
+
 - Modify: `src/components/PosterPreview.vue`
 
 - [ ] **Step 1: Add a computed for the layout class**
@@ -247,6 +256,7 @@ git commit -m "feat(poster): bind layout CSS class to poster page"
 ### Task 5: Add Layout Select dropdown in AlbumEditor
 
 **Files:**
+
 - Modify: `src/components/AlbumEditor.vue`
 
 - [ ] **Step 1: Add layout type imports**
@@ -280,29 +290,29 @@ function updateLayout(value: string): void {
 Replace the entire `<AccordionItem value="layout">...</AccordionItem>` block with:
 
 ```html
-    <AccordionItem value="layout">
-      <Card>
-        <AccordionTrigger header="Layout" />
-        <AccordionContent>
-          <div class="grid gap-2 px-1">
-            <Label for="poster-layout">Spacing</Label>
-            <Select :model-value="draft.layout" @update:model-value="updateLayout">
-              <SelectTrigger id="poster-layout" class="w-full">
-                <SelectValue placeholder="Select layout" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="small">Small</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="large">Large</SelectItem>
-                  <SelectItem value="edge-to-edge">Edge to Edge</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-        </AccordionContent>
-      </Card>
-    </AccordionItem>
+<AccordionItem value="layout">
+  <Card>
+    <AccordionTrigger header="Layout" />
+    <AccordionContent>
+      <div class="grid gap-2 px-1">
+        <label for="poster-layout">Spacing</label>
+        <select :model-value="draft.layout" @update:model-value="updateLayout">
+          <SelectTrigger id="poster-layout" class="w-full">
+            <SelectValue placeholder="Select layout" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="small">Small</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="large">Large</SelectItem>
+              <SelectItem value="edge-to-edge">Edge to Edge</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </select>
+      </div>
+    </AccordionContent>
+  </Card>
+</AccordionItem>
 ```
 
 - [ ] **Step 4: Verify types compile**

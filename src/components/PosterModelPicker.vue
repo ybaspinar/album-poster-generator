@@ -32,7 +32,9 @@ const selectedModel = computed(() => props.selectedModelId);
       </Button>
       <div class="grid gap-1">
         <CardTitle class="text-3xl tracking-tight">Choose a poster model</CardTitle>
-        <CardDescription>Select a starting point. You can still edit every field after this.</CardDescription>
+        <CardDescription
+          >Select a starting point. You can still edit every field after this.</CardDescription
+        >
       </div>
     </CardHeader>
 
@@ -48,8 +50,12 @@ const selectedModel = computed(() => props.selectedModelId);
         ]"
         @click="emit('selectModel', model.id)"
       >
-        <span class="grid aspect-[3/4] place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-4 shadow-inner">
-          <span class="grid h-full w-full content-between rounded-lg border border-white/15 bg-gradient-to-b from-zinc-800 to-zinc-950 p-3">
+        <span
+          class="grid aspect-[3/4] place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-4 shadow-inner"
+        >
+          <span
+            class="grid h-full w-full content-between rounded-lg border border-white/15 bg-gradient-to-b from-zinc-800 to-zinc-950 p-3"
+          >
             <span class="mx-auto size-16 rounded-2xl bg-white/80" />
             <span class="grid gap-1">
               <span class="h-3 w-4/5 rounded-full bg-white/80" />

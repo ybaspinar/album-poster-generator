@@ -112,7 +112,9 @@ describe("App flow", () => {
         .map((input) => input.element.value),
     ).toEqual(["#112233", "#445566", "#778899", "#aabbcc", "#ddeeff", "#010203"]);
 
-    const editorTitleInput = wrapper.find('[data-test="creator-editor-step"] [data-test="title-input"]');
+    const editorTitleInput = wrapper.find(
+      '[data-test="creator-editor-step"] [data-test="title-input"]',
+    );
     expect(editorTitleInput.exists()).toBe(true);
     await editorTitleInput.setValue("My Custom Poster Title");
 

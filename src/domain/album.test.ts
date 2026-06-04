@@ -131,7 +131,7 @@ describe("album draft model", () => {
         artist: {
           color: "bad",
           size: 200,
-          weight: 123,
+          weight: 123 as never,
           italic: true,
           uppercase: false,
         },

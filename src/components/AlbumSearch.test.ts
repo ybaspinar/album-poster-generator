@@ -80,7 +80,6 @@ describe("AlbumSearch", () => {
     });
   });
 
-
   it("offers manual start and renders artwork-first result cards", async () => {
     const wrapper = mount(AlbumSearch);
 

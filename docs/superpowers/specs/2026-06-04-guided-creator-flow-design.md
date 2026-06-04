@@ -48,12 +48,12 @@ After an album is loaded, show a model picker before exposing detailed controls.
 
 Model cards map to existing capabilities:
 
-| Model | Initial settings | Purpose |
-| --- | --- | --- |
-| Standard | Current default poster layout | Safe first choice |
-| Frame | Current layout with framed artwork feel | Framed poster option |
-| Basic | Simplified text/artwork emphasis | Minimal poster |
-| Full Cover | Artwork-forward layout/background | Strong visual album-cover style |
+| Model      | Initial settings                        | Purpose                         |
+| ---------- | --------------------------------------- | ------------------------------- |
+| Standard   | Current default poster layout           | Safe first choice               |
+| Frame      | Current layout with framed artwork feel | Framed poster option            |
+| Basic      | Simplified text/artwork emphasis        | Minimal poster                  |
+| Full Cover | Artwork-forward layout/background       | Strong visual album-cover style |
 
 Selecting a model applies a draft patch and advances to editing. The user can go back to choose a different model.
 
@@ -69,12 +69,12 @@ The editor should feel like a focused creation workspace, not the current full a
 
 Top tabs:
 
-| Tab | Fields |
-| --- | --- |
+| Tab         | Fields                                                         |
+| ----------- | -------------------------------------------------------------- |
 | Information | Title, artist, release date, metadata line, artwork URL/upload |
-| Tracklist | Tracklist text, show tracklist, columns, tracklist size |
-| Style | Font, typography, swatches, background, layout |
-| Export | Preset selection and PNG export action |
+| Tracklist   | Tracklist text, show tracklist, columns, tracklist size        |
+| Style       | Font, typography, swatches, background, layout                 |
+| Export      | Preset selection and PNG export action                         |
 
 The old accordion grouping can be removed or internalized once all fields are reachable through the tabs.
 

@@ -29,6 +29,7 @@
 ### Task 1: Add poster model definitions
 
 **Files:**
+
 - Create: `src/domain/poster-models.ts`
 - Create: `src/domain/poster-models.test.ts`
 
@@ -214,6 +215,7 @@ git commit -m "Add poster model presets"
 ### Task 2: Add visual model picker
 
 **Files:**
+
 - Create: `src/components/PosterModelPicker.vue`
 - Create: `src/components/PosterModelPicker.test.ts`
 
@@ -301,7 +303,9 @@ const selectedModel = computed(() => props.selectedModelId);
       </Button>
       <div class="grid gap-1">
         <CardTitle class="text-3xl tracking-tight">Choose a poster model</CardTitle>
-        <CardDescription>Select a starting point. You can still edit every field after this.</CardDescription>
+        <CardDescription
+          >Select a starting point. You can still edit every field after this.</CardDescription
+        >
       </div>
     </CardHeader>
 
@@ -317,8 +321,12 @@ const selectedModel = computed(() => props.selectedModelId);
         ]"
         @click="emit('selectModel', model.id)"
       >
-        <span class="grid aspect-[3/4] place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-4 shadow-inner">
-          <span class="grid h-full w-full content-between rounded-lg border border-white/15 bg-gradient-to-b from-zinc-800 to-zinc-950 p-3">
+        <span
+          class="grid aspect-[3/4] place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-4 shadow-inner"
+        >
+          <span
+            class="grid h-full w-full content-between rounded-lg border border-white/15 bg-gradient-to-b from-zinc-800 to-zinc-950 p-3"
+          >
             <span class="mx-auto size-16 rounded-2xl bg-white/80" />
             <span class="grid gap-1">
               <span class="h-3 w-4/5 rounded-full bg-white/80" />
@@ -364,6 +372,7 @@ git commit -m "Add poster model picker"
 ### Task 3: Make album search feel like a creator start
 
 **Files:**
+
 - Modify: `src/components/AlbumSearch.vue`
 - Modify: `src/components/AlbumSearch.test.ts`
 
@@ -489,6 +498,7 @@ git commit -m "Simplify album search start"
 ### Task 4: Convert AlbumEditor from accordion to top tabs
 
 **Files:**
+
 - Modify: `src/components/AlbumEditor.vue`
 - Modify: `src/components/AlbumEditor.test.ts`
 
@@ -587,7 +597,11 @@ Use the existing field markup and update only the section wrappers:
 Information panel wraps the current Info and Artwork fields:
 
 ```vue
-<div v-show="props.activeTab === 'information'" data-test="editor-panel-information" class="grid gap-4">
+<div
+  v-show="props.activeTab === 'information'"
+  data-test="editor-panel-information"
+  class="grid gap-4"
+>
   <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
     <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">Album details</h3>
     Move the current Info field grid into this section without changing field bindings.
@@ -656,6 +670,7 @@ git commit -m "Group album editor controls into tabs"
 ### Task 5: Wire the guided flow in App
 
 **Files:**
+
 - Modify: `src/App.vue`
 - Modify: `src/components/AppFlow.test.ts`
 - Modify: `src/components/AppLayout.test.ts`
@@ -699,7 +714,9 @@ it("searches, selects an album, chooses a model, edits details, and exports from
     "Feel the Love\nFire",
   );
 
-  const editorTitleInput = wrapper.find('[data-test="creator-editor-step"] [data-test="title-input"]');
+  const editorTitleInput = wrapper.find(
+    '[data-test="creator-editor-step"] [data-test="title-input"]',
+  );
   await editorTitleInput.setValue("My Custom Poster Title");
 
   expect(wrapper.text()).toContain("My Custom Poster Title");
@@ -938,6 +955,7 @@ In `src/App.vue`, replace the top workspace structure that renders the hero card
 - [ ] **Step 5: Update App layout test**
 
 In `src/components/AppLayout.test.ts`, replace the old desktop-column assertion with:
+
 ```ts
 expect(wrapper.find('[data-test="app-workspace"]').classes().join(" ")).toContain("max-w-[112rem]");
 expect(wrapper.find('[data-test="creator-search-step"]').exists()).toBe(true);
@@ -967,6 +985,7 @@ git commit -m "Wire guided creator flow"
 ### Task 6: Final focused verification
 
 **Files:**
+
 - Verify only changed tests and the project checks after all implementation tasks are complete.
 
 - [ ] **Step 1: Run changed test files**

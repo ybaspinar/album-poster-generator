@@ -260,7 +260,11 @@ async function exportPoster(): Promise<void> {
         <AlbumSearch @manual-start="startManualDraft" @select="selectAlbum" />
       </section>
 
-      <section v-else-if="creatorStep === 'models'" data-test="creator-models-step" class="grid gap-5">
+      <section
+        v-else-if="creatorStep === 'models'"
+        data-test="creator-models-step"
+        class="grid gap-5"
+      >
         <PosterModelPicker
           :selected-model-id="selectedModelId"
           @back="backToSearch"
@@ -285,12 +289,21 @@ async function exportPoster(): Promise<void> {
         data-test="creator-editor-step"
         class="grid gap-6 lg:grid-cols-[minmax(0,0.95fr)_440px] lg:items-start xl:grid-cols-[minmax(0,1fr)_480px]"
       >
-        <section data-test="preview-stage" class="min-w-0 lg:sticky lg:top-10 lg:min-h-[calc(100vh-6rem)]">
-          <Card class="min-h-full border-border/80 bg-card/80 shadow-2xl shadow-black/20 backdrop-blur">
-            <CardHeader class="flex flex-row items-center justify-between gap-3 border-b border-border/70">
+        <section
+          data-test="preview-stage"
+          class="min-w-0 lg:sticky lg:top-10 lg:min-h-[calc(100vh-6rem)]"
+        >
+          <Card
+            class="min-h-full border-border/80 bg-card/80 shadow-2xl shadow-black/20 backdrop-blur"
+          >
+            <CardHeader
+              class="flex flex-row items-center justify-between gap-3 border-b border-border/70"
+            >
               <div>
                 <CardTitle>Preview</CardTitle>
-                <CardDescription>Only the poster surface is captured during PNG export.</CardDescription>
+                <CardDescription
+                  >Only the poster surface is captured during PNG export.</CardDescription
+                >
               </div>
               <Button
                 data-test="editor-back-button"
@@ -301,7 +314,9 @@ async function exportPoster(): Promise<void> {
                 Back
               </Button>
             </CardHeader>
-            <CardContent class="grid min-h-[calc(100vh-14rem)] place-items-center overflow-auto p-6 xl:p-10 2xl:p-12">
+            <CardContent
+              class="grid min-h-[calc(100vh-14rem)] place-items-center overflow-auto p-6 xl:p-10 2xl:p-12"
+            >
               <PosterPreview :draft="draft" />
             </CardContent>
           </Card>
@@ -312,7 +327,11 @@ async function exportPoster(): Promise<void> {
             <button
               data-test="creator-tab-information"
               type="button"
-              :class="activeEditorTab === 'information' ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm' : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'"
+              :class="
+                activeEditorTab === 'information'
+                  ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm'
+                  : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'
+              "
               @click="selectEditorTab('information')"
             >
               Information
@@ -320,7 +339,11 @@ async function exportPoster(): Promise<void> {
             <button
               data-test="creator-tab-tracklist"
               type="button"
-              :class="activeEditorTab === 'tracklist' ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm' : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'"
+              :class="
+                activeEditorTab === 'tracklist'
+                  ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm'
+                  : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'
+              "
               @click="selectEditorTab('tracklist')"
             >
               Tracklist
@@ -328,7 +351,11 @@ async function exportPoster(): Promise<void> {
             <button
               data-test="creator-tab-style"
               type="button"
-              :class="activeEditorTab === 'style' ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm' : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'"
+              :class="
+                activeEditorTab === 'style'
+                  ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm'
+                  : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'
+              "
               @click="selectEditorTab('style')"
             >
               Style
@@ -336,7 +363,11 @@ async function exportPoster(): Promise<void> {
             <button
               data-test="creator-tab-export"
               type="button"
-              :class="activeEditorTab === 'export' ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm' : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'"
+              :class="
+                activeEditorTab === 'export'
+                  ? 'rounded-xl bg-background px-3 py-2 text-sm font-semibold text-foreground shadow-sm'
+                  : 'rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:text-foreground'
+              "
               @click="selectEditorTab('export')"
             >
               Export

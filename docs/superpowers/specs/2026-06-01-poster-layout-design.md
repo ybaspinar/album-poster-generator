@@ -11,12 +11,12 @@ Add a layout selector to the Layout accordion section that controls internal spa
 
 Each preset controls only the outer padding of the poster. Internal element spacing (rule, meta row, tracklist margins, etc.) stays exactly the same — only the outer frame changes.
 
-| Option | `.poster-page` padding | `.poster-caption` padding | Behavior |
-|--------|----------------------|--------------------------|----------|
-| **Small** | `3% 4%` | unchanged (current) | Tighter outer frame |
-| **Medium** | `5.5% 7.5%` (current default) | unchanged (current) | The current look |
-| **Large** | `7% 10%` | unchanged (current) | More breathing room |
-| **Edge to Edge** | `0` | `0 3% 3%` (overrides current `padding-top`) | Artwork bleeds to edges, caption has small left/right/bottom inset |
+| Option           | `.poster-page` padding        | `.poster-caption` padding                   | Behavior                                                           |
+| ---------------- | ----------------------------- | ------------------------------------------- | ------------------------------------------------------------------ |
+| **Small**        | `3% 4%`                       | unchanged (current)                         | Tighter outer frame                                                |
+| **Medium**       | `5.5% 7.5%` (current default) | unchanged (current)                         | The current look                                                   |
+| **Large**        | `7% 10%`                      | unchanged (current)                         | More breathing room                                                |
+| **Edge to Edge** | `0`                           | `0 3% 3%` (overrides current `padding-top`) | Artwork bleeds to edges, caption has small left/right/bottom inset |
 
 Key nuance for Edge to Edge: the artwork fills the full poster surface edge-to-edge (no outer padding at all). The caption section (title, artist, meta, tracklist) gets its own left/right/bottom padding of `3%` so info doesn't touch the border. Internal element spacing within the caption stays the same as every other layout — only the outer frame changes.
 

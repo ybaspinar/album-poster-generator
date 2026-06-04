@@ -244,7 +244,11 @@ function fontLabel(font: PosterFont): string {
 
 <template>
   <section class="grid gap-4" data-test="album-editor-panels">
-    <div v-show="props.activeTab === 'information'" data-test="editor-panel-information" class="grid gap-4">
+    <div
+      v-show="props.activeTab === 'information'"
+      data-test="editor-panel-information"
+      class="grid gap-4"
+    >
       <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
         <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Album details
@@ -317,7 +321,11 @@ function fontLabel(font: PosterFont): string {
       </section>
     </div>
 
-    <div v-show="props.activeTab === 'tracklist'" data-test="editor-panel-tracklist" class="grid gap-4">
+    <div
+      v-show="props.activeTab === 'tracklist'"
+      data-test="editor-panel-tracklist"
+      class="grid gap-4"
+    >
       <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
         <div class="grid gap-3 px-1">
           <div class="grid gap-2">
@@ -370,7 +378,10 @@ function fontLabel(font: PosterFont): string {
               </div>
               <div class="grid gap-2">
                 <Label for="poster-tracklist-size">Tracklist size</Label>
-                <Select :model-value="draft.tracklistSize" @update:model-value="updateTracklistSize">
+                <Select
+                  :model-value="draft.tracklistSize"
+                  @update:model-value="updateTracklistSize"
+                >
                   <SelectTrigger id="poster-tracklist-size" class="w-full">
                     <SelectValue placeholder="Size" />
                   </SelectTrigger>
@@ -644,10 +655,10 @@ function fontLabel(font: PosterFont): string {
             </div>
             <div class="grid gap-2">
               <div class="flex items-center justify-between gap-3">
-                <Label for="poster-bg-blur-amount" class="text-sm font-medium">
-                  Blur level
-                </Label>
-                <span class="text-xs text-muted-foreground">{{ draft.backgroundBlurAmount }}px</span>
+                <Label for="poster-bg-blur-amount" class="text-sm font-medium"> Blur level </Label>
+                <span class="text-xs text-muted-foreground"
+                  >{{ draft.backgroundBlurAmount }}px</span
+                >
               </div>
               <Input
                 id="poster-bg-blur-amount"

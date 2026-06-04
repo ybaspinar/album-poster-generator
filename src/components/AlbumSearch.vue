@@ -327,7 +327,9 @@ function selectResult(album: AlbumDraftInput): void {
           ]"
           @click="selectResult(result)"
         >
-          <span class="grid aspect-square place-items-center overflow-hidden bg-muted text-xs font-bold uppercase tracking-wider text-muted-foreground">
+          <span
+            class="grid aspect-square place-items-center overflow-hidden bg-muted text-xs font-bold uppercase tracking-wider text-muted-foreground"
+          >
             <img
               v-if="result.artworkUrl"
               :src="result.artworkUrl"
@@ -338,7 +340,9 @@ function selectResult(album: AlbumDraftInput): void {
             <span v-else>No art</span>
           </span>
           <span class="grid min-w-0 gap-1 p-3">
-            <strong class="truncate text-sm font-semibold text-foreground">{{ result.title }}</strong>
+            <strong class="truncate text-sm font-semibold text-foreground">{{
+              result.title
+            }}</strong>
             <span class="truncate text-sm font-normal text-muted-foreground">
               {{ result.artist || "Unknown artist" }} &middot;
               {{ result.releaseDate || "Unknown date" }}

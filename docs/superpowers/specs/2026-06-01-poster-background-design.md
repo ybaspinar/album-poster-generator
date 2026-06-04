@@ -6,17 +6,18 @@
 ## Goal
 
 Add a new **Background** accordion card with two independent controls:
+
 1. **Background mode** — Default / Solid / Gradient / Artwork
 2. **Frosted blur toggle** — applies a frosted overlay on top of any background mode
 
 ## Background Modes
 
-| Mode | Behavior |
-|------|----------|
-| **Default** | Current design — solid `--paper` color, artwork in frame, caption on top. No extra UI. |
-| **Solid** | Single color picker replaces `--paper` background. Artwork frame and caption unchanged. |
-| **Gradient** | Two color pickers + direction dropdown (horizontal / vertical / radial). Replaces `--paper` background. |
-| **Artwork** | Artwork fills the full poster as the background (no separate art frame). Caption sits on top with a white-to-transparent gradient strip at the bottom for readability. |
+| Mode         | Behavior                                                                                                                                                               |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Default**  | Current design — solid `--paper` color, artwork in frame, caption on top. No extra UI.                                                                                 |
+| **Solid**    | Single color picker replaces `--paper` background. Artwork frame and caption unchanged.                                                                                |
+| **Gradient** | Two color pickers + direction dropdown (horizontal / vertical / radial). Replaces `--paper` background.                                                                |
+| **Artwork**  | Artwork fills the full poster as the background (no separate art frame). Caption sits on top with a white-to-transparent gradient strip at the bottom for readability. |
 
 ## Frosted Blur (Independent Toggle)
 
@@ -85,19 +86,23 @@ Background settings are saved to `localStorage` as a single JSON blob under key 
 New **Background** accordion card placed after Swatches, before Layout.
 
 ### When mode is Default:
+
 - Select shows "Default"
 - Only the "Frosted overlay" checkbox is visible below
 
 ### When mode is Solid:
+
 - Color picker labeled "Background color"
 - "Frosted overlay" checkbox
 
 ### When mode is Gradient:
+
 - Two color pickers: "From" and "To"
 - Direction dropdown: Horizontal / Vertical / Radial
 - "Frosted overlay" checkbox
 
 ### When mode is Artwork:
+
 - Brief helper text: "Album artwork fills the poster background"
 - "Frosted overlay" checkbox
 - Caption gets a white gradient strip overlay automatically for text readability
@@ -111,6 +116,7 @@ Background styles are controlled through CSS custom properties set via inline `:
 - `.poster-bg-frosted` — class that adds `backdrop-blur` overlay via `::before` pseudo-element
 
 For **Artwork** mode:
+
 - `.poster-bg-artwork` — class on `.poster-page`
 - Background image set via inline style `background-image: url(...)`
 - `.poster-caption::after` — white-to-transparent gradient strip at the bottom
