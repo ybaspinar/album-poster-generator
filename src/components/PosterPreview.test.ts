@@ -293,4 +293,12 @@ describe("PosterPreview", () => {
     expect(style).toContain("font-family:");
     expect(style).toContain("Roboto");
   });
+
+  it("adds a subtle border to the preview frame for definition against dark backgrounds", () => {
+    const wrapper = mount(PosterPreview, {
+      props: { draft: createAlbumDraft() },
+    });
+    const frame = wrapper.find('[data-test="poster-preview-frame"]');
+    expect(frame.classes()).toContain("poster-preview-frame");
+  });
 });

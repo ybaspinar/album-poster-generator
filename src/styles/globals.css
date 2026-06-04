@@ -127,8 +127,9 @@
   width: min(100%, 720px);
   aspect-ratio: 2480 / 3508;
   overflow: hidden;
+  box-sizing: border-box;
+  border: 1px solid rgba(128, 128, 128, 0.25);
 }
-
 .poster-preview-scale {
   width: 720px;
   transform: scale(var(--poster-preview-scale, 1));
