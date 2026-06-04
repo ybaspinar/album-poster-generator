@@ -62,7 +62,7 @@ const modelPreviews = computed(() =>
         <span
           class="grid place-items-center overflow-hidden rounded-xl border border-border/70 bg-background p-1 shadow-sm"
         >
-          <span class="w-full overflow-hidden rounded-lg" style="aspect-ratio: 1 / 1.22">
+          <span class="w-full max-w-[420px] overflow-hidden rounded-lg">
             <PosterPreview :draft="model.draft" />
           </span>
         </span>
