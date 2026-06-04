@@ -60,9 +60,9 @@ const modelPreviews = computed(() =>
         @click="emit('selectModel', model.id)"
       >
         <span
-          class="grid place-items-center overflow-hidden rounded-xl border border-border/70 bg-zinc-950 p-2 shadow-inner"
+          class="grid place-items-center overflow-hidden rounded-xl border border-border/70 bg-background p-1 shadow-sm"
         >
-          <span class="w-full overflow-hidden rounded-lg shadow-2xl shadow-black/30">
+          <span class="w-full overflow-hidden rounded-lg shadow-2xl shadow-black/20">
             <PosterPreview :draft="model.draft" />
           </span>
         </span>
