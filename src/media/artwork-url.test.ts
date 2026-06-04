@@ -70,4 +70,14 @@ describe("createExportableArtworkUrl", () => {
       artworkUrl: "blob:manual-artwork",
     });
   });
+
+  it("passes proxy image URLs through without fetching", async () => {
+    const fetcher = vi.fn();
+    const proxyUrl = "https://mb-proxy.ybaspinar.dev/image?url=https%3A%2F%2Fcoverartarchive.org%2Ffront.jpg";
+
+    const result = await createExportableArtworkUrl(proxyUrl, { fetcher });
+
+    expect(result).toEqual({ ok: true, artworkUrl: proxyUrl });
+    expect(fetcher).not.toHaveBeenCalled();
+  });
 });

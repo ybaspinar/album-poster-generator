@@ -39,6 +39,12 @@ export async function createExportableArtworkUrl(
 
   const normalizedArtworkUrl = normalizeArtworkUrl(artworkUrl);
 
+  // Proxy URLs are served by our backend with CORS and edge caching.
+  // Skip redundant client-side download + data URL conversion.
+  if (isProxyImageUrl(normalizedArtworkUrl)) {
+    return { ok: true, artworkUrl: normalizedArtworkUrl };
+  }
+
   const cached = imageCache.get(normalizedArtworkUrl);
   if (cached) {
     return { ok: true, artworkUrl: cached };
@@ -59,7 +65,6 @@ export async function createExportableArtworkUrl(
         message: blockedArtworkDownloadMessage,
       };
     }
-
     const dataUrl = await blobToDataUrl(await response.blob());
     imageCache.set(normalizedArtworkUrl, dataUrl);
     return { ok: true, artworkUrl: dataUrl };
@@ -74,6 +79,15 @@ export async function createExportableArtworkUrl(
 
 function isHttpUrl(url: string): boolean {
   return /^https?:\/\//i.test(url);
+}
+
+function isProxyImageUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.pathname === "/image" && parsed.searchParams.has("url");
+  } catch {
+    return false;
+  }
 }
 
 function normalizeArtworkUrl(url: string): string {
