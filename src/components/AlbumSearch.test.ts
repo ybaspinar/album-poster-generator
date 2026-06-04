@@ -80,6 +80,25 @@ describe("AlbumSearch", () => {
     });
   });
 
+
+  it("offers manual start and renders artwork-first result cards", async () => {
+    const wrapper = mount(AlbumSearch);
+
+    expect(wrapper.find('[data-test="manual-start-button"]').exists()).toBe(true);
+
+    await wrapper.find('[data-test="manual-start-button"]').trigger("click");
+    expect(wrapper.emitted("manualStart")).toHaveLength(1);
+
+    await wrapper.find('[data-test="artist-input"]').setValue("kanye");
+    await wrapper.find('[data-test="title-input"]').setValue("kids see ghosts");
+    await wrapper.find('[data-test="search-form"]').trigger("submit");
+    await Promise.resolve();
+    await Promise.resolve();
+
+    const result = wrapper.find('[data-test="result-0"]');
+    expect(result.classes().join(" ")).toContain("rounded-2xl");
+    expect(result.find("img").exists()).toBe(true);
+  });
   it("does not search while typing", async () => {
     const wrapper = mount(AlbumSearch);
 

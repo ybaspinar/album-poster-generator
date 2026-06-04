@@ -21,6 +21,7 @@ import {
 } from "../sources/musicbrainz";
 
 const emit = defineEmits<{
+  manualStart: [];
   select: [album: AlbumDraftInput];
 }>();
 
@@ -279,6 +280,15 @@ function selectResult(album: AlbumDraftInput): void {
           >
             Clear
           </Button>
+          <Button
+            data-test="manual-start-button"
+            type="button"
+            variant="ghost"
+            class="shrink-0"
+            @click="emit('manualStart')"
+          >
+            Start manually
+          </Button>
         </div>
       </form>
 
@@ -305,23 +315,19 @@ function selectResult(album: AlbumDraftInput): void {
 
       <p v-if="status" class="text-sm text-muted-foreground">{{ status }}</p>
 
-      <div v-if="results.length" class="grid gap-2">
-        <Button
+      <div v-if="results.length" class="grid gap-3 sm:grid-cols-2">
+        <button
           v-for="(result, index) in results"
           :key="`${result.sourceId}-${index}`"
           :data-test="`result-${index}`"
           type="button"
-          variant="outline"
           :class="[
-            'h-auto justify-start gap-3 whitespace-normal p-3 text-left',
-            selectedIndex === index ? 'ring-2 ring-ring' : '',
+            'grid overflow-hidden rounded-2xl border bg-background/80 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-primary/70 hover:shadow-lg',
+            selectedIndex === index ? 'border-primary ring-2 ring-ring' : 'border-border/70',
           ]"
           @click="selectResult(result)"
         >
-          <span
-            class="grid size-13 shrink-0 place-items-center overflow-hidden rounded-md border bg-muted text-[0.58rem] font-bold uppercase tracking-wider text-muted-foreground"
-            aria-hidden="true"
-          >
+          <span class="grid aspect-square place-items-center overflow-hidden bg-muted text-xs font-bold uppercase tracking-wider text-muted-foreground">
             <img
               v-if="result.artworkUrl"
               :src="result.artworkUrl"
@@ -331,14 +337,14 @@ function selectResult(album: AlbumDraftInput): void {
             />
             <span v-else>No art</span>
           </span>
-          <span class="grid min-w-0 gap-1">
-            <strong class="truncate text-sm font-medium text-foreground">{{ result.title }}</strong>
+          <span class="grid min-w-0 gap-1 p-3">
+            <strong class="truncate text-sm font-semibold text-foreground">{{ result.title }}</strong>
             <span class="truncate text-sm font-normal text-muted-foreground">
               {{ result.artist || "Unknown artist" }} &middot;
               {{ result.releaseDate || "Unknown date" }}
             </span>
           </span>
-        </Button>
+        </button>
       </div>
     </CardContent>
   </Card>
