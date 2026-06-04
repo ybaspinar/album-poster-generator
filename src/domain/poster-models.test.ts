@@ -5,10 +5,10 @@ import { applyPosterModel, posterModels } from "./poster-models";
 describe("poster models", () => {
   it("defines four selectable creator models with stable labels", () => {
     expect(posterModels.map((model) => [model.id, model.label])).toEqual([
-      ["standard", "Standard"],
-      ["frame", "Frame"],
-      ["basic", "Basic"],
-      ["full-cover", "Full Cover"],
+      ["clean", "Clean"],
+      ["cover", "Cover"],
+      ["atmosphere", "Atmosphere"],
+      ["darkroom", "Darkroom"],
     ]);
   });
 
@@ -21,7 +21,7 @@ describe("poster models", () => {
       tracklist: ["Starboy"],
     });
 
-    const modelled = applyPosterModel(draft, "full-cover");
+    const modelled = applyPosterModel(draft, "cover");
 
     expect(modelled.id).toBe("draft-1");
     expect(modelled.title).toBe("Starboy");

@@ -97,13 +97,13 @@ describe("App flow", () => {
       4,
     );
     expect(
-      wrapper.find('[data-test="poster-model-standard"]').find(".poster-art").attributes("src"),
+      wrapper.find('[data-test="poster-model-clean"]').find(".poster-art").attributes("src"),
     ).toBe("blob:search-front-exportable");
     expect(fetchMusicBrainzTracklist).toHaveBeenCalledWith("rg-1");
     expect(createExportableArtworkUrl).toHaveBeenCalledWith("https://example.com/search-front.jpg");
     expect(findCoverArt).not.toHaveBeenCalled();
 
-    await wrapper.find('[data-test="poster-model-standard"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-clean"]').trigger("click");
     await Promise.resolve();
 
     expect(wrapper.find('[data-test="creator-editor-step"]').exists()).toBe(true);
@@ -136,7 +136,7 @@ describe("App flow", () => {
     await wrapper.find('[data-test="manual-start-button"]').trigger("click");
     expect(wrapper.find('[data-test="creator-models-step"]').exists()).toBe(true);
 
-    await wrapper.find('[data-test="poster-model-basic"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-cover"]').trigger("click");
     expect(wrapper.find('[data-test="creator-editor-step"]').exists()).toBe(true);
   });
 
@@ -193,7 +193,7 @@ describe("App flow", () => {
     expect(wrapper.find('[data-test="edition-dialog"]').exists()).toBe(false);
     expect(wrapper.find('[data-test="creator-models-step"]').exists()).toBe(true);
 
-    await wrapper.find('[data-test="poster-model-standard"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-clean"]').trigger("click");
     await Promise.resolve();
 
     expect(wrapper.find('[data-test="tracklist-input"]').element).toHaveProperty(
@@ -207,7 +207,7 @@ describe("App flow", () => {
     const wrapper = mount(App);
 
     await wrapper.find('[data-test="manual-start-button"]').trigger("click");
-    await wrapper.find('[data-test="poster-model-standard"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-clean"]').trigger("click");
 
     const showTracklistCheckbox = wrapper.find('[data-test="show-tracklist-input"]');
     expect((showTracklistCheckbox.element as HTMLInputElement).checked).toBe(true);
@@ -216,7 +216,7 @@ describe("App flow", () => {
     expect(window.localStorage.getItem("album-poster-generator:show-tracklist")).toBe("false");
 
     await wrapper.find('[data-test="editor-back-button"]').trigger("click");
-    await wrapper.find('[data-test="poster-model-basic"]').trigger("click");
+    await wrapper.find('[data-test="poster-model-cover"]').trigger("click");
 
     expect(
       (wrapper.find('[data-test="show-tracklist-input"]').element as HTMLInputElement).checked,

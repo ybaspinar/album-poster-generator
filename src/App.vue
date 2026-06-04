@@ -46,7 +46,7 @@ type AlbumEditorTab = Exclude<EditorTab, "export">;
 
 const creatorStep = shallowRef<CreatorStep>("search");
 const activeEditorTab = shallowRef<EditorTab>("information");
-const selectedModelId = shallowRef<PosterModelId>("standard");
+const selectedModelId = shallowRef<PosterModelId>("clean");
 const activeAlbumEditorTab = computed<AlbumEditorTab>(() =>
   activeEditorTab.value === "export" ? "information" : activeEditorTab.value,
 );

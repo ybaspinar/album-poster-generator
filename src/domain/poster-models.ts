@@ -1,7 +1,7 @@
 import { applyDraftPatch } from "../editor/draft";
 import type { AlbumDraft, AlbumDraftInput, PosterLayout } from "./album";
 
-export type PosterModelId = "standard" | "frame" | "basic" | "full-cover";
+export type PosterModelId = "clean" | "cover" | "atmosphere" | "darkroom";
 
 export interface PosterModel {
   id: PosterModelId;
@@ -13,73 +13,86 @@ export interface PosterModel {
 
 export const posterModels: PosterModel[] = [
   {
-    id: "standard",
-    label: "Standard",
-    description: "Balanced artwork, title, metadata, tracklist, and palette.",
+    id: "clean",
+    label: "Clean",
+    description: "Balanced, modern poster. Artwork, tracklist, palette — everything in its place.",
     layout: "medium",
     patch: {
       layout: "medium",
       backgroundMode: "default",
+      font: "inter",
       showTracklist: true,
       showSwatches: true,
       swatchShape: "square",
       typography: {
-        title: { size: 48, weight: 700, uppercase: true },
-        artist: { size: 16, weight: 400, uppercase: true },
-        metadata: { size: 13, weight: 400, uppercase: true },
-        tracklist: { size: 11, weight: 400, uppercase: true },
+        title: { color: "#111111", size: 46, weight: 800, uppercase: true },
+        artist: { color: "#333333", size: 16, weight: 500, uppercase: true },
+        metadata: { color: "#555555", size: 12, weight: 400, uppercase: true },
+        tracklist: { color: "#444444", size: 11, weight: 400, uppercase: true },
       },
     },
   },
   {
-    id: "frame",
-    label: "Frame",
-    description: "A cleaner framed look with generous poster margins.",
-    layout: "large",
-    patch: {
-      layout: "large",
-      backgroundMode: "solid",
-      backgroundSolidColor: "#f6f1e8",
-      showTracklist: true,
-      showSwatches: true,
-      typography: {
-        title: { size: 44, weight: 800, uppercase: true },
-        artist: { size: 15, weight: 500, uppercase: true },
-      },
-    },
-  },
-  {
-    id: "basic",
-    label: "Basic",
-    description: "Minimal artwork and type for quick clean posters.",
-    layout: "small",
-    patch: {
-      layout: "small",
-      backgroundMode: "default",
-      showTracklist: false,
-      showSwatches: false,
-      typography: {
-        title: { size: 42, weight: 700, uppercase: false },
-        artist: { size: 18, weight: 500, uppercase: false },
-      },
-    },
-  },
-  {
-    id: "full-cover",
-    label: "Full Cover",
-    description: "Artwork-forward poster with the cover driving the surface.",
+    id: "cover",
+    label: "Cover",
+    description: "The artwork is the poster. Light text sits over expansive cover art.",
     layout: "edge-to-edge",
     patch: {
       layout: "edge-to-edge",
       backgroundMode: "artwork",
       backgroundBlur: true,
-      backgroundBlurAmount: 12,
-      showTracklist: true,
+      backgroundBlurAmount: 8,
+      font: "Oswald",
+      showTracklist: false,
       showSwatches: false,
       typography: {
-        title: { size: 52, weight: 900, uppercase: true },
-        artist: { size: 18, weight: 700, uppercase: true },
-        tracklist: { size: 10, weight: 500, uppercase: true },
+        title: { color: "#ffffff", size: 40, weight: 700, uppercase: true },
+        artist: { color: "#f0f0f0", size: 14, weight: 500, uppercase: true },
+        metadata: { color: "#cccccc", size: 11, weight: 400, uppercase: true },
+        tracklist: { color: "#dddddd", size: 10, weight: 400, uppercase: true },
+      },
+    },
+  },
+  {
+    id: "atmosphere",
+    label: "Atmosphere",
+    description: "Artwork fills the background behind generous spacing and elegant serif type.",
+    layout: "large",
+    patch: {
+      layout: "large",
+      backgroundMode: "artwork",
+      backgroundBlur: true,
+      backgroundBlurAmount: 18,
+      font: "Playfair Display",
+      showTracklist: true,
+      showSwatches: true,
+      swatchShape: "circle",
+      typography: {
+        title: { color: "#0a0a0a", size: 54, weight: 900, uppercase: true },
+        artist: { color: "#1a1a1a", size: 18, weight: 700, uppercase: true },
+        metadata: { color: "#333333", size: 13, weight: 400, uppercase: true },
+        tracklist: { color: "#2a2a2a", size: 11, weight: 400, uppercase: true },
+      },
+    },
+  },
+  {
+    id: "darkroom",
+    label: "Darkroom",
+    description: "High-contrast gallery look. Dark backdrop, white type, bold energy.",
+    layout: "medium",
+    patch: {
+      layout: "medium",
+      backgroundMode: "solid",
+      backgroundSolidColor: "#0d0d0d",
+      font: "Space Grotesk",
+      showTracklist: true,
+      showSwatches: true,
+      swatchShape: "circle",
+      typography: {
+        title: { color: "#ffffff", size: 50, weight: 900, uppercase: true },
+        artist: { color: "#d4d4d4", size: 16, weight: 600, uppercase: true },
+        metadata: { color: "#a0a0a0", size: 12, weight: 400, uppercase: true },
+        tracklist: { color: "#c0c0c0", size: 10, weight: 400, uppercase: true },
       },
     },
   },
