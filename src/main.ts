@@ -1,5 +1,6 @@
 import { createApp } from "vue";
 import { createPinia } from "pinia";
+import { i18n } from "./i18n";
 import { capturePostHogException, initPostHog } from "./analytics/posthog";
 import App from "./App.vue";
 import "./styles/globals.css";
@@ -13,6 +14,7 @@ initPostHog({
 });
 
 const app = createApp(App);
+app.use(i18n);
 const pinia = createPinia();
 
 app.use(pinia);

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { capturePostHogEvent } from "../analytics/posthog";
+import { useI18n } from "vue-i18n";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,8 @@ import { posterFontOptions } from "../domain/album";
 import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
 import { loadGoogleFont } from "../services/google-fonts";
 
+const { t } = useI18n();
+
 type AlbumEditorTab = "information" | "tracklist" | "style";
 
 const props = withDefaults(
@@ -45,18 +48,18 @@ const emit = defineEmits<{
 }>();
 
 const typographySections: Array<{ key: TypographySection; label: string }> = [
-  { key: "title", label: "Title" },
-  { key: "artist", label: "Artist" },
-  { key: "metadata", label: "Date / metadata" },
-  { key: "tracklist", label: "Tracklist" },
+  { key: "title", label: t("editor.sectionTitle") },
+  { key: "artist", label: t("editor.sectionArtist") },
+  { key: "metadata", label: t("editor.sectionMetadata") },
+  { key: "tracklist", label: t("editor.sectionTracklist") },
 ];
 
 const typographyWeights: Array<{ value: TypographyWeight; label: string }> = [
-  { value: 400, label: "Regular" },
-  { value: 500, label: "Medium" },
-  { value: 700, label: "Bold" },
-  { value: 800, label: "Extra bold" },
-  { value: 900, label: "Black" },
+  { value: 400, label: t("editor.weightRegular") },
+  { value: 500, label: t("editor.weightMedium") },
+  { value: 700, label: t("editor.weightBold") },
+  { value: 800, label: t("editor.weightExtraBold") },
+  { value: 900, label: t("editor.weightBlack") },
 ];
 
 function updateField(
@@ -201,9 +204,9 @@ function updateTypographyUppercase(section: TypographySection, event: Event): vo
 
 function fontLabel(font: PosterFont): string {
   const labels: Record<PosterFont, string> = {
-    gotham: "Gotham (built-in sans-serif)",
-    inter: "Inter (built-in sans-serif)",
-    system: "System default",
+    gotham: t("editor.fontGotham"),
+    inter: t("editor.fontInter"),
+    system: t("editor.fontSystem"),
     // Sans-serif Google Fonts
     Roboto: "Roboto",
     "Open Sans": "Open Sans",
@@ -251,11 +254,11 @@ function fontLabel(font: PosterFont): string {
     >
       <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
         <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Album details
+          {{ t("editor.albumDetails") }}
         </h3>
         <div class="grid gap-3 px-1">
           <div class="grid gap-2">
-            <Label for="poster-title">Title</Label>
+            <Label for="poster-title">{{ t("editor.title") }}</Label>
             <Input
               id="poster-title"
               data-test="title-input"
@@ -265,7 +268,7 @@ function fontLabel(font: PosterFont): string {
           </div>
 
           <div class="grid gap-2">
-            <Label for="poster-artist">Artist</Label>
+            <Label for="poster-artist">{{ t("editor.artist") }}</Label>
             <Input
               id="poster-artist"
               :model-value="draft.artist"
@@ -274,17 +277,17 @@ function fontLabel(font: PosterFont): string {
           </div>
 
           <div class="grid gap-2">
-            <Label for="poster-release-date">Release date</Label>
+            <Label for="poster-release-date">{{ t("editor.releaseDate") }}</Label>
             <Input
               id="poster-release-date"
               :model-value="draft.releaseDate"
-              aria-label="Release date, for example 2018-06-08"
+              :aria-label="t('editor.releaseDateAria')"
               @update:model-value="updateField('releaseDate', $event)"
             />
           </div>
 
           <div class="grid gap-2">
-            <Label for="poster-metadata-line">Metadata line</Label>
+            <Label for="poster-metadata-line">{{ t("editor.metadataLine") }}</Label>
             <Input
               id="poster-metadata-line"
               :model-value="draft.metadataLine"
@@ -296,11 +299,11 @@ function fontLabel(font: PosterFont): string {
 
       <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
         <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Artwork
+          {{ t("editor.artwork") }}
         </h3>
         <div class="grid gap-3 px-1">
           <div class="grid gap-2">
-            <Label for="poster-artwork-url">Artwork URL</Label>
+            <Label for="poster-artwork-url">{{ t("editor.artworkUrl") }}</Label>
             <Input
               id="poster-artwork-url"
               :model-value="draft.artworkUrl"
@@ -309,7 +312,7 @@ function fontLabel(font: PosterFont): string {
           </div>
 
           <div class="grid gap-2">
-            <Label for="poster-artwork-upload">Upload artwork</Label>
+            <Label for="poster-artwork-upload">{{ t("editor.uploadArtwork") }}</Label>
             <Input
               id="poster-artwork-upload"
               type="file"
@@ -330,7 +333,7 @@ function fontLabel(font: PosterFont): string {
         <div class="grid gap-3 px-1">
           <div class="grid gap-2">
             <div class="flex items-center justify-between gap-3">
-              <Label for="poster-tracklist">Tracklist</Label>
+              <Label for="poster-tracklist">{{ t("editor.tracklist") }}</Label>
               <label
                 for="poster-show-tracklist"
                 class="flex items-center gap-2 text-xs font-medium text-muted-foreground"
@@ -343,7 +346,7 @@ function fontLabel(font: PosterFont): string {
                   :checked="draft.showTracklist"
                   @change="updateShowTracklist"
                 />
-                Show on poster
+                {{ t("editor.showOnPoster") }}
               </label>
             </div>
             <textarea
@@ -351,45 +354,45 @@ function fontLabel(font: PosterFont): string {
               data-test="tracklist-input"
               class="border-input placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-ring/50 dark:bg-input/30 min-h-28 w-full rounded-md border bg-transparent px-3 py-2 text-sm shadow-xs outline-none focus-visible:ring-[3px]"
               :value="draft.tracklist.join('\n')"
-              placeholder="One track per line"
+              :placeholder="t('editor.oneTrackPerLine')"
               @input="updateTracklist(($event.target as HTMLTextAreaElement).value)"
             />
             <p class="text-muted-foreground text-xs">
-              One track per line. Numbers are added on the poster.
+              {{ t("editor.tracklistHint") }}
             </p>
             <div class="grid grid-cols-2 gap-3">
               <div class="grid gap-2">
-                <Label for="poster-tracklist-columns">Tracklist columns</Label>
+                <Label for="poster-tracklist-columns">{{ t("editor.tracklistColumns") }}</Label>
                 <Select
                   :model-value="draft.tracklistColumns"
                   @update:model-value="updateTracklistColumns"
                 >
                   <SelectTrigger id="poster-tracklist-columns" class="w-full">
-                    <SelectValue placeholder="Columns" />
+                    <SelectValue :placeholder="t('editor.tracklistColumns')" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="1">1 column</SelectItem>
-                      <SelectItem value="2">2 columns</SelectItem>
-                      <SelectItem value="3">3 columns</SelectItem>
+                      <SelectItem value="1">{{ t("editor.column1") }}</SelectItem>
+                      <SelectItem value="2">{{ t("editor.column2") }}</SelectItem>
+                      <SelectItem value="3">{{ t("editor.column3") }}</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
               </div>
               <div class="grid gap-2">
-                <Label for="poster-tracklist-size">Tracklist size</Label>
+                <Label for="poster-tracklist-size">{{ t("editor.tracklistSize") }}</Label>
                 <Select
                   :model-value="draft.tracklistSize"
                   @update:model-value="updateTracklistSize"
                 >
                   <SelectTrigger id="poster-tracklist-size" class="w-full">
-                    <SelectValue placeholder="Size" />
+                    <SelectValue :placeholder="t('editor.tracklistSize')" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
-                      <SelectItem value="small">Small</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="large">Large</SelectItem>
+                      <SelectItem value="small">{{ t("editor.small") }}</SelectItem>
+                      <SelectItem value="medium">{{ t("editor.medium") }}</SelectItem>
+                      <SelectItem value="large">{{ t("editor.large") }}</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -403,14 +406,14 @@ function fontLabel(font: PosterFont): string {
     <div v-show="props.activeTab === 'style'" data-test="editor-panel-style" class="grid gap-4">
       <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
         <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Typography
+          {{ t("editor.typography") }}
         </h3>
         <div class="grid gap-3 px-1">
           <div class="grid gap-2">
-            <Label for="poster-font">Font</Label>
+            <Label for="poster-font">{{ t("editor.font") }}</Label>
             <Select :model-value="draft.font" @update:model-value="selectFont">
               <SelectTrigger id="poster-font" class="w-full">
-                <SelectValue placeholder="Select font" />
+                <SelectValue :placeholder="t('editor.selectFont')" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
@@ -430,7 +433,7 @@ function fontLabel(font: PosterFont): string {
             <div class="text-sm font-semibold">{{ section.label }}</div>
             <div class="grid grid-cols-2 gap-3">
               <div class="grid gap-2">
-                <Label :for="`typography-${section.key}-color`">Color</Label>
+                <Label :for="`typography-${section.key}-color`">{{ t("editor.color") }}</Label>
                 <Input
                   :id="`typography-${section.key}-color`"
                   :data-test="`typography-${section.key}-color-input`"
@@ -441,13 +444,13 @@ function fontLabel(font: PosterFont): string {
                 />
               </div>
               <div class="grid gap-2">
-                <Label :for="`typography-${section.key}-weight`">Weight</Label>
+                <Label :for="`typography-${section.key}-weight`">{{ t("editor.weight") }}</Label>
                 <Select
                   :model-value="String(draft.typography[section.key].weight)"
                   @update:model-value="updateTypographyWeight(section.key, String($event))"
                 >
                   <SelectTrigger :id="`typography-${section.key}-weight`" class="w-full">
-                    <SelectValue placeholder="Weight" />
+                    <SelectValue :placeholder="t('editor.weight')" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectGroup>
@@ -465,7 +468,7 @@ function fontLabel(font: PosterFont): string {
             </div>
             <div class="grid gap-2">
               <div class="flex items-center justify-between gap-3">
-                <Label :for="`typography-${section.key}-size`">Size</Label>
+                <Label :for="`typography-${section.key}-size`">{{ t("editor.size") }}</Label>
                 <span class="text-xs tabular-nums text-muted-foreground">
                   {{ draft.typography[section.key].size }}px
                 </span>
@@ -488,7 +491,7 @@ function fontLabel(font: PosterFont): string {
                   :checked="draft.typography[section.key].italic"
                   @change="updateTypographyItalic(section.key, $event)"
                 />
-                Italic
+                {{ t("editor.italic") }}
               </label>
               <label class="flex items-center gap-2 text-xs font-medium text-muted-foreground">
                 <input
@@ -497,7 +500,7 @@ function fontLabel(font: PosterFont): string {
                   :checked="draft.typography[section.key].uppercase"
                   @change="updateTypographyUppercase(section.key, $event)"
                 />
-                Uppercase
+                {{ t("editor.uppercase") }}
               </label>
             </div>
           </div>
@@ -506,11 +509,11 @@ function fontLabel(font: PosterFont): string {
 
       <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
         <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Swatches
+          {{ t("editor.swatches") }}
         </h3>
         <div class="grid gap-3 px-1">
           <div class="flex items-center justify-between gap-3">
-            <Label for="poster-show-swatches">Palette swatches</Label>
+            <Label for="poster-show-swatches">{{ t("editor.paletteSwatches") }}</Label>
             <label
               for="poster-show-swatches"
               class="flex items-center gap-2 text-xs font-medium text-muted-foreground"
@@ -523,20 +526,20 @@ function fontLabel(font: PosterFont): string {
                 :checked="draft.showSwatches"
                 @change="updateShowSwatches"
               />
-              Show on poster
+              {{ t("editor.showOnPoster") }}
             </label>
           </div>
 
           <div class="grid gap-2">
-            <Label for="poster-swatch-shape">Swatch shape</Label>
+            <Label for="poster-swatch-shape">{{ t("editor.swatchShape") }}</Label>
             <Select :model-value="draft.swatchShape" @update:model-value="updateSwatchShape">
               <SelectTrigger id="poster-swatch-shape" class="w-full">
-                <SelectValue placeholder="Select swatch shape" />
+                <SelectValue :placeholder="t('editor.swatchShape')" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="square">Square</SelectItem>
-                  <SelectItem value="circle">Circle</SelectItem>
+                  <SelectItem value="square">{{ t("editor.shapeSquare") }}</SelectItem>
+                  <SelectItem value="circle">{{ t("editor.shapeCircle") }}</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -548,7 +551,7 @@ function fontLabel(font: PosterFont): string {
               :key="`${color}-${index}`"
               class="grid gap-2"
             >
-              <Label :for="`palette-${index}`">Swatch {{ index + 1 }}</Label>
+              <Label :for="`palette-${index}`">{{ t("editor.swatch", { n: index + 1 }) }}</Label>
               <Input
                 :id="`palette-${index}`"
                 :data-test="`palette-input-${index}`"
@@ -564,28 +567,28 @@ function fontLabel(font: PosterFont): string {
 
       <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
         <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Background
+          {{ t("editor.background") }}
         </h3>
         <div class="grid gap-3 px-1">
           <div class="grid gap-2">
-            <Label for="poster-background-mode">Mode</Label>
+            <Label for="poster-background-mode">{{ t("editor.backgroundMode") }}</Label>
             <Select :model-value="draft.backgroundMode" @update:model-value="updateBackgroundMode">
               <SelectTrigger id="poster-background-mode" class="w-full">
-                <SelectValue placeholder="Select background" />
+                <SelectValue :placeholder="t('editor.backgroundMode')" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem value="default">Default</SelectItem>
-                  <SelectItem value="solid">Solid</SelectItem>
-                  <SelectItem value="gradient">Gradient</SelectItem>
-                  <SelectItem value="artwork">Artwork</SelectItem>
+                  <SelectItem value="default">{{ t("editor.modeDefault") }}</SelectItem>
+                  <SelectItem value="solid">{{ t("editor.modeSolid") }}</SelectItem>
+                  <SelectItem value="gradient">{{ t("editor.modeGradient") }}</SelectItem>
+                  <SelectItem value="artwork">{{ t("editor.modeArtwork") }}</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
           </div>
 
           <div v-if="draft.backgroundMode === 'solid'" class="grid gap-2">
-            <Label for="poster-background-color">Background color</Label>
+            <Label for="poster-background-color">{{ t("editor.backgroundColor") }}</Label>
             <Input
               id="poster-background-color"
               type="color"
@@ -598,7 +601,7 @@ function fontLabel(font: PosterFont): string {
           <template v-if="draft.backgroundMode === 'gradient'">
             <div class="grid grid-cols-2 gap-3">
               <div class="grid gap-2">
-                <Label for="poster-bg-from">From</Label>
+                <Label for="poster-bg-from">{{ t("editor.from") }}</Label>
                 <Input
                   id="poster-bg-from"
                   type="color"
@@ -608,7 +611,7 @@ function fontLabel(font: PosterFont): string {
                 />
               </div>
               <div class="grid gap-2">
-                <Label for="poster-bg-to">To</Label>
+                <Label for="poster-bg-to">{{ t("editor.to") }}</Label>
                 <Input
                   id="poster-bg-to"
                   type="color"
@@ -619,19 +622,19 @@ function fontLabel(font: PosterFont): string {
               </div>
             </div>
             <div class="grid gap-2">
-              <Label for="poster-bg-direction">Direction</Label>
+              <Label for="poster-bg-direction">{{ t("editor.direction") }}</Label>
               <Select
                 :model-value="draft.backgroundGradientDirection"
                 @update:model-value="updateBackgroundGradientDirection"
               >
                 <SelectTrigger id="poster-bg-direction" class="w-full">
-                  <SelectValue placeholder="Direction" />
+                  <SelectValue :placeholder="t('editor.direction')" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="horizontal">Horizontal</SelectItem>
-                    <SelectItem value="vertical">Vertical</SelectItem>
-                    <SelectItem value="radial">Radial</SelectItem>
+                    <SelectItem value="horizontal">{{ t("editor.horizontal") }}</SelectItem>
+                    <SelectItem value="vertical">{{ t("editor.vertical") }}</SelectItem>
+                    <SelectItem value="radial">{{ t("editor.radial") }}</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -639,7 +642,7 @@ function fontLabel(font: PosterFont): string {
           </template>
 
           <div v-if="draft.backgroundMode === 'artwork'" class="text-sm text-muted-foreground">
-            Album artwork will fill the poster background. Caption will remain on top.
+            {{ t("editor.artworkBackgroundCaption") }}
           </div>
 
           <div class="grid gap-2 pt-1">
@@ -651,11 +654,15 @@ function fontLabel(font: PosterFont): string {
                 :checked="draft.backgroundBlur"
                 @change="updateBackgroundBlur"
               />
-              <Label for="poster-bg-blur" class="text-sm font-medium">Frosted overlay</Label>
+              <Label for="poster-bg-blur" class="text-sm font-medium">{{
+                t("editor.frostedOverlay")
+              }}</Label>
             </div>
             <div class="grid gap-2">
               <div class="flex items-center justify-between gap-3">
-                <Label for="poster-bg-blur-amount" class="text-sm font-medium"> Blur level </Label>
+                <Label for="poster-bg-blur-amount" class="text-sm font-medium">{{
+                  t("editor.blurLevel")
+                }}</Label>
                 <span class="text-xs text-muted-foreground"
                   >{{ draft.backgroundBlurAmount }}px</span
                 >
@@ -678,20 +685,20 @@ function fontLabel(font: PosterFont): string {
 
       <section class="rounded-2xl border border-border/70 bg-card/80 p-4 shadow-sm">
         <h3 class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-          Layout
+          {{ t("editor.layout") }}
         </h3>
         <div class="grid gap-2 px-1">
-          <Label for="poster-layout">Spacing</Label>
+          <Label for="poster-layout">{{ t("editor.spacing") }}</Label>
           <Select :model-value="draft.layout" @update:model-value="updateLayout">
             <SelectTrigger id="poster-layout" class="w-full">
-              <SelectValue placeholder="Select layout" />
+              <SelectValue :placeholder="t('editor.spacing')" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="small">Small</SelectItem>
-                <SelectItem value="medium">Medium</SelectItem>
-                <SelectItem value="large">Large</SelectItem>
-                <SelectItem value="edge-to-edge">Edge to Edge</SelectItem>
+                <SelectItem value="small">{{ t("editor.small") }}</SelectItem>
+                <SelectItem value="medium">{{ t("editor.medium") }}</SelectItem>
+                <SelectItem value="large">{{ t("editor.large") }}</SelectItem>
+                <SelectItem value="edge-to-edge">{{ t("editor.layoutEdgeToEdge") }}</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>

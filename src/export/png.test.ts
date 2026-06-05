@@ -38,20 +38,22 @@ describe("exportElementAsPng", () => {
   it("exports an element with preset dimensions and downloads the result", async () => {
     const anchorClicks: string[] = [];
     const createdAnchors: HTMLAnchorElement[] = [];
-    const createElement = vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
-      const element = document.createElementNS(
-        "http://www.w3.org/1999/xhtml",
-        tagName,
-      ) as HTMLElement;
-      if (tagName === "a") {
-        const anchor = element as unknown as HTMLAnchorElement;
-        Object.defineProperty(anchor, "click", {
-          value: () => anchorClicks.push("clicked"),
-        });
-        createdAnchors.push(anchor);
-      }
-      return element as never;
-    });
+    const createElement = vi
+      .spyOn(document, "createElement")
+      .mockImplementation((tagName: string) => {
+        const element = document.createElementNS(
+          "http://www.w3.org/1999/xhtml",
+          tagName,
+        ) as HTMLElement;
+        if (tagName === "a") {
+          const anchor = element as unknown as HTMLAnchorElement;
+          Object.defineProperty(anchor, "click", {
+            value: () => anchorClicks.push("clicked"),
+          });
+          createdAnchors.push(anchor);
+        }
+        return element as never;
+      });
 
     vi.spyOn(navigator, "userAgent", "get").mockReturnValue(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
@@ -84,20 +86,22 @@ describe("exportElementAsPng", () => {
   it("opens the image in a new tab on iOS because the download attribute is not supported", async () => {
     const anchorClicks: string[] = [];
     const createdAnchors: HTMLAnchorElement[] = [];
-    const createElement = vi.spyOn(document, "createElement").mockImplementation((tagName: string) => {
-      const element = document.createElementNS(
-        "http://www.w3.org/1999/xhtml",
-        tagName,
-      ) as HTMLElement;
-      if (tagName === "a") {
-        const anchor = element as unknown as HTMLAnchorElement;
-        Object.defineProperty(anchor, "click", {
-          value: () => anchorClicks.push("clicked"),
-        });
-        createdAnchors.push(anchor);
-      }
-      return element as never;
-    });
+    const createElement = vi
+      .spyOn(document, "createElement")
+      .mockImplementation((tagName: string) => {
+        const element = document.createElementNS(
+          "http://www.w3.org/1999/xhtml",
+          tagName,
+        ) as HTMLElement;
+        if (tagName === "a") {
+          const anchor = element as unknown as HTMLAnchorElement;
+          Object.defineProperty(anchor, "click", {
+            value: () => anchorClicks.push("clicked"),
+          });
+          createdAnchors.push(anchor);
+        }
+        return element as never;
+      });
 
     vi.spyOn(navigator, "userAgent", "get").mockReturnValue(
       "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)",

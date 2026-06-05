@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from "vue";
 import { storeToRefs } from "pinia";
+import { useI18n } from "vue-i18n";
 import { capturePostHogEvent, capturePostHogException } from "./analytics/posthog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -16,10 +17,11 @@ import {
 } from "@/components/ui/dialog";
 import AlbumEditor from "./components/AlbumEditor.vue";
 import AlbumSearch from "./components/AlbumSearch.vue";
-import { useTheme } from "./composables/useTheme";
 import ExportPanel from "./components/ExportPanel.vue";
+import LanguageSwitcher from "./components/LanguageSwitcher.vue";
 import PosterModelPicker from "./components/PosterModelPicker.vue";
 import PosterPreview from "./components/PosterPreview.vue";
+import { useTheme } from "./composables/useTheme";
 import { type AlbumDraft, type AlbumDraftInput } from "./domain/album";
 import { applyPosterModel, type PosterModelId } from "./domain/poster-models";
 import { applyDraftPatch, mergeFetchedAlbum } from "./editor/draft";
@@ -35,6 +37,15 @@ import {
   type MusicBrainzEdition,
 } from "./sources/musicbrainz";
 import { useAlbumStore } from "./stores/album";
+const { t, locale } = useI18n();
+
+watch(
+  locale,
+  (val) => {
+    document.documentElement.lang = val;
+  },
+  { immediate: true },
+);
 
 const store = useAlbumStore();
 const { draft, selectedPresetId, exporting, status, pendingAlbum, pendingEditions } =
@@ -78,7 +89,7 @@ async function selectAlbum(album: AlbumDraftInput): Promise<void> {
 
   if (editions.length > 1) {
     store.setPendingAlbum(album, editions);
-    store.setStatus("Choose an album edition to load its exact tracklist.");
+    store.setStatus(t("status.chooseEdition"));
     return;
   }
 
@@ -116,7 +127,7 @@ async function selectEdition(edition: MusicBrainzEdition): Promise<void> {
 function cancelEditionSelection(): void {
   capturePostHogEvent("edition_selection_cancelled");
   store.clearPendingAlbum();
-  store.setStatus("Album selection cancelled.");
+  store.setStatus(t("status.selectionCancelled"));
 }
 
 async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Promise<void> {
@@ -130,9 +141,7 @@ async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Prom
     showTracklist: store.readShowTracklistPreference(),
     artworkUrl: exportableArtwork.artworkUrl,
   });
-  status.value = exportableArtwork.ok
-    ? "Album data loaded. You can override every field."
-    : exportableArtwork.message;
+  status.value = exportableArtwork.ok ? t("status.albumLoaded") : exportableArtwork.message;
 
   if (album.sourceId && !album.artworkUrl) {
     try {
@@ -149,8 +158,7 @@ async function loadAlbumDraft(album: AlbumDraftInput, tracklist: string[]): Prom
         status.value = exportableCoverArt.message;
       }
     } catch (error) {
-      status.value =
-        error instanceof Error ? error.message : "Artwork lookup failed. Add artwork manually.";
+      status.value = error instanceof Error ? error.message : t("status.artworkLookupFailed");
     }
   }
   creatorStep.value = "models";
@@ -167,7 +175,7 @@ function patchDraft(patch: Partial<AlbumDraft>): void {
 function startManualDraft(): void {
   capturePostHogEvent("manual_start_clicked");
   creatorStep.value = "models";
-  status.value = "Choose a poster model, then edit any details manually.";
+  status.value = t("status.chooseModel");
 }
 
 function backToSearch(): void {
@@ -186,7 +194,7 @@ function selectPosterModel(modelId: PosterModelId): void {
   draft.value = applyPosterModel(draft.value, modelId);
   creatorStep.value = "editor";
   activeEditorTab.value = "information";
-  status.value = "Poster model applied. Fine-tune the details or export when ready.";
+  status.value = t("status.modelApplied");
 }
 
 function selectEditorTab(tab: EditorTab): void {
@@ -205,12 +213,12 @@ async function exportPoster(): Promise<void> {
   const posterElement = document.querySelector<HTMLElement>("[data-export-poster]");
 
   if (!posterElement) {
-    status.value = "Poster preview is not ready to export.";
+    status.value = t("status.notReady");
     return;
   }
 
   exporting.value = true;
-  status.value = "Preparing PNG export…";
+  status.value = t("status.preparing");
 
   try {
     await exportElementAsPng(
@@ -218,7 +226,7 @@ async function exportPoster(): Promise<void> {
       selectedPreset.value,
       createExportFilename(draft.value.artist, draft.value.title, selectedPreset.value),
     );
-    status.value = `Exported ${selectedPreset.value.label} PNG.`;
+    status.value = t("status.exported", { preset: selectedPreset.value.label });
     capturePostHogEvent("poster_exported", {
       preset_id: selectedPreset.value.id,
       preset_label: selectedPreset.value.label,
@@ -228,8 +236,7 @@ async function exportPoster(): Promise<void> {
       has_tracklist: draft.value.showTracklist && draft.value.tracklist.length > 0,
     });
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "PNG export failed. Try another preset.";
+    const message = error instanceof Error ? error.message : t("status.exportFailed");
     status.value = message;
     capturePostHogException(error instanceof Error ? error : new Error(message), {
       preset_id: selectedPreset.value.id,
@@ -254,25 +261,31 @@ async function exportPoster(): Promise<void> {
       >
         <Card class="border-border/80 bg-card/92 shadow-2xl shadow-black/10 backdrop-blur">
           <CardHeader class="relative gap-3 pb-5">
-            <Button
-              :aria-label="theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'"
-              type="button"
-              variant="ghost"
-              size="icon"
-              class="absolute right-4 top-4"
-              @click="toggleTheme"
-            >
-              <Sun v-if="theme === 'dark'" class="size-5" />
-              <Moon v-else class="size-5" />
-            </Button>
+            <div class="absolute right-4 top-4 flex items-center gap-2">
+              <LanguageSwitcher />
+              <Button
+                :aria-label="
+                  t('aria.toggleTheme', {
+                    mode: theme === 'dark' ? t('aria.light') : t('aria.dark'),
+                  })
+                "
+                type="button"
+                variant="ghost"
+                size="icon"
+                @click="toggleTheme"
+              >
+                <Sun v-if="theme === 'dark'" class="size-5" />
+                <Moon v-else class="size-5" />
+              </Button>
+            </div>
             <p class="font-mono text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-              Album Poster Generator
+              {{ t("app.brand") }}
             </p>
             <CardTitle class="max-w-2xl text-4xl leading-[0.95] tracking-tight md:text-5xl">
-              Make a print-ready album poster.
+              {{ t("app.headline") }}
             </CardTitle>
             <CardDescription>
-              Search an album, choose a model, tweak the poster, and export a PNG.
+              {{ t("app.description") }}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -309,10 +322,8 @@ async function exportPoster(): Promise<void> {
               class="flex flex-row items-center justify-between gap-3 border-b border-border/70"
             >
               <div>
-                <CardTitle>Preview</CardTitle>
-                <CardDescription
-                  >Only the poster surface is captured during PNG export.</CardDescription
-                >
+                <CardTitle>{{ t("editor.previewTitle") }}</CardTitle>
+                <CardDescription>{{ t("editor.previewCaption") }}</CardDescription>
               </div>
               <Button
                 data-test="editor-back-button"
@@ -320,7 +331,7 @@ async function exportPoster(): Promise<void> {
                 variant="ghost"
                 @click="backToModels"
               >
-                Back
+                {{ t("editor.back") }}
               </Button>
             </CardHeader>
             <CardContent
@@ -343,7 +354,7 @@ async function exportPoster(): Promise<void> {
               "
               @click="selectEditorTab('information')"
             >
-              Information
+              {{ t("editor.tabInformation") }}
             </button>
             <button
               data-test="creator-tab-tracklist"
@@ -355,7 +366,7 @@ async function exportPoster(): Promise<void> {
               "
               @click="selectEditorTab('tracklist')"
             >
-              Tracklist
+              {{ t("editor.tabTracklist") }}
             </button>
             <button
               data-test="creator-tab-style"
@@ -367,7 +378,7 @@ async function exportPoster(): Promise<void> {
               "
               @click="selectEditorTab('style')"
             >
-              Style
+              {{ t("editor.tabStyle") }}
             </button>
           </div>
 
@@ -388,10 +399,9 @@ async function exportPoster(): Promise<void> {
     <Dialog :open="editionDialogOpen">
       <DialogContent data-test="edition-dialog">
         <DialogHeader>
-          <DialogTitle>Choose edition</DialogTitle>
+          <DialogTitle>{{ t("editionDialog.title") }}</DialogTitle>
           <DialogDescription>
-            This album has multiple MusicBrainz releases. Pick the edition whose tracklist and date
-            should be used on the poster.
+            {{ t("editionDialog.description") }}
           </DialogDescription>
         </DialogHeader>
 
@@ -409,19 +419,21 @@ async function exportPoster(): Promise<void> {
               <img
                 v-if="edition.artworkUrl"
                 :src="edition.artworkUrl"
-                :alt="`${edition.title} cover`"
+                :alt="t('preview.artworkAlt', { title: edition.title })"
                 class="h-12 w-12 rounded object-cover"
               />
               <div v-else class="h-12 w-12 rounded bg-muted" />
               <span class="grid gap-1">
                 <strong class="text-sm text-foreground">{{ edition.title }}</strong>
                 <span class="text-xs font-normal text-muted-foreground">
-                  {{ edition.releaseDate || "Unknown date" }}
+                  {{ edition.releaseDate || t("editionDialog.unknownDate") }}
                   <template v-if="edition.country"> · {{ edition.country }}</template>
                   <template v-if="edition.formats.length">
                     · {{ edition.formats.join(", ") }}
                   </template>
-                  <template v-if="edition.trackCount"> · {{ edition.trackCount }} tracks</template>
+                  <template v-if="edition.trackCount">
+                    · {{ t("editionDialog.tracks", { count: edition.trackCount }) }}
+                  </template>
                 </span>
               </span>
             </div>
@@ -429,7 +441,9 @@ async function exportPoster(): Promise<void> {
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" @click="cancelEditionSelection">Cancel</Button>
+          <Button type="button" variant="outline" @click="cancelEditionSelection">{{
+            t("editionDialog.cancel")
+          }}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

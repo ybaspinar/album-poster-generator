@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useI18n } from "vue-i18n";
 import { ArrowLeft } from "@lucide/vue";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,8 @@ const emit = defineEmits<{
   back: [];
   selectModel: [modelId: PosterModelId];
 }>();
+
+const { t } = useI18n();
 
 const selectedModel = computed(() => props.selectedModelId);
 const modelPreviews = computed(() =>
@@ -37,13 +40,11 @@ const modelPreviews = computed(() =>
         @click="emit('back')"
       >
         <ArrowLeft class="size-4" />
-        Back to search
+        {{ t("models.back") }}
       </Button>
       <div class="grid gap-1">
-        <CardTitle class="text-3xl tracking-tight">Choose a poster model</CardTitle>
-        <CardDescription
-          >Select a starting point. You can still edit every field after this.</CardDescription
-        >
+        <CardTitle class="text-3xl tracking-tight">{{ t("models.title") }}</CardTitle>
+        <CardDescription>{{ t("models.subtitle") }}</CardDescription>
       </div>
     </CardHeader>
 
@@ -70,8 +71,12 @@ const modelPreviews = computed(() =>
           </span>
         </span>
         <span class="grid gap-1">
-          <strong class="text-base text-foreground">{{ model.label }}</strong>
-          <span class="text-sm text-muted-foreground">{{ model.description }}</span>
+          <strong class="text-base text-foreground">
+            {{ model.id === "clean" ? t("models.cleanLabel") : t("models.atmosphereLabel") }}
+          </strong>
+          <span class="text-sm text-muted-foreground">
+            {{ model.id === "clean" ? t("models.cleanDesc") : t("models.atmosphereDesc") }}
+          </span>
         </span>
       </div>
     </CardContent>

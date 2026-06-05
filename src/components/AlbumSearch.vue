@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
+import { useI18n } from "vue-i18n";
 import { capturePostHogEvent, capturePostHogException } from "../analytics/posthog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,6 +20,8 @@ import {
   searchMusicBrainzAlbums,
   type MusicBrainzSearchParams,
 } from "../sources/musicbrainz";
+
+const { t } = useI18n();
 
 const emit = defineEmits<{
   manualStart: [];
@@ -93,7 +96,7 @@ function clearAllFields(): void {
   artist.value = "";
   title.value = "";
   year.value = "";
-  type.value = "";
+  type.value = "any";
   clearResults();
   nextTick(() => {
     const el = artistInputRef.value?.$el?.querySelector?.("input") ?? artistInputRef.value;
@@ -118,8 +121,8 @@ async function performSearch(): Promise<void> {
     const params = currentParams();
     results.value = await searchMusicBrainzAlbums(params);
     status.value = results.value.length
-      ? `${results.value.length} result${results.value.length === 1 ? "" : "s"} found.`
-      : "No results found. Adjust the query or fill in details manually.";
+      ? t("search.resultsFound", results.value.length)
+      : t("search.noResults");
     capturePostHogEvent("album_searched", {
       result_count: results.value.length,
       has_artist: Boolean(params.artist),
@@ -135,7 +138,7 @@ async function performSearch(): Promise<void> {
     capturePostHogException(
       error instanceof Error ? error : new Error("MusicBrainz search failed."),
     );
-    status.value = error instanceof Error ? error.message : "MusicBrainz search failed.";
+    status.value = error instanceof Error ? error.message : t("status.searchFailed");
     results.value = [];
   } finally {
     loading.value = false;
@@ -198,12 +201,12 @@ function selectResult(album: AlbumDraftInput): void {
 <template>
   <Card>
     <CardHeader>
-      <CardTitle>Find album data</CardTitle>
+      <CardTitle>{{ t("search.title") }}</CardTitle>
     </CardHeader>
     <CardContent class="grid gap-4">
       <form data-test="search-form" class="grid gap-3" @submit.prevent="performSearch">
         <div class="grid gap-2">
-          <Label for="album-artist">Artist</Label>
+          <Label for="album-artist">{{ t("search.artist") }}</Label>
           <div class="relative">
             <Input
               id="album-artist"
@@ -211,7 +214,7 @@ function selectResult(album: AlbumDraftInput): void {
               v-model="artist"
               data-test="artist-input"
               type="search"
-              placeholder="Kanye West"
+              :placeholder="t('search.artistPlaceholder')"
               autocomplete="off"
               @focus="focusArtistInput"
               @blur="blurArtistInput"
@@ -222,14 +225,14 @@ function selectResult(album: AlbumDraftInput): void {
         </div>
 
         <div class="grid gap-2">
-          <Label for="album-title">Title</Label>
+          <Label for="album-title">{{ t("search.title") }}</Label>
           <div class="relative">
             <Input
               id="album-title"
               v-model="title"
               data-test="title-input"
               type="search"
-              placeholder="Kids See Ghosts"
+              :placeholder="t('search.titlePlaceholder')"
               autocomplete="off"
               @input="onSearchInput"
               @keydown="onKeyDown"
@@ -239,30 +242,30 @@ function selectResult(album: AlbumDraftInput): void {
 
         <div class="grid grid-cols-2 gap-3">
           <div class="grid gap-2">
-            <Label for="album-year">Year</Label>
+            <Label for="album-year">{{ t("search.year") }}</Label>
             <Input
               id="album-year"
               v-model="year"
               data-test="year-input"
               type="search"
-              placeholder="2018"
+              :placeholder="t('search.yearPlaceholder')"
               autocomplete="off"
               @input="onSearchInput"
               @keydown="onKeyDown"
             />
           </div>
           <div class="grid gap-2">
-            <Label for="album-type">Type</Label>
+            <Label for="album-type">{{ t("search.type") }}</Label>
             <Select v-model="type">
               <SelectTrigger id="album-type" data-test="type-select" class="w-full">
-                <SelectValue placeholder="Any" />
+                <SelectValue :placeholder="t('search.any')" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="any">Any</SelectItem>
-                <SelectItem value="album">Album</SelectItem>
-                <SelectItem value="ep">EP</SelectItem>
-                <SelectItem value="single">Single</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="any">{{ t("search.any") }}</SelectItem>
+                <SelectItem value="album">{{ t("search.album") }}</SelectItem>
+                <SelectItem value="ep">{{ t("search.ep") }}</SelectItem>
+                <SelectItem value="single">{{ t("search.single") }}</SelectItem>
+                <SelectItem value="other">{{ t("search.other") }}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -270,7 +273,7 @@ function selectResult(album: AlbumDraftInput): void {
 
         <div class="flex gap-2">
           <Button type="submit" class="flex-1" :disabled="loading || !hasSearchableContent">
-            {{ loading ? "Searching…" : "Search" }}
+            {{ loading ? t("search.searching") : t("search.search") }}
           </Button>
           <Button
             v-if="hasSearchableContent"
@@ -278,7 +281,7 @@ function selectResult(album: AlbumDraftInput): void {
             variant="outline"
             @click="clearAllFields"
           >
-            Clear
+            {{ t("search.clear") }}
           </Button>
           <Button
             data-test="manual-start-button"
@@ -287,7 +290,7 @@ function selectResult(album: AlbumDraftInput): void {
             class="shrink-0"
             @click="emit('manualStart')"
           >
-            Start manually
+            {{ t("search.startManually") }}
           </Button>
         </div>
       </form>
@@ -297,7 +300,7 @@ function selectResult(album: AlbumDraftInput): void {
         class="relative z-10 -mt-2 rounded-md border border-border bg-popover shadow-md"
       >
         <p class="px-3 py-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-          Recent
+          {{ t("search.recent") }}
         </p>
         <button
           v-for="(recent, index) in recents"
@@ -337,15 +340,15 @@ function selectResult(album: AlbumDraftInput): void {
               class="size-full object-cover"
               loading="lazy"
             />
-            <span v-else>No art</span>
+            <span v-else>{{ t("search.noArt") }}</span>
           </span>
           <span class="grid min-w-0 gap-1 p-3">
             <strong class="truncate text-sm font-semibold text-foreground">{{
               result.title
             }}</strong>
             <span class="truncate text-sm font-normal text-muted-foreground">
-              {{ result.artist || "Unknown artist" }} &middot;
-              {{ result.releaseDate || "Unknown date" }}
+              {{ result.artist || t("search.unknownArtist") }} &middot;
+              {{ result.releaseDate || t("search.unknownDate") }}
             </span>
           </span>
         </button>

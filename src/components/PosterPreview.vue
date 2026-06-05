@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, shallowRef, useTemplateRef, watch } from "vue";
+import { useI18n } from "vue-i18n";
 import type { AlbumDraft, PosterFont, PosterLayout } from "../domain/album";
 import { loadGoogleFont, getFontFamilyString } from "../services/google-fonts";
-
 const props = defineProps<{
   draft: AlbumDraft;
 }>();
+
+const { t } = useI18n();
 
 const POSTER_CANONICAL_WIDTH_PX = 720;
 
@@ -153,7 +155,7 @@ watch(
         data-export-poster
         class="poster-page"
         :class="[fontClass, layoutClass, backgroundClasses]"
-        aria-label="Album poster preview"
+        :aria-label="t('preview.ariaLabel')"
         :style="[posterStyle, backgroundStyle]"
       >
         <div class="poster-art-frame">
@@ -161,33 +163,33 @@ watch(
             v-if="draft.artworkUrl"
             :src="draft.artworkUrl"
             crossorigin="anonymous"
-            :alt="`${draft.title || 'Album'} artwork`"
+            :alt="t('preview.artworkAlt', { title: draft.title || t('preview.untitledAlbum') })"
             class="poster-art"
             loading="lazy"
             decoding="async"
           />
           <div v-else class="poster-art poster-art-empty">
-            <span>Add artwork</span>
+            <span>{{ t("preview.addArtwork") }}</span>
           </div>
         </div>
 
         <section class="poster-caption">
-          <h2 v-if="draft.showTitle">{{ draft.title || "Untitled Album" }}</h2>
+          <h2 v-if="draft.showTitle">{{ draft.title || t("preview.untitledAlbum") }}</h2>
           <div v-if="draft.showTitle" class="poster-rule" />
           <div class="poster-meta-row">
             <div class="poster-meta-left">
               <p v-if="draft.showArtist" class="poster-release">
-                {{ draft.metadataLine || draft.releaseDate || "Release date" }}
+                {{ draft.metadataLine || draft.releaseDate || t("preview.releaseDate") }}
               </p>
               <p v-if="draft.showArtist" class="poster-artist">
-                {{ draft.artist || "Unknown Artist" }}
+                {{ draft.artist || t("preview.unknownArtist") }}
               </p>
             </div>
             <div
               v-if="draft.showSwatches"
               class="poster-swatches"
               :class="`poster-swatches-${draft.swatchShape}`"
-              aria-label="Poster palette"
+              :aria-label="t('preview.paletteAria')"
             >
               <span
                 v-for="color in draft.palette"
@@ -205,7 +207,7 @@ watch(
               `poster-tracklist-columns-${draft.tracklistColumns}`,
               `poster-tracklist-size-${draft.tracklistSize}`,
             ]"
-            aria-label="Tracklist"
+            :aria-label="t('preview.tracklistAria')"
           >
             <li v-for="(track, index) in draft.tracklist" :key="`${track}-${index}`">
               <span>{{ index + 1 }}) </span>
