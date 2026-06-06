@@ -21,7 +21,7 @@ export async function extractPaletteFromImage(url: string, maxColors = 6): Promi
     // Fill remaining slots with default palette colors
     while (hexColors.length < maxColors && hexColors.length < defaultPalette.length) {
       const remainingDefault = defaultPalette[hexColors.length];
-      if (!hexColors.includes(remainingDefault)) {
+      if (remainingDefault && !hexColors.includes(remainingDefault)) {
         hexColors.push(remainingDefault);
       }
     }

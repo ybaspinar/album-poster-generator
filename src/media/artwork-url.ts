@@ -15,7 +15,7 @@ interface ExportableArtworkUrlFailure {
 
 export type ExportableArtworkUrlResult = ExportableArtworkUrlSuccess | ExportableArtworkUrlFailure;
 
-export const blockedArtworkDownloadMessage =
+const blockedArtworkDownloadMessage =
   "Artwork preview loaded, but the image server blocks browser download. Upload the artwork manually for PNG export.";
 
 const imageCache = new Map<string, string>();

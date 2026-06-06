@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
-import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/select";
+import Button from "@/components/ui/button/Button.vue";
+import Select from "@/components/ui/select/Select.vue";
 import ExportPanel from "./ExportPanel.vue";
 
 describe("ExportPanel", () => {
@@ -31,7 +31,7 @@ describe("ExportPanel", () => {
     const buttons = wrapper.findAllComponents(Button);
     expect(buttons).toHaveLength(1);
 
-    await buttons[0].trigger("click");
+    await buttons[0]!.trigger("click");
     expect(wrapper.emitted("exportPoster")).toHaveLength(1);
   });
 });

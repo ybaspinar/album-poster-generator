@@ -1,0 +1,44 @@
+{
+  "categories": {
+    "correctness": "error",
+    "suspicious": "error",
+    "perf": "error"
+  },
+  "plugins": ["vue", "vitest", "import", "promise"],
+  "globals": {
+    "defineProps": "readonly",
+    "defineEmits": "readonly",
+    "defineOptions": "readonly",
+    "defineModel": "readonly",
+    "defineExpose": "readonly",
+    "defineSlots": "readonly",
+    "withDefaults": "readonly"
+  },
+  "rules": {
+    "no-console": ["error", { "allow": ["error"] }],
+    "unicorn/filename-case": "off",
+    "vitest/require-hook": "off",
+    "vitest/require-mock-type-parameters": "off",
+    "vue/max-props": "off",
+    "eslint/sort-imports": "off",
+    "eslint/sort-keys": "off",
+    "eslint/id-length": "off",
+    "eslint/no-ternary": "off",
+    "eslint/func-style": "off",
+    "oxc/no-rest-spread-properties": "off",
+    "oxc/no-map-spread": "off",
+    "import/no-relative-parent-imports": "off",
+    "import/max-dependencies": "off",
+    "typescript/prefer-readonly-parameter-types": "off",
+    "typescript/prefer-regexp-exec": "off",
+    "typescript/prefer-readonly": "off",
+    "typescript/no-confusing-void-expression": "off",
+    "typescript/promise-function-async": "off",
+    "typescript/no-unnecessary-condition": "off",
+    "typescript/strict-boolean-expressions": "off",
+    "typescript/no-unsafe-type-assertion": "off",
+    "typescript/no-unsafe-member-access": "off",
+    "typescript/no-unnecessary-type-assertion": "off"
+  },
+  "ignorePatterns": ["dist/**", "coverage/**", "node_modules/**"]
+}

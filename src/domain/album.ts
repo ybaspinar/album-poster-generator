@@ -77,23 +77,21 @@ export const posterFontOptions: PosterFont[] = [
   "Bangers",
   "Anton",
 ];
-export const defaultPosterFont: PosterFont = "gotham";
+const defaultPosterFont: PosterFont = "gotham";
 
 export type PosterLayout = "small" | "medium" | "large" | "edge-to-edge";
 
 export const defaultPosterLayout: PosterLayout = "medium";
 
-export const posterLayoutOptions: PosterLayout[] = ["small", "medium", "large", "edge-to-edge"];
-
 export type PosterBackgroundMode = "default" | "solid" | "gradient" | "artwork";
 export type GradientDirection = "horizontal" | "vertical" | "radial";
 
-export const defaultPosterBackgroundMode: PosterBackgroundMode = "default";
-export const defaultBackgroundSolidColor = "#1a1a2e";
-export const defaultBackgroundGradientFrom = "#1a1a2e";
-export const defaultBackgroundGradientTo = "#16213e";
-export const defaultBackgroundGradientDirection: GradientDirection = "vertical";
-export const defaultBackgroundBlurAmount = 10;
+const defaultPosterBackgroundMode: PosterBackgroundMode = "default";
+const defaultBackgroundSolidColor = "#1a1a2e";
+const defaultBackgroundGradientFrom = "#1a1a2e";
+const defaultBackgroundGradientTo = "#16213e";
+const defaultBackgroundGradientDirection: GradientDirection = "vertical";
+const defaultBackgroundBlurAmount = 10;
 
 export type TypographySection = "title" | "artist" | "metadata" | "tracklist";
 export type TypographyWeight = 400 | 500 | 700 | 800 | 900;

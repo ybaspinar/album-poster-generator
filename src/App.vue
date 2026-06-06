@@ -3,18 +3,20 @@ import { computed, shallowRef, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useI18n } from "vue-i18n";
 import { capturePostHogEvent, capturePostHogException } from "./analytics/posthog";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "@lucide/vue";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import Alert from "@/components/ui/alert/Alert.vue";
+import AlertDescription from "@/components/ui/alert/AlertDescription.vue";
+import Button from "@/components/ui/button/Button.vue";
+import Card from "@/components/ui/card/Card.vue";
+import CardContent from "@/components/ui/card/CardContent.vue";
+import CardDescription from "@/components/ui/card/CardDescription.vue";
+import CardHeader from "@/components/ui/card/CardHeader.vue";
+import CardTitle from "@/components/ui/card/CardTitle.vue";
+import Dialog from "@/components/ui/dialog/Dialog.vue";
+import DialogContent from "@/components/ui/dialog/DialogContent.vue";
+import DialogDescription from "@/components/ui/dialog/DialogDescription.vue";
+import DialogFooter from "@/components/ui/dialog/DialogFooter.vue";
+import DialogHeader from "@/components/ui/dialog/DialogHeader.vue";
+import DialogTitle from "@/components/ui/dialog/DialogTitle.vue";
 import AlbumEditor from "./components/AlbumEditor.vue";
 import AlbumSearch from "./components/AlbumSearch.vue";
 import ExportPanel from "./components/ExportPanel.vue";

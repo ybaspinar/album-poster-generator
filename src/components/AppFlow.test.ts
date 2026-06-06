@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
-import { Alert } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import Alert from "@/components/ui/alert/Alert.vue";
+import Button from "@/components/ui/button/Button.vue";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App.vue";
 import { createExportableArtworkUrl } from "../media/artwork-url";

@@ -10,3 +10,4 @@ graphify-out/
 .env
 .claude/
 posthog-setup-report.md
+.fallow/

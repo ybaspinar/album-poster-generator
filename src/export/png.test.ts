@@ -76,7 +76,7 @@ describe("exportElementAsPng", () => {
       canvasHeight: 3508,
     });
     expect(anchorClicks).toEqual(["clicked"]);
-    expect(createdAnchors[0].download).toBe("poster.png");
+    expect(createdAnchors[0]!.download).toBe("poster.png");
     expect(revokeSpy).toHaveBeenCalledOnce();
 
     createElement.mockRestore();
@@ -115,8 +115,8 @@ describe("exportElementAsPng", () => {
     await exportElementAsPng(element, preset, "poster.png");
 
     expect(anchorClicks).toEqual(["clicked"]);
-    expect(createdAnchors[0].target).toBe("_blank");
-    expect(createdAnchors[0].download).toBe("");
+    expect(createdAnchors[0]!.target).toBe("_blank");
+    expect(createdAnchors[0]!.download).toBe("");
     expect(revokeSpy).not.toHaveBeenCalled();
 
     createElement.mockRestore();

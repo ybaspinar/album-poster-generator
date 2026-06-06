@@ -2,17 +2,18 @@
 import { computed, nextTick, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { capturePostHogEvent, capturePostHogException } from "../analytics/posthog";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Button from "@/components/ui/button/Button.vue";
+import Card from "@/components/ui/card/Card.vue";
+import CardContent from "@/components/ui/card/CardContent.vue";
+import CardHeader from "@/components/ui/card/CardHeader.vue";
+import CardTitle from "@/components/ui/card/CardTitle.vue";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Select from "@/components/ui/select/Select.vue";
+import SelectContent from "@/components/ui/select/SelectContent.vue";
+import SelectItem from "@/components/ui/select/SelectItem.vue";
+import SelectTrigger from "@/components/ui/select/SelectTrigger.vue";
+import SelectValue from "@/components/ui/select/SelectValue.vue";
 import type { AlbumDraftInput } from "../domain/album";
 import { addRecentSearch, readRecentSearches } from "../sources/search-recent";
 import {
@@ -77,8 +78,8 @@ function selectRecent(q: string): void {
   // Try to parse "artist - title" pattern back into fields
   const dashSplit = q.split(/\s+-\s+/);
   if (dashSplit.length === 2) {
-    artist.value = dashSplit[0];
-    title.value = dashSplit[1];
+    artist.value = dashSplit[0]!;
+    title.value = dashSplit[1]!;
   } else {
     title.value = q;
   }
@@ -99,7 +100,7 @@ function clearAllFields(): void {
   type.value = "any";
   clearResults();
   nextTick(() => {
-    const el = artistInputRef.value?.$el?.querySelector?.("input") ?? artistInputRef.value;
+    const el = artistInputRef.value;
     if (el && typeof el.focus === "function") {
       el.focus();
     }
@@ -167,9 +168,9 @@ function onKeyDown(event: KeyboardEvent): void {
   } else if (event.key === "Enter") {
     event.preventDefault();
     if (showRecents.value && selectedIndex.value >= 0) {
-      selectRecent(recents.value[selectedIndex.value]);
+      selectRecent(recents.value[selectedIndex.value]!);
     } else if (selectedIndex.value >= 0 && results.value[selectedIndex.value]) {
-      emit("select", results.value[selectedIndex.value]);
+      emit("select", results.value[selectedIndex.value]!);
       clearResults();
       artist.value = "";
       title.value = "";

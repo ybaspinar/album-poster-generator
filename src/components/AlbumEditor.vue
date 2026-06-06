@@ -4,14 +4,12 @@ import { useI18n } from "vue-i18n";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import Select from "@/components/ui/select/Select.vue";
+import SelectContent from "@/components/ui/select/SelectContent.vue";
+import SelectGroup from "@/components/ui/select/SelectGroup.vue";
+import SelectItem from "@/components/ui/select/SelectItem.vue";
+import SelectTrigger from "@/components/ui/select/SelectTrigger.vue";
+import SelectValue from "@/components/ui/select/SelectValue.vue";
 import type {
   AlbumDraft,
   GradientDirection,
@@ -27,7 +25,6 @@ import type {
 } from "../domain/album";
 import { posterFontOptions } from "../domain/album";
 import { createArtworkObjectUrl, validateArtworkFile } from "../media/image-upload";
-import { loadGoogleFont } from "../services/google-fonts";
 
 const { t } = useI18n();
 
@@ -365,7 +362,7 @@ function fontLabel(font: PosterFont): string {
                 <Label for="poster-tracklist-columns">{{ t("editor.tracklistColumns") }}</Label>
                 <Select
                   :model-value="draft.tracklistColumns"
-                  @update:model-value="updateTracklistColumns"
+                  @update:model-value="(value) => { if (typeof value === 'string') updateTracklistColumns(value) }"
                 >
                   <SelectTrigger id="poster-tracklist-columns" class="w-full">
                     <SelectValue :placeholder="t('editor.tracklistColumns')" />
@@ -383,7 +380,7 @@ function fontLabel(font: PosterFont): string {
                 <Label for="poster-tracklist-size">{{ t("editor.tracklistSize") }}</Label>
                 <Select
                   :model-value="draft.tracklistSize"
-                  @update:model-value="updateTracklistSize"
+                  @update:model-value="(value) => { if (typeof value === 'string') updateTracklistSize(value) }"
                 >
                   <SelectTrigger id="poster-tracklist-size" class="w-full">
                     <SelectValue :placeholder="t('editor.tracklistSize')" />
@@ -411,7 +408,7 @@ function fontLabel(font: PosterFont): string {
         <div class="grid gap-3 px-1">
           <div class="grid gap-2">
             <Label for="poster-font">{{ t("editor.font") }}</Label>
-            <Select :model-value="draft.font" @update:model-value="selectFont">
+            <Select :model-value="draft.font" @update:model-value="(value) => { if (typeof value === 'string') selectFont(value) }">
               <SelectTrigger id="poster-font" class="w-full">
                 <SelectValue :placeholder="t('editor.selectFont')" />
               </SelectTrigger>
@@ -532,7 +529,7 @@ function fontLabel(font: PosterFont): string {
 
           <div class="grid gap-2">
             <Label for="poster-swatch-shape">{{ t("editor.swatchShape") }}</Label>
-            <Select :model-value="draft.swatchShape" @update:model-value="updateSwatchShape">
+            <Select :model-value="draft.swatchShape" @update:model-value="(value) => { if (typeof value === 'string') updateSwatchShape(value) }">
               <SelectTrigger id="poster-swatch-shape" class="w-full">
                 <SelectValue :placeholder="t('editor.swatchShape')" />
               </SelectTrigger>
@@ -572,7 +569,7 @@ function fontLabel(font: PosterFont): string {
         <div class="grid gap-3 px-1">
           <div class="grid gap-2">
             <Label for="poster-background-mode">{{ t("editor.backgroundMode") }}</Label>
-            <Select :model-value="draft.backgroundMode" @update:model-value="updateBackgroundMode">
+            <Select :model-value="draft.backgroundMode" @update:model-value="(value) => { if (typeof value === 'string') updateBackgroundMode(value) }">
               <SelectTrigger id="poster-background-mode" class="w-full">
                 <SelectValue :placeholder="t('editor.backgroundMode')" />
               </SelectTrigger>
@@ -625,7 +622,7 @@ function fontLabel(font: PosterFont): string {
               <Label for="poster-bg-direction">{{ t("editor.direction") }}</Label>
               <Select
                 :model-value="draft.backgroundGradientDirection"
-                @update:model-value="updateBackgroundGradientDirection"
+                @update:model-value="(value) => { if (typeof value === 'string') updateBackgroundGradientDirection(value) }"
               >
                 <SelectTrigger id="poster-bg-direction" class="w-full">
                   <SelectValue :placeholder="t('editor.direction')" />
@@ -689,7 +686,7 @@ function fontLabel(font: PosterFont): string {
         </h3>
         <div class="grid gap-2 px-1">
           <Label for="poster-layout">{{ t("editor.spacing") }}</Label>
-          <Select :model-value="draft.layout" @update:model-value="updateLayout">
+          <Select :model-value="draft.layout" @update:model-value="(value) => { if (typeof value === 'string') updateLayout(value) }">
             <SelectTrigger id="poster-layout" class="w-full">
               <SelectValue :placeholder="t('editor.spacing')" />
             </SelectTrigger>

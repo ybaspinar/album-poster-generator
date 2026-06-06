@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
+import Button from "@/components/ui/button/Button.vue";
+import Card from "@/components/ui/card/Card.vue";
 import { Input } from "@/components/ui/input";
 import AlbumSearch from "./AlbumSearch.vue";
 import { searchMusicBrainzAlbums } from "../sources/musicbrainz";
@@ -172,7 +172,7 @@ describe("AlbumSearch", () => {
     const recentButtons = wrapper.findAll("button").filter((b) => b.text() === "vespertine");
     expect(recentButtons.length).toBeGreaterThan(0);
 
-    await recentButtons[0].trigger("mousedown");
+    await recentButtons[0]!.trigger("mousedown");
     await Promise.resolve();
     await Promise.resolve();
 

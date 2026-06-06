@@ -1,26 +1,63 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2024",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "lib": ["ES2024", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
-    "moduleResolution": "Bundler",
-    "allowImportingTsExtensions": true,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "preserve",
+
+    // Core strictness
     "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "useUnknownInCatchVariables": true,
+
+    // Extra strictness beyond "strict"
+    // "exactOptionalPropertyTypes": true,  // too strict for Vue/reka-ui v-bind
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    // "noPropertyAccessFromIndexSignature": true,  // noisy for import.meta.env
+
+    // Dead / suspicious code
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+
+    // Module/import correctness
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "forceConsistentCasingInFileNames": true,
     "noUncheckedSideEffectImports": true,
+
+    // Modern output / bundler setup
+    "target": "ES2024",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "jsx": "preserve",
+
+    // Do not emit from tsc in Vite apps
+    "noEmit": true,
+
+    // Interop / resolution
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "moduleDetection": "force",
+    "useDefineForClassFields": true,
+
+    // Quality of life
+    "skipLibCheck": true,
+
+    // Project-specific
     "types": ["vitest/globals"],
     "paths": {
       "@/*": ["./src/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
+  "exclude": ["node_modules", "dist"]
 }

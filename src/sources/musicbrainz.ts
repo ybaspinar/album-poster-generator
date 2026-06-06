@@ -174,7 +174,7 @@ export async function fetchMusicBrainzTracklistForRelease(
 
 function stringQueryToSearchParams(normalizedQuery: string): MusicBrainzSearchParams {
   const dashSplit = normalizedQuery.split(/\s+-\s+/);
-  if (dashSplit.length === 2 && dashSplit[0].length > 0 && dashSplit[1].length > 0) {
+  if (dashSplit.length === 2 && dashSplit[0]!.length > 0 && dashSplit[1]!.length > 0) {
     return { artist: dashSplit[0], title: dashSplit[1] };
   }
   return { title: normalizedQuery };

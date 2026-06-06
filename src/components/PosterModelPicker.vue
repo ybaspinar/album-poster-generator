@@ -2,8 +2,12 @@
 import { computed } from "vue";
 import { useI18n } from "vue-i18n";
 import { ArrowLeft } from "@lucide/vue";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import Button from "@/components/ui/button/Button.vue";
+import Card from "@/components/ui/card/Card.vue";
+import CardContent from "@/components/ui/card/CardContent.vue";
+import CardDescription from "@/components/ui/card/CardDescription.vue";
+import CardHeader from "@/components/ui/card/CardHeader.vue";
+import CardTitle from "@/components/ui/card/CardTitle.vue";
 import type { AlbumDraft } from "../domain/album";
 import { applyPosterModel, posterModels, type PosterModelId } from "../domain/poster-models";
 import PosterPreview from "./PosterPreview.vue";

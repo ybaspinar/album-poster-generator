@@ -121,15 +121,39 @@ function getFontFamily(_font: PosterFont): string {
     gotham: "'Gotham', 'Helvetica Neue', Arial, sans-serif",
     inter: "Inter, ui-sans-serif, system-ui, sans-serif",
     system: "system-ui, ui-sans-serif, sans-serif",
+    Roboto: getFontFamilyString("Roboto"),
+    "Open Sans": getFontFamilyString("Open Sans"),
+    Lato: getFontFamilyString("Lato"),
+    Montserrat: getFontFamilyString("Montserrat"),
+    Poppins: getFontFamilyString("Poppins"),
+    Raleway: getFontFamilyString("Raleway"),
+    "Noto Sans": getFontFamilyString("Noto Sans"),
+    "Source Sans Pro": getFontFamilyString("Source Sans Pro"),
+    Nunito: getFontFamilyString("Nunito"),
+    Oswald: getFontFamilyString("Oswald"),
+    Ubuntu: getFontFamilyString("Ubuntu"),
+    "Work Sans": getFontFamilyString("Work Sans"),
+    Rubik: getFontFamilyString("Rubik"),
+    "IBM Plex Sans": getFontFamilyString("IBM Plex Sans"),
+    Karla: getFontFamilyString("Karla"),
+    "Space Grotesk": getFontFamilyString("Space Grotesk"),
+    "Bebas Neue": getFontFamilyString("Bebas Neue"),
+    Teko: getFontFamilyString("Teko"),
+    "Playfair Display": getFontFamilyString("Playfair Display"),
+    Merriweather: getFontFamilyString("Merriweather"),
+    Lora: getFontFamilyString("Lora"),
+    "Crimson Text": getFontFamilyString("Crimson Text"),
+    "Cormorant Garamond": getFontFamilyString("Cormorant Garamond"),
+    "Zilla Slab": getFontFamilyString("Zilla Slab"),
+    "Permanent Marker": getFontFamilyString("Permanent Marker"),
+    Pacifico: getFontFamilyString("Pacifico"),
+    "Dancing Script": getFontFamilyString("Dancing Script"),
+    Courgette: getFontFamilyString("Courgette"),
+    Bangers: getFontFamilyString("Bangers"),
+    Anton: getFontFamilyString("Anton"),
   };
 
-  // Check if it's a built-in font
-  if (_font in fonts) {
-    return fonts[_font as keyof typeof fonts];
-  }
-
-  // It's a Google Font
-  return getFontFamilyString(_font);
+  return fonts[_font];
 }
 
 // Load Google Font when font changes

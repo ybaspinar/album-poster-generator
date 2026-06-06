@@ -56,8 +56,8 @@ export const posterModels: PosterModel[] = [
   },
 ];
 
-export function getPosterModel(id: string): PosterModel {
-  return posterModels.find((model) => model.id === id) ?? posterModels[0];
+function getPosterModel(id: string): PosterModel {
+  return posterModels.find((model) => model.id === id)!;
 }
 
 export function applyPosterModel(draft: AlbumDraft, modelId: string): AlbumDraft {

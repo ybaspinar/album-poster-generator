@@ -3,6 +3,7 @@ import { createPinia } from "pinia";
 import { i18n } from "./i18n";
 import { capturePostHogException, initPostHog } from "./analytics/posthog";
 import App from "./App.vue";
+// oxlint-disable-next-line import/no-unassigned-import
 import "./styles/globals.css";
 
 initPostHog({
